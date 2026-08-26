@@ -224,6 +224,29 @@
   box-shadow: 0 0 0 4px rgba(121, 151, 126, 0.13);
 }
 
+.journey-consent {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  color: #718075;
+  cursor: pointer;
+  font-size: 0.73rem;
+  line-height: 1.55;
+}
+
+.journey-consent input {
+  width: 17px;
+  height: 17px;
+  margin: 2px 0 0;
+  accent-color: #587862;
+}
+
+.journey-consent input:focus-visible {
+  outline: 3px solid rgba(71, 103, 83, 0.24);
+  outline-offset: 3px;
+}
+
 .journey-button {
   display: flex;
   min-height: 58px;

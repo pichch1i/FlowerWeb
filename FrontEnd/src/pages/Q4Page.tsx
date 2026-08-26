@@ -30,7 +30,10 @@ const q4Options = [
 ] as const
 
 type Q4PageProps = {
-  onAnswer: (emotion: (typeof q4Options)[number]['emotion']) => void
+  onAnswer: (
+    optionId: (typeof q4Options)[number]['id'],
+    emotion: (typeof q4Options)[number]['emotion'],
+  ) => void
 }
 
 function Q4Page({ onAnswer }: Q4PageProps) {
@@ -73,7 +76,10 @@ function Q4Page({ onAnswer }: Q4PageProps) {
                 aria-pressed={isSelected}
                 onClick={() => {
                   setSelectedAnswer(option.id)
-                  window.setTimeout(() => onAnswer(option.emotion), 220)
+                  window.setTimeout(
+                    () => onAnswer(option.id, option.emotion),
+                    220,
+                  )
                 }}
               >
                 <span className="q1-option__letter" aria-hidden="true">

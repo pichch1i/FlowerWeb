@@ -1,8 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   detectDominantEmotion,
+  emotionResults,
   type Emotion,
 } from './data/emotionResults'
+import type {
+  PlayerInfo,
+  QuizAnswer,
+  QuizOptionId,
+} from './data/quizSubmission'
+import { submitQuizResponse } from './services/googleSheets'
 import IntroPage from './pages/IntroPage'
 import PlayerInfoPage from './pages/PlayerInfoPage'
 import ResultPage from './pages/ResultPage'
@@ -28,48 +35,146 @@ type Page =
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('intro')
-  const [answers, setAnswers] = useState<Emotion[]>([])
+  const [playerInfo, setPlayerInfo] = useState<PlayerInfo | null>(null)
+  const [answers, setAnswers] = useState<QuizAnswer[]>([])
+  const [submissionId, setSubmissionId] = useState('')
+  const submissionAttempted = useRef(false)
 
-  const recordAnswer = (emotion: Emotion, nextPage: Page) => {
-    setAnswers((currentAnswers) => [...currentAnswers, emotion])
+  const resultEmotion = detectDominantEmotion(
+    answers.map((answer) => answer.emotion),
+  )
+
+  useEffect(() => {
+    if (
+      currentPage !== 'result' ||
+      !playerInfo ||
+      answers.length !== 7 ||
+      !submissionId ||
+      submissionAttempted.current
+    ) {
+      return
+    }
+
+    submissionAttempted.current = true
+    const result = emotionResults[resultEmotion]
+
+    void submitQuizResponse({
+      submissionId,
+      submittedAt: new Date().toISOString(),
+      player: playerInfo,
+      answers,
+      result: {
+        emotion: resultEmotion,
+        flower: result.flower,
+        resultTitle: result.resultTitle,
+      },
+    }).catch(() => {
+      submissionAttempted.current = false
+    })
+  }, [answers, currentPage, playerInfo, resultEmotion, submissionId])
+
+  const startQuiz = (nextPlayerInfo: PlayerInfo) => {
+    const nextSubmissionId =
+      globalThis.crypto?.randomUUID?.() ??
+      `flower-${Date.now()}-${Math.random().toString(36).slice(2)}`
+
+    setPlayerInfo(nextPlayerInfo)
+    setAnswers([])
+    setSubmissionId(nextSubmissionId)
+    submissionAttempted.current = false
+    setCurrentPage('q1')
+  }
+
+  const recordAnswer = (
+    question: number,
+    optionId: QuizOptionId,
+    emotion: Emotion,
+    nextPage: Page,
+  ) => {
+    setAnswers((currentAnswers) => [
+      ...currentAnswers,
+      { question, optionId, emotion },
+    ])
     setCurrentPage(nextPage)
   }
 
   const pageContent = (() => {
     if (currentPage === 'player-info') {
-      return <PlayerInfoPage onContinue={() => setCurrentPage('q1')} />
+      return <PlayerInfoPage onContinue={startQuiz} />
     }
 
     if (currentPage === 'q1') {
-      return <Q1Page onAnswer={(emotion) => recordAnswer(emotion, 'q2')} />
+      return (
+        <Q1Page
+          onAnswer={(optionId, emotion) =>
+            recordAnswer(1, optionId, emotion, 'q2')
+          }
+        />
+      )
     }
 
     if (currentPage === 'q2') {
-      return <Q2Page onAnswer={(emotion) => recordAnswer(emotion, 'q3')} />
+      return (
+        <Q2Page
+          onAnswer={(optionId, emotion) =>
+            recordAnswer(2, optionId, emotion, 'q3')
+          }
+        />
+      )
     }
 
     if (currentPage === 'q3') {
-      return <Q3Page onAnswer={(emotion) => recordAnswer(emotion, 'q4')} />
+      return (
+        <Q3Page
+          onAnswer={(optionId, emotion) =>
+            recordAnswer(3, optionId, emotion, 'q4')
+          }
+        />
+      )
     }
 
     if (currentPage === 'q4') {
-      return <Q4Page onAnswer={(emotion) => recordAnswer(emotion, 'q5')} />
+      return (
+        <Q4Page
+          onAnswer={(optionId, emotion) =>
+            recordAnswer(4, optionId, emotion, 'q5')
+          }
+        />
+      )
     }
 
     if (currentPage === 'q5') {
-      return <Q5Page onAnswer={(emotion) => recordAnswer(emotion, 'q6')} />
+      return (
+        <Q5Page
+          onAnswer={(optionId, emotion) =>
+            recordAnswer(5, optionId, emotion, 'q6')
+          }
+        />
+      )
     }
 
     if (currentPage === 'q6') {
-      return <Q6Page onAnswer={(emotion) => recordAnswer(emotion, 'q7')} />
+      return (
+        <Q6Page
+          onAnswer={(optionId, emotion) =>
+            recordAnswer(6, optionId, emotion, 'q7')
+          }
+        />
+      )
     }
 
     if (currentPage === 'q7') {
-      return <Q7Page onAnswer={(emotion) => recordAnswer(emotion, 'result')} />
+      return (
+        <Q7Page
+          onAnswer={(optionId, emotion) =>
+            recordAnswer(7, optionId, emotion, 'result')
+          }
+        />
+      )
     }
 
     if (currentPage === 'result') {
-      return <ResultPage emotion={detectDominantEmotion(answers)} />
+      return <ResultPage emotion={resultEmotion} />
     }
 
     return <IntroPage onStart={() => setCurrentPage('player-info')} />

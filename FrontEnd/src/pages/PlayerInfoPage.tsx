@@ -1,10 +1,11 @@
 import { type FormEvent, useState } from 'react'
+import type { PlayerInfo } from '../data/quizSubmission'
 import './PlayerInfoPage.css'
 
 const ageOptions = Array.from({ length: 70 }, (_, index) => index + 1)
 
 type PlayerInfoPageProps = {
-  onContinue: () => void
+  onContinue: (playerInfo: PlayerInfo) => void
 }
 
 function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
@@ -12,7 +13,13 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    onContinue()
+    const formData = new FormData(event.currentTarget)
+
+    onContinue({
+      fullName: String(formData.get('fullName') ?? '').trim(),
+      age: Number(age),
+      occupation: String(formData.get('occupation') ?? '').trim(),
+    })
   }
 
   return (
@@ -103,6 +110,14 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
               />
             </label>
           </div>
+
+          <label className="journey-consent">
+            <input type="checkbox" name="dataConsent" required />
+            <span>
+              ฉันยินยอมให้บันทึกข้อมูลและคำตอบนี้ใน Google Sheet
+              เพื่อจัดเก็บผลการทำแบบทดสอบ
+            </span>
+          </label>
 
           <button className="journey-button" type="submit">
             <span>เริ่มออกเดินทาง</span>
