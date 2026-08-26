@@ -1,0 +1,343 @@
+.intro-page {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 100vh;
+  place-items: center;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 22px 14px;
+  padding:
+    max(22px, env(safe-area-inset-top))
+    max(14px, env(safe-area-inset-right))
+    max(22px, env(safe-area-inset-bottom))
+    max(14px, env(safe-area-inset-left));
+  color: #344d3d;
+  border: 0;
+  background-color: #dcea8f;
+  box-sizing: border-box;
+}
+
+.intro-page::before {
+  position: absolute;
+  z-index: -2;
+  inset: -8px;
+  background-color: #dcea8f;
+  background-image: url('/player-info-background.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  content: '';
+}
+
+.intro-page::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.12) 45%,
+    rgba(34, 13, 70, 0.08) 100%
+  );
+  content: '';
+  pointer-events: none;
+}
+
+@supports (min-height: 100svh) {
+  .intro-page {
+    min-height: 100svh;
+  }
+}
+
+.intro-card {
+  position: relative;
+  width: min(100%, 620px);
+  padding: 46px 24px 38px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 30px 8px 30px 8px;
+  background: rgba(255, 253, 246, 0.94);
+  box-shadow: 0 24px 64px rgba(32, 16, 59, 0.2);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+@supports ((-webkit-backdrop-filter: blur(16px)) or (backdrop-filter: blur(16px))) {
+  .intro-card {
+    background: rgba(255, 253, 246, 0.87);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+}
+
+.intro-eyebrow {
+  margin: 0 0 12px;
+  color: #966c61;
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+}
+
+.intro-card h1 {
+  margin: 0;
+  color: #2e4938;
+  font-size: clamp(2.35rem, 11vw, 3.1rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+
+.intro-card h1 span {
+  display: block;
+  color: #56745e;
+  font-size: 0.72em;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+}
+
+.intro-message {
+  display: grid;
+  gap: 13px;
+  margin: 28px auto 0;
+  color: #697a6d;
+  font-size: 0.97rem;
+  line-height: 1.7;
+}
+
+.intro-message p {
+  margin: 0;
+}
+
+.intro-message strong,
+.intro-message em {
+  color: #405d49;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.intro-reassurance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 25px 0 0;
+  color: #865f57;
+  font-size: 1.08rem;
+}
+
+.intro-reassurance span {
+  color: #d9a092;
+  font-size: 0.68rem;
+}
+
+.intro-time {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  padding: 4px 13px;
+  border-radius: 999px;
+  color: #607264;
+  background: rgba(111, 143, 116, 0.1);
+  font-size: 0.82rem;
+}
+
+.intro-time__clock {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+.intro-time__clock::before,
+.intro-time__clock::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  border-radius: 1px;
+  background: currentColor;
+  content: '';
+  transform-origin: bottom;
+}
+
+.intro-time__clock::before {
+  height: 4px;
+  transform: translate(-50%, -100%);
+}
+
+.intro-time__clock::after {
+  height: 3px;
+  transform: translate(-50%, -100%) rotate(120deg);
+}
+
+.intro-button {
+  display: flex;
+  width: 100%;
+  min-height: 58px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 16px 6px 16px 6px;
+  color: #fffdf7;
+  background: linear-gradient(115deg, #476753, #66866e);
+  box-shadow: 0 12px 26px rgba(55, 87, 65, 0.22);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.97rem;
+  font-weight: 400;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.intro-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(55, 87, 65, 0.28);
+}
+
+.intro-button:active {
+  transform: translateY(0);
+}
+
+.intro-button:focus-visible {
+  outline: 3px solid rgba(71, 103, 83, 0.3);
+  outline-offset: 4px;
+}
+
+.intro-button__arrow {
+  font-family: system-ui, sans-serif;
+  font-size: 1.25rem;
+  transition: transform 180ms ease;
+}
+
+.intro-button:hover .intro-button__arrow {
+  transform: translateX(4px);
+}
+
+.intro-flower {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
+}
+
+.intro-flower__petal,
+.intro-flower__center {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.intro-flower__petal {
+  width: 22px;
+  height: 22px;
+  background: #e5a798;
+}
+
+.intro-flower__petal--top {
+  top: 0;
+  left: 15px;
+}
+
+.intro-flower__petal--right {
+  top: 15px;
+  right: 0;
+}
+
+.intro-flower__petal--bottom {
+  bottom: 0;
+  left: 15px;
+}
+
+.intro-flower__petal--left {
+  top: 15px;
+  left: 0;
+}
+
+.intro-flower__center {
+  z-index: 1;
+  top: 17px;
+  left: 17px;
+  width: 18px;
+  height: 18px;
+  background: #d6bc64;
+  box-shadow: 0 0 0 4px #fffaf0;
+}
+
+.intro-sprig {
+  position: absolute;
+  right: -22px;
+  bottom: -28px;
+  width: 132px;
+  height: 116px;
+  opacity: 0.2;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+.intro-sprig__stem {
+  position: absolute;
+  right: 65px;
+  bottom: -8px;
+  width: 2px;
+  height: 126px;
+  border-radius: 50%;
+  background: #6e9676;
+  transform: rotate(36deg);
+  transform-origin: bottom;
+}
+
+.intro-sprig__leaf {
+  position: absolute;
+  width: 42px;
+  height: 22px;
+  border-radius: 100% 0 100% 0;
+  background: #7aa080;
+}
+
+.intro-sprig__leaf--one {
+  right: 32px;
+  bottom: 42px;
+  transform: rotate(28deg);
+}
+
+.intro-sprig__leaf--two {
+  right: 68px;
+  bottom: 64px;
+  transform: rotate(205deg);
+}
+
+.intro-sprig__leaf--three {
+  right: 14px;
+  bottom: 86px;
+  transform: rotate(18deg) scale(0.8);
+}
+
+@media (min-width: 641px) {
+  .intro-page {
+    padding: 56px 24px;
+  }
+
+  .intro-card {
+    padding: 58px 68px 52px;
+    border-radius: 38px 10px 38px 10px;
+  }
+
+  .intro-message {
+    margin-top: 31px;
+    font-size: 1.03rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-button,
+  .intro-button__arrow {
+    transition: none;
+  }
+}

@@ -1,0 +1,32 @@
+@import './Q1Page.css';
+
+.q5-panel {
+  background:
+    radial-gradient(circle at 8% 3%, rgba(211, 180, 210, 0.9), transparent 37%),
+    radial-gradient(circle at 91% 35%, rgba(124, 79, 145, 0.5), transparent 45%),
+    linear-gradient(155deg, #8f758f 0%, #65496f 36%, #2f274b 100%);
+}
+
+.q5-panel .q1-story__eyebrow {
+  color: #f2ddee;
+}
+
+.q5-story__quote {
+  display: inline-block;
+  margin: 10px 0 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  color: #fff4fb;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.q5-story h1 {
+  margin-top: 14px;
+}
+
+.q5-panel .q1-option__letter {
+  color: #725470;
+  background: #f1dff0;
+}

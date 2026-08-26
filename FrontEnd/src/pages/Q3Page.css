@@ -1,0 +1,17 @@
+@import './Q1Page.css';
+
+.q3-panel {
+  background:
+    radial-gradient(circle at 7% 4%, rgba(161, 209, 188, 0.9), transparent 37%),
+    radial-gradient(circle at 93% 37%, rgba(58, 104, 112, 0.48), transparent 45%),
+    linear-gradient(155deg, #547f78 0%, #2e5a61 35%, #162b3c 100%);
+}
+
+.q3-panel .q1-story__eyebrow {
+  color: #d8f2e5;
+}
+
+.q3-panel .q1-option__letter {
+  color: #3c665b;
+  background: #d8efe6;
+}

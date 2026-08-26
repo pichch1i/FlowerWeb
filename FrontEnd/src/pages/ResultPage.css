@@ -1,0 +1,314 @@
+.result-page {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 100vh;
+  place-items: center;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 22px 14px;
+  padding:
+    max(22px, env(safe-area-inset-top))
+    max(14px, env(safe-area-inset-right))
+    max(22px, env(safe-area-inset-bottom))
+    max(14px, env(safe-area-inset-left));
+  color: #344d3d;
+  background-color: #dcea8f;
+  box-sizing: border-box;
+}
+
+.result-page::before {
+  position: absolute;
+  z-index: -2;
+  inset: -8px;
+  background-color: #dcea8f;
+  background-image: url('/player-info-background.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  content: '';
+}
+
+.result-page::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.14) 44%,
+    rgba(40, 20, 73, 0.09) 100%
+  );
+  content: '';
+  pointer-events: none;
+}
+
+@supports (min-height: 100svh) {
+  .result-page {
+    min-height: 100svh;
+  }
+}
+
+.result-card {
+  --result-petal-start: #bda7df;
+  --result-petal-end: #816aae;
+  --result-center: #e1c76d;
+  --result-leaf: #83a58a;
+  position: relative;
+  width: min(100%, 680px);
+  padding: 42px 24px 38px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 32px 8px 32px 8px;
+  background: rgba(255, 253, 246, 0.95);
+  box-shadow: 0 24px 68px rgba(38, 22, 66, 0.21);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.result-card[data-emotion='hope'] {
+  --result-petal-start: #f5d85f;
+  --result-petal-end: #e5a72e;
+  --result-center: #765124;
+  --result-leaf: #78a362;
+}
+
+.result-card[data-emotion='serenity'] {
+  --result-petal-start: #fffef8;
+  --result-petal-end: #e9eadf;
+  --result-center: #e4bf55;
+  --result-leaf: #79a68a;
+}
+
+.result-card[data-emotion='sadness'] {
+  --result-petal-start: #f0a8b1;
+  --result-petal-end: #bc5c74;
+  --result-center: #d8b76b;
+  --result-leaf: #7f9e84;
+}
+
+.result-card[data-emotion='frustration'] {
+  --result-petal-start: #f2df73;
+  --result-petal-end: #d5ad32;
+  --result-center: #9b7227;
+  --result-leaf: #6d9964;
+}
+
+@supports ((-webkit-backdrop-filter: blur(16px)) or (backdrop-filter: blur(16px))) {
+  .result-card {
+    background: rgba(255, 253, 246, 0.88);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+}
+
+.result-eyebrow {
+  margin: 18px 0 0;
+  color: #8d665d;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+}
+
+.result-card h1 {
+  margin: 5px 0 0;
+  color: #2e4938;
+  font-size: clamp(2.25rem, 10vw, 3.25rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.result-flower-name {
+  margin: 9px 0 0;
+  color: #7c665f;
+  font-size: 1rem;
+}
+
+.result-description {
+  margin: 22px 0 0;
+  color: #6b7b6e;
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+
+.result-message {
+  margin-top: 27px;
+  padding: 21px 18px 22px;
+  border-radius: 22px 6px 22px 6px;
+  background: rgba(111, 143, 116, 0.1);
+}
+
+.result-message p {
+  margin: 0;
+  color: #718075;
+  font-size: 0.79rem;
+}
+
+.result-message blockquote {
+  margin: 9px 0 0;
+  color: #3f604b;
+  font-size: clamp(1.25rem, 6vw, 1.65rem);
+  line-height: 1.4;
+}
+
+.result-emotion {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  color: #6f6d73;
+  background: rgba(133, 119, 148, 0.1);
+  font-family: system-ui, sans-serif;
+  font-size: 0.67rem;
+  letter-spacing: 0.02em;
+}
+
+.result-emotion strong {
+  color: #665277;
+  font-weight: 600;
+}
+
+.result-flower {
+  position: relative;
+  width: 112px;
+  height: 142px;
+  margin: 0 auto;
+}
+
+.result-flower__petal,
+.result-flower__center,
+.result-flower__stem,
+.result-flower__leaf {
+  position: absolute;
+}
+
+.result-flower__petal {
+  z-index: 1;
+  top: 20px;
+  left: 39px;
+  width: 36px;
+  height: 45px;
+  border-radius: 65% 65% 55% 55%;
+  background: linear-gradient(
+    180deg,
+    var(--result-petal-start),
+    var(--result-petal-end)
+  );
+  transform-origin: 18px 35px;
+  box-shadow: inset 0 -4px 10px rgba(126, 68, 91, 0.1);
+}
+
+.result-flower__petal--one {
+  transform: translateY(-16px);
+}
+
+.result-flower__petal--two {
+  transform: rotate(72deg) translateY(-16px);
+}
+
+.result-flower__petal--three {
+  transform: rotate(144deg) translateY(-16px);
+}
+
+.result-flower__petal--four {
+  transform: rotate(216deg) translateY(-16px);
+}
+
+.result-flower__petal--five {
+  transform: rotate(288deg) translateY(-16px);
+}
+
+.result-flower__center {
+  z-index: 2;
+  top: 38px;
+  left: 45px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--result-center);
+  box-shadow: 0 0 0 5px rgba(255, 250, 240, 0.88);
+}
+
+.result-flower__stem {
+  z-index: 0;
+  top: 59px;
+  left: 55px;
+  width: 4px;
+  height: 78px;
+  border-radius: 999px;
+  background: #6f9777;
+}
+
+.result-flower__leaf {
+  z-index: 1;
+  top: 93px;
+  width: 34px;
+  height: 18px;
+  background: var(--result-leaf);
+}
+
+.result-card[data-emotion='sadness'] .result-flower__petal {
+  background: repeating-linear-gradient(
+    155deg,
+    var(--result-petal-start) 0 8px,
+    #f6d6d7 8px 12px,
+    var(--result-petal-end) 12px 19px
+  );
+}
+
+.result-flower__leaf--left {
+  left: 24px;
+  border-radius: 100% 0 100% 0;
+  transform: rotate(18deg);
+}
+
+.result-flower__leaf--right {
+  right: 22px;
+  border-radius: 0 100% 0 100%;
+  transform: rotate(-18deg);
+}
+
+.result-sparkles span {
+  position: absolute;
+  color: rgba(215, 167, 107, 0.45);
+  font-family: system-ui, sans-serif;
+}
+
+.result-sparkles span:nth-child(1) {
+  top: 42px;
+  left: 42px;
+  font-size: 0.8rem;
+}
+
+.result-sparkles span:nth-child(2) {
+  top: 92px;
+  right: 34px;
+  font-size: 1rem;
+}
+
+.result-sparkles span:nth-child(3) {
+  right: 60px;
+  bottom: 52px;
+  font-size: 0.65rem;
+}
+
+@media (min-width: 641px) {
+  .result-page {
+    padding: 56px 24px;
+  }
+
+  .result-card {
+    padding: 52px 70px 48px;
+    border-radius: 40px 10px 40px 10px;
+  }
+
+  .result-description {
+    font-size: 1rem;
+  }
+
+  .result-message {
+    padding: 24px 24px 26px;
+  }
+}
