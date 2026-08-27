@@ -9,7 +9,7 @@
     max(12px, env(safe-area-inset-right))
     max(12px, env(safe-area-inset-bottom))
     max(12px, env(safe-area-inset-left));
-  background: #f7f4ee;
+  background: #d8d5d0;
   box-sizing: border-box;
 }
 
@@ -29,9 +29,9 @@
   border-radius: 34px;
   color: #fffdf7;
   background:
-    radial-gradient(circle at 7% 4%, rgba(154, 211, 238, 0.95), transparent 38%),
-    radial-gradient(circle at 94% 38%, rgba(45, 76, 145, 0.5), transparent 46%),
-    linear-gradient(155deg, #567aac 0%, #243f7f 36%, #121d43 100%);
+    radial-gradient(circle at 7% 4%, rgba(151, 184, 199, 0.88), transparent 38%),
+    radial-gradient(circle at 94% 38%, rgba(70, 82, 116, 0.48), transparent 46%),
+    linear-gradient(155deg, #65798c 0%, #404f68 36%, #222a3b 100%);
   box-shadow: 0 20px 54px rgba(17, 29, 66, 0.2);
   box-sizing: border-box;
 }

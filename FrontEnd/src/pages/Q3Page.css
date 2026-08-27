@@ -2,9 +2,9 @@
 
 .q3-panel {
   background:
-    radial-gradient(circle at 7% 4%, rgba(161, 209, 188, 0.9), transparent 37%),
-    radial-gradient(circle at 93% 37%, rgba(58, 104, 112, 0.48), transparent 45%),
-    linear-gradient(155deg, #547f78 0%, #2e5a61 35%, #162b3c 100%);
+    radial-gradient(circle at 7% 4%, rgba(170, 198, 181, 0.86), transparent 37%),
+    radial-gradient(circle at 93% 37%, rgba(79, 107, 108, 0.46), transparent 45%),
+    linear-gradient(155deg, #647c72 0%, #415c59 35%, #24353a 100%);
 }
 
 .q3-panel .q1-story__eyebrow {

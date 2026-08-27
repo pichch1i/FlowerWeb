@@ -6,6 +6,14 @@ export type PlayerInfo = {
   occupation: string
 }
 
+export const PRIVACY_NOTICE_VERSION = '2026-08-27'
+
+export type PrivacyConsent = {
+  accepted: true
+  acceptedAt: string
+  noticeVersion: typeof PRIVACY_NOTICE_VERSION
+}
+
 export type QuizOptionId = 'A' | 'B' | 'C' | 'D' | 'E'
 
 export type QuizAnswer = {
@@ -18,6 +26,7 @@ export type QuizSubmission = {
   submissionId: string
   submittedAt: string
   player: PlayerInfo
+  consent: PrivacyConsent
   answers: QuizAnswer[]
   result: {
     emotion: Emotion

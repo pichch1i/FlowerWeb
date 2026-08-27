@@ -6,6 +6,7 @@ import {
 } from './data/emotionResults'
 import type {
   PlayerInfo,
+  PrivacyConsent,
   QuizAnswer,
   QuizOptionId,
 } from './data/quizSubmission'
@@ -36,6 +37,8 @@ type Page =
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('intro')
   const [playerInfo, setPlayerInfo] = useState<PlayerInfo | null>(null)
+  const [privacyConsent, setPrivacyConsent] =
+    useState<PrivacyConsent | null>(null)
   const [answers, setAnswers] = useState<QuizAnswer[]>([])
   const [submissionId, setSubmissionId] = useState('')
   const submissionAttempted = useRef(false)
@@ -48,6 +51,7 @@ function App() {
     if (
       currentPage !== 'result' ||
       !playerInfo ||
+      !privacyConsent ||
       answers.length !== 7 ||
       !submissionId ||
       submissionAttempted.current
@@ -62,6 +66,7 @@ function App() {
       submissionId,
       submittedAt: new Date().toISOString(),
       player: playerInfo,
+      consent: privacyConsent,
       answers,
       result: {
         emotion: resultEmotion,
@@ -71,14 +76,25 @@ function App() {
     }).catch(() => {
       submissionAttempted.current = false
     })
-  }, [answers, currentPage, playerInfo, resultEmotion, submissionId])
+  }, [
+    answers,
+    currentPage,
+    playerInfo,
+    privacyConsent,
+    resultEmotion,
+    submissionId,
+  ])
 
-  const startQuiz = (nextPlayerInfo: PlayerInfo) => {
+  const startQuiz = (
+    nextPlayerInfo: PlayerInfo,
+    nextPrivacyConsent: PrivacyConsent,
+  ) => {
     const nextSubmissionId =
       globalThis.crypto?.randomUUID?.() ??
       `flower-${Date.now()}-${Math.random().toString(36).slice(2)}`
 
     setPlayerInfo(nextPlayerInfo)
+    setPrivacyConsent(nextPrivacyConsent)
     setAnswers([])
     setSubmissionId(nextSubmissionId)
     submissionAttempted.current = false

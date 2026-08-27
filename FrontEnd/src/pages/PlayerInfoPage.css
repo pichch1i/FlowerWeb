@@ -14,7 +14,7 @@
     max(14px, env(safe-area-inset-left));
   color: #33473b;
   border: 0;
-  background-color: #dcea8f;
+  background-color: #aeb49a;
   box-sizing: border-box;
 }
 
@@ -22,11 +22,12 @@
   position: absolute;
   z-index: -2;
   inset: -8px;
-  background-color: #dcea8f;
+  background-color: #aeb49a;
   background-image: url('/player-info-background.png');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  filter: saturate(0.68) brightness(0.88) contrast(0.96);
   content: '';
 }
 
@@ -36,9 +37,9 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.08) 44%,
-    rgba(34, 13, 70, 0.08) 100%
+    rgba(63, 61, 68, 0.14) 0%,
+    rgba(75, 72, 76, 0.12) 44%,
+    rgba(34, 27, 49, 0.2) 100%
   );
   content: '';
   pointer-events: none;
@@ -172,6 +173,73 @@
   box-shadow: 0 0 0 4px rgba(121, 151, 126, 0.13);
 }
 
+.occupation-picker {
+  position: relative;
+}
+
+.occupation-picker select {
+  width: 100%;
+  min-height: 55px;
+  padding: 0 52px 0 18px;
+  border: 1px solid rgba(104, 133, 109, 0.22);
+  border-radius: 15px 5px 15px 5px;
+  outline: 0;
+  appearance: none;
+  color: #2f4436;
+  background: rgba(249, 249, 241, 0.78);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 400;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+  box-sizing: border-box;
+}
+
+.occupation-picker select:invalid {
+  color: #a7aea7;
+}
+
+.occupation-picker:hover select,
+.occupation-picker:focus-within select {
+  border-color: #79977e;
+  background: #fffefa;
+}
+
+.occupation-picker:focus-within select {
+  box-shadow: 0 0 0 4px rgba(121, 151, 126, 0.13);
+}
+
+.occupation-picker__chevron {
+  position: absolute;
+  top: 50%;
+  right: 21px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid #5c6f61;
+  border-bottom: 2px solid #5c6f61;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.journey-field .occupation-picker__other {
+  animation: occupation-field-in 180ms ease both;
+}
+
+@keyframes occupation-field-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .age-picker {
   position: relative;
 }
@@ -224,6 +292,105 @@
   box-shadow: 0 0 0 4px rgba(121, 151, 126, 0.13);
 }
 
+.journey-privacy {
+  display: grid;
+  gap: 13px;
+  padding: 17px;
+  border: 1px solid rgba(104, 133, 109, 0.18);
+  border-radius: 18px 7px 18px 7px;
+  color: #52685a;
+  background: rgba(241, 245, 232, 0.68);
+}
+
+.journey-privacy__heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.journey-privacy__badge {
+  display: inline-grid;
+  min-width: 46px;
+  min-height: 30px;
+  place-items: center;
+  border-radius: 999px;
+  color: #fffdf7;
+  background: #5f8068;
+  font-family: system-ui, sans-serif;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.journey-privacy h2,
+.journey-privacy h3,
+.journey-privacy p {
+  margin: 0;
+}
+
+.journey-privacy h2 {
+  color: #3e5847;
+  font-size: 0.89rem;
+  font-weight: 400;
+}
+
+.journey-privacy__heading p {
+  margin-top: 2px;
+  color: #819086;
+  font-size: 0.68rem;
+}
+
+.journey-privacy__summary {
+  font-size: 0.73rem;
+  line-height: 1.65;
+}
+
+.journey-privacy__details {
+  border-top: 1px solid rgba(104, 133, 109, 0.16);
+  padding-top: 10px;
+}
+
+.journey-privacy__details summary {
+  color: #4d7158;
+  cursor: pointer;
+  font-size: 0.73rem;
+  list-style-position: inside;
+}
+
+.journey-privacy__details summary:focus-visible {
+  border-radius: 5px;
+  outline: 3px solid rgba(71, 103, 83, 0.2);
+  outline-offset: 3px;
+}
+
+.journey-privacy__content {
+  display: grid;
+  gap: 7px;
+  margin-top: 13px;
+  padding: 13px;
+  border-radius: 12px 4px 12px 4px;
+  background: rgba(255, 254, 250, 0.68);
+  font-size: 0.68rem;
+  line-height: 1.6;
+}
+
+.journey-privacy__content h3 {
+  margin-top: 5px;
+  color: #3e5847;
+  font-size: 0.73rem;
+  font-weight: 400;
+}
+
+.journey-privacy__content h3:first-child {
+  margin-top: 0;
+}
+
+.journey-privacy__content small {
+  margin-top: 5px;
+  color: #89938c;
+  font-size: 0.61rem;
+}
+
 .journey-consent {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);
@@ -231,6 +398,7 @@
   gap: 10px;
   color: #718075;
   cursor: pointer;
+  padding: 0 3px;
   font-size: 0.73rem;
   line-height: 1.55;
 }
@@ -430,7 +598,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .journey-button,
-  .journey-button__arrow {
+  .journey-button__arrow,
+  .journey-field .occupation-picker__other {
+    animation: none;
     transition: none;
   }
 }
