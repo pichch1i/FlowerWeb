@@ -9,7 +9,7 @@
     max(12px, env(safe-area-inset-right))
     max(12px, env(safe-area-inset-bottom))
     max(12px, env(safe-area-inset-left));
-  background: #d8d5d0;
+  background: #050405 url('/flower-grid-pixel-bg.jpg') center / cover no-repeat;
   box-sizing: border-box;
 }
 
@@ -29,10 +29,11 @@
   border-radius: 34px;
   color: #fffdf7;
   background:
-    radial-gradient(circle at 7% 4%, rgba(151, 184, 199, 0.88), transparent 38%),
-    radial-gradient(circle at 94% 38%, rgba(70, 82, 116, 0.48), transparent 46%),
-    linear-gradient(155deg, #65798c 0%, #404f68 36%, #222a3b 100%);
-  box-shadow: 0 20px 54px rgba(17, 29, 66, 0.2);
+    linear-gradient(160deg, rgba(38, 19, 28, 0.8), rgba(8, 7, 12, 0.9)),
+    url('/flower-grid-pixel-bg.jpg') center / cover no-repeat;
+  box-shadow:
+    0 20px 54px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(242, 190, 150, 0.12);
   box-sizing: border-box;
 }
 

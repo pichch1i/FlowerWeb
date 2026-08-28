@@ -22,12 +22,12 @@
   position: absolute;
   z-index: -2;
   inset: -8px;
-  background-color: #aeb49a;
-  background-image: url('/player-info-background.png');
+  background-color: #050405;
+  background-image: url('/flower-grid-pixel-bg.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  filter: saturate(0.68) brightness(0.88) contrast(0.96);
+  filter: saturate(0.88) brightness(0.72) contrast(1.08);
   content: '';
 }
 
@@ -35,12 +35,9 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(63, 61, 68, 0.14) 0%,
-    rgba(75, 72, 76, 0.12) 44%,
-    rgba(34, 27, 49, 0.2) 100%
-  );
+  background:
+    radial-gradient(circle at 50% 46%, rgba(8, 5, 8, 0.08), rgba(2, 2, 3, 0.34) 82%),
+    linear-gradient(180deg, rgba(3, 2, 4, 0.24), transparent 46%, rgba(3, 2, 4, 0.34));
   content: '';
   pointer-events: none;
 }
