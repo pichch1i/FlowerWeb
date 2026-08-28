@@ -1,0 +1,62 @@
+name: Deploy Flower Journey to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: FrontEnd/package-lock.json
+
+      - name: Install dependencies
+        working-directory: FrontEnd
+        run: npm ci
+
+      - name: Build website
+        working-directory: FrontEnd
+        env:
+          VITE_GOOGLE_SHEETS_WEB_APP_URL: https://script.google.com/macros/s/AKfycbzive7lTYQct72zT2IeqnJGxx95Qy034Zntv0UKz0cZslowcmTTyk9u4ZdP0EnZrgVarQ/exec
+        run: npm run build
+
+      - name: Prepare static site
+        run: touch FrontEnd/dist/client/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: FrontEnd/dist/client
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
