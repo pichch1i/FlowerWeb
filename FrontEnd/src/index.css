@@ -1,23 +1,40 @@
 @font-face {
-  font-family: 'GMCkanomTian Demo';
-  src: url('./assets/font/GMCkanomTian demo.ttf') format('truetype');
+  font-family: 'JaoTomato Thin';
+  src: url('./assets/font/JaoTomato Thin.ttf') format('truetype');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Prompt ExtraLight';
+  src: url('./assets/font/Prompt/Prompt-ExtraLight.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+
 :root {
-  font-family:
-    'GMCkanomTian Demo',
-    'Noto Sans Thai',
-    'Leelawadee UI',
-    Tahoma,
+  --font-body:
+    'Prompt ExtraLight', 'Prompt', 'Noto Sans Thai', 'Leelawadee UI', Tahoma,
     sans-serif;
+  --font-heading:
+    'JaoTomato Thin', 'Noto Sans Thai', 'Leelawadee UI', Tahoma, sans-serif;
+  font-family: var(--font-body);
   font-size: 18px;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
 }
 
 * {
@@ -64,6 +81,8 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
