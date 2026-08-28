@@ -39,7 +39,54 @@ const ALLOWED_EMOTIONS = [
 
 const ALLOWED_OPTIONS = ['A', 'B', 'C', 'D', 'E'];
 
-function doGet() {
+const TOUCHDESIGNER_API_KEY_PROPERTY = 'TOUCHDESIGNER_API_KEY';
+const TOUCHDESIGNER_LATEST_RESULT_PROPERTY =
+  'TOUCHDESIGNER_LATEST_RESULT';
+
+const TOUCHDESIGNER_RESULTS = {
+  Hope: {
+    flowerId: 'sunflower',
+    flower: 'ดอกทานตะวัน',
+    resultTitle: 'ดอกไม้แห่งแสงวันใหม่',
+    visualIndex: 0,
+  },
+  Anxiety: {
+    flowerId: 'lavender',
+    flower: 'ลาเวนเดอร์',
+    resultTitle: 'ดอกไม้แห่งการปลอบประโลม',
+    visualIndex: 1,
+  },
+  Serenity: {
+    flowerId: 'daisy',
+    flower: 'ดอกเดซี',
+    resultTitle: 'ดอกไม้แห่งลมหายใจ',
+    visualIndex: 2,
+  },
+  Sadness: {
+    flowerId: 'striped_carnation',
+    flower: 'คาร์เนชั่นลายริ้ว',
+    resultTitle: 'ดอกไม้แห่งความรู้สึกลึกซึ้ง',
+    visualIndex: 3,
+  },
+  Frustration: {
+    flowerId: 'dandelion',
+    flower: 'แดนดิไลออน',
+    resultTitle: 'ดอกไม้แห่งแรงผลัก',
+    visualIndex: 4,
+  },
+};
+
+function doGet(event) {
+  const action = String(
+    event && event.parameter && event.parameter.action
+      ? event.parameter.action
+      : '',
+  );
+
+  if (action === 'latest') {
+    return getLatestTouchDesignerResult(event);
+  }
+
   return jsonResponse({ ok: true, service: 'Flower quiz responses' });
 }
 
@@ -84,6 +131,7 @@ function doPost(event) {
     );
 
     sheet.appendRow(row);
+    publishTouchDesignerResult(payload);
     return jsonResponse({ ok: true, duplicate: false });
   } catch (error) {
     return jsonResponse({ ok: false, error: 'invalid_request' });
@@ -91,6 +139,100 @@ function doPost(event) {
     if (lock.hasLock()) {
       lock.releaseLock();
     }
+  }
+}
+
+function setupTouchDesignerApiKey() {
+  const apiKey = (Utilities.getUuid() + Utilities.getUuid()).replace(
+    /-/g,
+    '',
+  );
+
+  PropertiesService.getScriptProperties().setProperty(
+    TOUCHDESIGNER_API_KEY_PROPERTY,
+    apiKey,
+  );
+
+  console.log('TouchDesigner API key: ' + apiKey);
+  return apiKey;
+}
+
+function publishTouchDesignerResult(payload) {
+  const visual = TOUCHDESIGNER_RESULTS[payload.result.emotion];
+
+  if (!visual) {
+    return;
+  }
+
+  const publicResult = {
+    eventId: Utilities.getUuid(),
+    submittedAt: payload.submittedAt.toISOString(),
+    publishedAt: new Date().toISOString(),
+    emotion: payload.result.emotion,
+    flowerId: visual.flowerId,
+    flower: visual.flower,
+    resultTitle: visual.resultTitle,
+    visualIndex: visual.visualIndex,
+  };
+
+  PropertiesService.getScriptProperties().setProperty(
+    TOUCHDESIGNER_LATEST_RESULT_PROPERTY,
+    JSON.stringify(publicResult),
+  );
+}
+
+function getLatestTouchDesignerResult(event) {
+  const properties = PropertiesService.getScriptProperties();
+  const configuredApiKey = String(
+    properties.getProperty(TOUCHDESIGNER_API_KEY_PROPERTY) || '',
+  );
+  const requestedApiKey = String(
+    event && event.parameter && event.parameter.key
+      ? event.parameter.key
+      : '',
+  );
+
+  if (!configuredApiKey) {
+    return jsonResponse({
+      ok: false,
+      error: 'touchdesigner_not_configured',
+    });
+  }
+
+  if (!requestedApiKey || requestedApiKey !== configuredApiKey) {
+    return jsonResponse({ ok: false, error: 'unauthorized' });
+  }
+
+  const latestResult = String(
+    properties.getProperty(TOUCHDESIGNER_LATEST_RESULT_PROPERTY) || '',
+  );
+
+  if (!latestResult) {
+    return jsonResponse({
+      ok: true,
+      hasResult: false,
+      fetchedAt: new Date().toISOString(),
+    });
+  }
+
+  try {
+    const result = JSON.parse(latestResult);
+
+    return jsonResponse({
+      ok: true,
+      hasResult: true,
+      eventId: result.eventId,
+      submittedAt: result.submittedAt,
+      publishedAt: result.publishedAt,
+      fetchedAt: new Date().toISOString(),
+      emotion: result.emotion,
+      flowerId: result.flowerId,
+      flower: result.flower,
+      resultTitle: result.resultTitle,
+      visualIndex: result.visualIndex,
+    });
+  } catch (error) {
+    return jsonResponse({ ok: false, error: 'invalid_latest_result' });
   }
 }
 
@@ -172,12 +314,16 @@ function parseAndValidatePayload(event) {
     }
   });
 
+  const detectedEmotion = detectDominantEmotion(normalizedAnswers);
+
   if (
     !payload.result ||
-    ALLOWED_EMOTIONS.indexOf(String(payload.result.emotion || '')) === -1
+    String(payload.result.emotion || '') !== detectedEmotion
   ) {
     throw new Error('Invalid result');
   }
+
+  const canonicalResult = TOUCHDESIGNER_RESULTS[detectedEmotion];
 
   return {
     submissionId: submissionId,
@@ -194,11 +340,45 @@ function parseAndValidatePayload(event) {
     },
     answers: normalizedAnswers,
     result: {
-      emotion: String(payload.result.emotion),
-      flower: String(payload.result.flower || ''),
-      resultTitle: String(payload.result.resultTitle || ''),
+      emotion: detectedEmotion,
+      flower: canonicalResult.flower,
+      resultTitle: canonicalResult.resultTitle,
     },
   };
+}
+
+function detectDominantEmotion(answers) {
+  const scores = {};
+
+  ALLOWED_EMOTIONS.forEach(function (emotion) {
+    scores[emotion] = 0;
+  });
+
+  answers.forEach(function (answer) {
+    scores[answer.emotion] += 1;
+  });
+
+  const highestScore = Math.max.apply(
+    null,
+    ALLOWED_EMOTIONS.map(function (emotion) {
+      return scores[emotion];
+    }),
+  );
+  const highestEmotions = ALLOWED_EMOTIONS.filter(function (emotion) {
+    return scores[emotion] === highestScore;
+  });
+
+  if (highestEmotions.length === 1) {
+    return highestEmotions[0];
+  }
+
+  const q7Emotion = answers[6].emotion;
+
+  if (highestEmotions.indexOf(q7Emotion) !== -1) {
+    return q7Emotion;
+  }
+
+  return highestEmotions[0];
 }
 
 function ensureHeaders(sheet) {
