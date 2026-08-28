@@ -11,6 +11,7 @@ import type {
   QuizOptionId,
 } from './data/quizSubmission'
 import { submitQuizResponse } from './services/googleSheets'
+import { publishTouchDesignerResult } from './services/touchDesigner'
 import IntroPage from './pages/IntroPage'
 import PlayerInfoPage from './pages/PlayerInfoPage'
 import ResultPage from './pages/ResultPage'
@@ -75,6 +76,17 @@ function App() {
       },
     }).catch(() => {
       submissionAttempted.current = false
+    })
+
+    void publishTouchDesignerResult({
+      submissionId,
+      completedAt: new Date().toISOString(),
+      emotion: resultEmotion,
+      flower: result.flower,
+      resultTitle: result.resultTitle,
+    }).catch(() => {
+      // TouchDesigner is an optional local output. The quiz still works when
+      // the bridge is not running, such as during normal Vite development.
     })
   }, [
     answers,
