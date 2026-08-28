@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'JaoTomato Thin';
-  src: url('./assets/font/JaoTomato Thin.ttf') format('truetype');
+  font-family: 'GMCkanomTian Demo';
+  src: url('./assets/font/GMCkanomTian demo.ttf') format('truetype');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -8,8 +8,7 @@
 
 :root {
   font-family:
-    'JaoTomato Thin',
-    'JaoTomato',
+    'GMCkanomTian Demo',
     'Noto Sans Thai',
     'Leelawadee UI',
     Tahoma,
