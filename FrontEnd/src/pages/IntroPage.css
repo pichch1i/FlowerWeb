@@ -6,28 +6,29 @@
   place-items: center;
   isolation: isolate;
   overflow: hidden;
-  padding: 22px 14px;
+  padding: 18px 14px;
   padding:
-    max(22px, env(safe-area-inset-top))
+    max(18px, env(safe-area-inset-top))
     max(14px, env(safe-area-inset-right))
-    max(22px, env(safe-area-inset-bottom))
+    max(18px, env(safe-area-inset-bottom))
     max(14px, env(safe-area-inset-left));
-  color: #344d3d;
+  color: #f5eadf;
   border: 0;
-  background-color: #aeb49a;
+  background-color: #050405;
   box-sizing: border-box;
 }
 
 .intro-page::before {
   position: absolute;
   z-index: -2;
-  inset: -8px;
-  background-color: #aeb49a;
-  background-image: url('/player-info-background.png');
-  background-position: center;
+  inset: -12px;
+  background-color: #050405;
+  background-image: url('/intro-dark-garden.jpg');
+  background-position: center 52%;
   background-repeat: no-repeat;
   background-size: cover;
-  filter: saturate(0.68) brightness(0.88) contrast(0.96);
+  filter: saturate(0.9) brightness(0.72) contrast(1.08);
+  transform: scale(1.02);
   content: '';
 }
 
@@ -35,12 +36,9 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(63, 61, 68, 0.14) 0%,
-    rgba(75, 72, 76, 0.12) 45%,
-    rgba(34, 27, 49, 0.2) 100%
-  );
+  background:
+    radial-gradient(circle at 50% 48%, rgba(17, 9, 15, 0.12), rgba(4, 3, 5, 0.58) 86%),
+    linear-gradient(180deg, rgba(2, 2, 3, 0.42), rgba(9, 4, 9, 0.04) 46%, rgba(2, 2, 3, 0.48));
   content: '';
   pointer-events: none;
 }
@@ -53,28 +51,30 @@
 
 .intro-card {
   position: relative;
-  width: min(100%, 620px);
-  padding: 46px 24px 38px;
+  width: min(100%, 560px);
+  padding: 38px 23px 28px;
   overflow: hidden;
-  border: 0;
-  border-radius: 30px 8px 30px 8px;
-  background: rgba(255, 253, 246, 0.94);
-  box-shadow: 0 24px 64px rgba(32, 16, 59, 0.2);
+  border: 1px solid rgba(244, 200, 166, 0.22);
+  border-radius: 32px 8px 32px 8px;
+  background: linear-gradient(145deg, rgba(24, 12, 19, 0.76), rgba(8, 6, 11, 0.68));
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.56),
+    inset 0 1px rgba(255, 232, 206, 0.08);
   text-align: center;
   box-sizing: border-box;
 }
 
 @supports ((-webkit-backdrop-filter: blur(16px)) or (backdrop-filter: blur(16px))) {
   .intro-card {
-    background: rgba(255, 253, 246, 0.87);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
+    background: linear-gradient(145deg, rgba(26, 13, 20, 0.7), rgba(7, 5, 9, 0.63));
+    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+    backdrop-filter: blur(12px) saturate(1.1);
   }
 }
 
 .intro-eyebrow {
   margin: 0 0 12px;
-  color: #966c61;
+  color: #d6a586;
   font-size: 0.78rem;
   font-weight: 400;
   letter-spacing: 0.12em;
@@ -82,7 +82,7 @@
 
 .intro-card h1 {
   margin: 0;
-  color: #2e4938;
+  color: #fff6e9;
   font-size: clamp(2.35rem, 11vw, 3.1rem);
   font-weight: 400;
   line-height: 1.06;
@@ -91,7 +91,7 @@
 
 .intro-card h1 span {
   display: block;
-  color: #56745e;
+  color: #e6c2af;
   font-size: 0.72em;
   line-height: 1.28;
   letter-spacing: -0.02em;
@@ -101,7 +101,7 @@
   display: grid;
   gap: 13px;
   margin: 28px auto 0;
-  color: #697a6d;
+  color: #c9beb8;
   font-size: 0.97rem;
   line-height: 1.7;
 }
@@ -112,7 +112,7 @@
 
 .intro-message strong,
 .intro-message em {
-  color: #405d49;
+  color: #f1c79f;
   font-style: normal;
   font-weight: 400;
 }
@@ -123,12 +123,12 @@
   justify-content: center;
   gap: 10px;
   margin: 25px 0 0;
-  color: #865f57;
+  color: #e7c5b0;
   font-size: 1.08rem;
 }
 
 .intro-reassurance span {
-  color: #d9a092;
+  color: #e3a675;
   font-size: 0.68rem;
 }
 
@@ -140,8 +140,9 @@
   margin-top: 15px;
   padding: 4px 13px;
   border-radius: 999px;
-  color: #607264;
-  background: rgba(111, 143, 116, 0.1);
+  border: 1px solid rgba(224, 177, 138, 0.14);
+  color: #d9c7ba;
+  background: rgba(235, 195, 159, 0.08);
   font-size: 0.82rem;
 }
 
@@ -184,11 +185,13 @@
   gap: 12px;
   margin-top: 28px;
   padding: 0 22px;
-  border: 0;
+  border: 1px solid rgba(255, 221, 190, 0.22);
   border-radius: 16px 6px 16px 6px;
-  color: #fffdf7;
-  background: linear-gradient(115deg, #476753, #66866e);
-  box-shadow: 0 12px 26px rgba(55, 87, 65, 0.22);
+  color: #fff9f0;
+  background: linear-gradient(115deg, #6e332e, #a15b45 55%, #c07955);
+  box-shadow:
+    0 14px 34px rgba(132, 58, 39, 0.38),
+    inset 0 1px rgba(255, 234, 213, 0.2);
   cursor: pointer;
   font: inherit;
   font-size: 0.97rem;
@@ -200,7 +203,9 @@
 
 .intro-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 30px rgba(55, 87, 65, 0.28);
+  box-shadow:
+    0 18px 38px rgba(151, 70, 47, 0.48),
+    inset 0 1px rgba(255, 238, 220, 0.24);
 }
 
 .intro-button:active {
@@ -208,7 +213,7 @@
 }
 
 .intro-button:focus-visible {
-  outline: 3px solid rgba(71, 103, 83, 0.3);
+  outline: 3px solid rgba(224, 155, 109, 0.48);
   outline-offset: 4px;
 }
 
@@ -238,7 +243,8 @@
 .intro-flower__petal {
   width: 22px;
   height: 22px;
-  background: #e5a798;
+  background: linear-gradient(145deg, #a75f64, #d38b79);
+  box-shadow: 0 0 18px rgba(212, 124, 99, 0.2);
 }
 
 .intro-flower__petal--top {
@@ -267,8 +273,10 @@
   left: 17px;
   width: 18px;
   height: 18px;
-  background: #d6bc64;
-  box-shadow: 0 0 0 4px #fffaf0;
+  background: #dca85d;
+  box-shadow:
+    0 0 0 4px rgba(255, 235, 211, 0.9),
+    0 0 24px rgba(228, 151, 77, 0.42);
 }
 
 .intro-sprig {
@@ -277,7 +285,7 @@
   bottom: -28px;
   width: 132px;
   height: 116px;
-  opacity: 0.2;
+  opacity: 0.28;
   transform: rotate(-12deg);
   pointer-events: none;
 }
@@ -289,7 +297,7 @@
   width: 2px;
   height: 126px;
   border-radius: 50%;
-  background: #6e9676;
+  background: #be8058;
   transform: rotate(36deg);
   transform-origin: bottom;
 }
@@ -299,7 +307,7 @@
   width: 42px;
   height: 22px;
   border-radius: 100% 0 100% 0;
-  background: #7aa080;
+  background: #9b5e50;
 }
 
 .intro-sprig__leaf--one {
@@ -326,7 +334,7 @@
   }
 
   .intro-card {
-    padding: 58px 68px 52px;
+    padding: 52px 68px 46px;
     border-radius: 38px 10px 38px 10px;
   }
 
