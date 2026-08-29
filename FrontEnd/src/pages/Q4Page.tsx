@@ -51,7 +51,6 @@ function Q4Page({ onAnswer }: Q4PageProps) {
 
         <div className="q1-story q4-story">
           <p className="q1-story__eyebrow">“ทางแยก”</p>
-          <p className="q1-story__label">สถานการณ์</p>
           <p className="q1-story__situation">
             คุณเดินมาเจอทางแยก
             <br />
@@ -82,9 +81,6 @@ function Q4Page({ onAnswer }: Q4PageProps) {
                   )
                 }}
               >
-                <span className="q1-option__letter" aria-hidden="true">
-                  {option.id}
-                </span>
                 <span className="q1-option__text">{option.text}</span>
                 <span className="q1-option__check" aria-hidden="true">
                   ✓

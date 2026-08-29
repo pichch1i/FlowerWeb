@@ -55,7 +55,6 @@ function Q2Page({ onAnswer }: Q2PageProps) {
 
         <div className="q1-story q2-story">
           <p className="q1-story__eyebrow">“ฝนกำลังมา”</p>
-          <p className="q1-story__label">สถานการณ์</p>
           <p className="q1-story__situation">
             คุณกำลังจะไปดูสวนดอกไม้ที่รอมานาน
             <br />
@@ -86,9 +85,6 @@ function Q2Page({ onAnswer }: Q2PageProps) {
                   )
                 }}
               >
-                <span className="q1-option__letter" aria-hidden="true">
-                  {option.id}
-                </span>
                 <span className="q1-option__text">{option.text}</span>
                 <span className="q1-option__check" aria-hidden="true">
                   ✓

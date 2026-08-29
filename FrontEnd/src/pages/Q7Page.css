@@ -16,8 +16,3 @@
 .q7-story h1 {
   font-size: clamp(2rem, 9vw, 2.75rem);
 }
-
-.q7-panel .q1-option__letter {
-  color: #29161a;
-  background: var(--question-accent-soft);
-}

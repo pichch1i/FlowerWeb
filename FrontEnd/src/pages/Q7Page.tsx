@@ -51,7 +51,6 @@ function Q7Page({ onAnswer }: Q7PageProps) {
 
         <div className="q1-story q7-story">
           <p className="q1-story__eyebrow">“ก่อนที่คุณจะกลับ”</p>
-          <p className="q1-story__label">สถานการณ์</p>
           <p className="q1-story__situation">
             ก่อนที่คุณจะออกจากสวน
             <br />
@@ -84,9 +83,6 @@ function Q7Page({ onAnswer }: Q7PageProps) {
                   )
                 }}
               >
-                <span className="q1-option__letter" aria-hidden="true">
-                  {option.id}
-                </span>
                 <span className="q1-option__text">{option.text}</span>
                 <span className="q1-option__check" aria-hidden="true">
                   ✓

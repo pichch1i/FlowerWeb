@@ -51,7 +51,6 @@ function Q1Page({ onAnswer }: Q1PageProps) {
 
         <div className="q1-story">
           <p className="q1-story__eyebrow">“ก่อนที่ดอกไม้จะบาน”</p>
-          <p className="q1-story__label">สถานการณ์</p>
           <p className="q1-story__situation">
             คุณกำลังเดินอยู่ในสวน
             <br />
@@ -82,9 +81,6 @@ function Q1Page({ onAnswer }: Q1PageProps) {
                   )
                 }}
               >
-                <span className="q1-option__letter" aria-hidden="true">
-                  {option.id}
-                </span>
                 <span className="q1-option__text">{option.text}</span>
                 <span className="q1-option__check" aria-hidden="true">
                   ✓

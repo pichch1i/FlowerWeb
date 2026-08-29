@@ -12,8 +12,3 @@
 .q2-panel .q1-story__eyebrow {
   color: var(--question-accent-soft);
 }
-
-.q2-panel .q1-option__letter {
-  color: #29161a;
-  background: var(--question-accent-soft);
-}

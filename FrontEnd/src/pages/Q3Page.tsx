@@ -51,7 +51,6 @@ function Q3Page({ onAnswer }: Q3PageProps) {
 
         <div className="q1-story q3-story">
           <p className="q1-story__eyebrow">“กิ่งที่หัก”</p>
-          <p className="q1-story__label">สถานการณ์</p>
           <p className="q1-story__situation">
             คุณกำลังดูแลต้นไม้ต้นหนึ่ง
             <br />
@@ -80,9 +79,6 @@ function Q3Page({ onAnswer }: Q3PageProps) {
                   )
                 }}
               >
-                <span className="q1-option__letter" aria-hidden="true">
-                  {option.id}
-                </span>
                 <span className="q1-option__text">{option.text}</span>
                 <span className="q1-option__check" aria-hidden="true">
                   ✓

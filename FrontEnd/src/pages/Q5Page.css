@@ -27,8 +27,3 @@
 .q5-story h1 {
   margin-top: 14px;
 }
-
-.q5-panel .q1-option__letter {
-  color: #29161a;
-  background: var(--question-accent-soft);
-}

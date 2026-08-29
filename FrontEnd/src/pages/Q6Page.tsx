@@ -51,7 +51,6 @@ function Q6Page({ onAnswer }: Q6PageProps) {
 
         <div className="q1-story q6-story">
           <p className="q1-story__eyebrow">“วันที่เหนื่อย”</p>
-          <p className="q1-story__label">สถานการณ์</p>
           <p className="q1-story__situation">
             หลังจากเดินในสวนมาทั้งวัน
             <br />
@@ -82,9 +81,6 @@ function Q6Page({ onAnswer }: Q6PageProps) {
                   )
                 }}
               >
-                <span className="q1-option__letter" aria-hidden="true">
-                  {option.id}
-                </span>
                 <span className="q1-option__text">{option.text}</span>
                 <span className="q1-option__check" aria-hidden="true">
                   ✓

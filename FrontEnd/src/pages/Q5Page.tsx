@@ -51,7 +51,6 @@ function Q5Page({ onAnswer }: Q5PageProps) {
 
         <div className="q1-story q5-story">
           <p className="q1-story__eyebrow">“ดอกไม้ที่ยังไม่บาน”</p>
-          <p className="q1-story__label">สถานการณ์</p>
           <p className="q1-story__situation">
             คุณเจอดอกไม้ดอกหนึ่ง แต่มันยังไม่บาน
             <br />
@@ -85,9 +84,6 @@ function Q5Page({ onAnswer }: Q5PageProps) {
                   )
                 }}
               >
-                <span className="q1-option__letter" aria-hidden="true">
-                  {option.id}
-                </span>
                 <span className="q1-option__text">{option.text}</span>
                 <span className="q1-option__check" aria-hidden="true">
                   ✓
