@@ -87,28 +87,24 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
                 <input
                   type="number"
                   name="age"
-                  min={isCustomAge ? MAX_LISTED_AGE + 1 : MIN_AGE}
-                  max={isCustomAge ? MAX_AGE : MAX_LISTED_AGE}
+                  min={MIN_AGE}
+                  max={MAX_AGE}
                   inputMode="numeric"
                   placeholder={isCustomAge ? '56+' : '00'}
                   value={age}
                   aria-labelledby="age-label"
                   onChange={(event) => {
                     const nextAge = event.target.value
-                    const numericAge = Number(nextAge)
-                    const minimumAge = isCustomAge
-                      ? MAX_LISTED_AGE + 1
-                      : MIN_AGE
-                    const maximumAge = isCustomAge
-                      ? MAX_AGE
-                      : MAX_LISTED_AGE
 
-                    if (
-                      nextAge === '' ||
-                      (numericAge >= minimumAge && numericAge <= maximumAge)
-                    ) {
-                      setAge(nextAge)
-                    }
+                    // Keep partial input such as "1" while the player is
+                    // typing "18". The min/max constraints validate the
+                    // completed value when the form is submitted.
+                    if (!/^\d{0,3}$/.test(nextAge)) return
+
+                    setAge(nextAge)
+                    setIsCustomAge(
+                      nextAge !== '' && Number(nextAge) > MAX_LISTED_AGE,
+                    )
                   }}
                   required
                 />
