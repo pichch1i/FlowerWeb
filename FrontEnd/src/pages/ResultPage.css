@@ -12,8 +12,8 @@
     max(14px, env(safe-area-inset-right))
     max(22px, env(safe-area-inset-bottom))
     max(14px, env(safe-area-inset-left));
-  color: #344d3d;
-  background-color: #aeb49a;
+  color: #f5eadf;
+  background-color: #050405;
   box-sizing: border-box;
 }
 
@@ -26,7 +26,7 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  filter: saturate(0.88) brightness(0.72) contrast(1.08);
+  filter: saturate(0.92) brightness(0.58) contrast(1.12);
   content: '';
 }
 
@@ -35,8 +35,8 @@
   z-index: -1;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 46%, rgba(8, 5, 8, 0.08), rgba(2, 2, 3, 0.34) 82%),
-    linear-gradient(180deg, rgba(3, 2, 4, 0.24), transparent 46%, rgba(3, 2, 4, 0.34));
+    radial-gradient(circle at 50% 46%, rgba(43, 19, 31, 0.1), rgba(2, 2, 3, 0.7) 84%),
+    linear-gradient(180deg, rgba(2, 2, 3, 0.5), transparent 46%, rgba(2, 2, 3, 0.62));
   content: '';
   pointer-events: none;
 }
@@ -56,10 +56,12 @@
   width: min(100%, 680px);
   padding: 42px 24px 38px;
   overflow: hidden;
-  border: 0;
+  border: 1px solid rgba(244, 200, 166, 0.2);
   border-radius: 32px 8px 32px 8px;
-  background: rgba(255, 253, 246, 0.95);
-  box-shadow: 0 24px 68px rgba(38, 22, 66, 0.21);
+  background: linear-gradient(145deg, rgba(24, 12, 19, 0.96), rgba(8, 6, 11, 0.96));
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.62),
+    inset 0 1px rgba(255, 232, 206, 0.07);
   text-align: center;
   box-sizing: border-box;
 }
@@ -94,22 +96,22 @@
 
 @supports ((-webkit-backdrop-filter: blur(16px)) or (backdrop-filter: blur(16px))) {
   .result-card {
-    background: rgba(255, 253, 246, 0.88);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
+    background: linear-gradient(145deg, rgba(26, 13, 20, 0.9), rgba(7, 5, 9, 0.88));
+    -webkit-backdrop-filter: blur(14px) saturate(1.05);
+    backdrop-filter: blur(14px) saturate(1.05);
   }
 }
 
 .result-eyebrow {
   margin: 18px 0 0;
-  color: #8d665d;
+  color: #d6a586;
   font-size: 0.8rem;
   letter-spacing: 0.1em;
 }
 
 .result-card h1 {
   margin: 5px 0 0;
-  color: #2e4938;
+  color: #fff6e9;
   font-size: clamp(2.25rem, 10vw, 3.25rem);
   font-weight: 400;
   line-height: 1.12;
@@ -118,13 +120,13 @@
 
 .result-flower-name {
   margin: 9px 0 0;
-  color: #7c665f;
+  color: #e7c5b0;
   font-size: 1rem;
 }
 
 .result-description {
   margin: 22px 0 0;
-  color: #6b7b6e;
+  color: #c9beb8;
   font-size: 0.92rem;
   line-height: 1.75;
 }
@@ -133,18 +135,19 @@
   margin-top: 27px;
   padding: 21px 18px 22px;
   border-radius: 22px 6px 22px 6px;
-  background: rgba(111, 143, 116, 0.1);
+  border: 1px solid rgba(244, 200, 166, 0.12);
+  background: rgba(255, 246, 233, 0.055);
 }
 
 .result-message p {
   margin: 0;
-  color: #718075;
+  color: #b9aaa6;
   font-size: 0.79rem;
 }
 
 .result-message blockquote {
   margin: 9px 0 0;
-  color: #3f604b;
+  color: #f1c79f;
   font-size: clamp(1.25rem, 6vw, 1.65rem);
   line-height: 1.4;
 }
@@ -156,14 +159,15 @@
   margin-top: 20px;
   padding: 6px 13px;
   border-radius: 999px;
-  color: #6f6d73;
-  background: rgba(133, 119, 148, 0.1);
+  border: 1px solid rgba(244, 200, 166, 0.12);
+  color: #c9beb8;
+  background: rgba(255, 246, 233, 0.06);
   font-size: 0.67rem;
   letter-spacing: 0.02em;
 }
 
 .result-emotion strong {
-  color: #665277;
+  color: #e3a675;
   font-weight: 600;
 }
 
@@ -235,7 +239,7 @@
   width: 4px;
   height: 78px;
   border-radius: 999px;
-  background: #6f9777;
+  background: #8e6b53;
 }
 
 .result-flower__leaf {

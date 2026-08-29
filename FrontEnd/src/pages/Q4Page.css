@@ -1,17 +1,19 @@
 @import './Q1Page.css';
 
 .q4-panel {
+  --question-accent: #d0a07c;
+  --question-accent-soft: #efd0b3;
   background:
-    radial-gradient(circle at 8% 3%, rgba(187, 195, 181, 0.84), transparent 37%),
-    radial-gradient(circle at 92% 36%, rgba(117, 108, 136, 0.45), transparent 45%),
-    linear-gradient(155deg, #717d73 0%, #585a69 36%, #2e2f3d 100%);
+    radial-gradient(circle at 8% 3%, rgba(135, 76, 65, 0.24), transparent 38%),
+    linear-gradient(160deg, rgba(32, 16, 24, 0.97), rgba(7, 5, 9, 0.98)),
+    url('/flower-grid-pixel-bg.jpg') center / cover no-repeat;
 }
 
 .q4-panel .q1-story__eyebrow {
-  color: #e1eadb;
+  color: var(--question-accent-soft);
 }
 
 .q4-panel .q1-option__letter {
-  color: #53664f;
-  background: #e4edd9;
+  color: #29161a;
+  background: var(--question-accent-soft);
 }
