@@ -156,8 +156,10 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
                   required
                 >
                   <option value="">เลือกอาชีพ</option>
+                  <option value="นักเรียน">นักเรียน</option>
                   <option value="นักศึกษา">นักศึกษา</option>
                   <option value="อาจารย์">อาจารย์</option>
+                  <option value="ผู้ปกครอง">ผู้ปกครอง</option>
                   <option value="other">อื่น ๆ</option>
                 </select>
                 <span
