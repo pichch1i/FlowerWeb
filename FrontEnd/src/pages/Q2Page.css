@@ -1,12 +1,15 @@
 @import './Q1Page.css';
 
+.q2-page {
+  background: #19060a url('/q2-pixel-garden-bg.png') center / cover no-repeat;
+}
+
 .q2-panel {
   --question-accent: #c9a58d;
   --question-accent-soft: #edd0ba;
-  background:
-    radial-gradient(circle at 8% 3%, rgba(126, 76, 67, 0.22), transparent 38%),
-    linear-gradient(160deg, rgba(30, 16, 23, 0.97), rgba(6, 6, 9, 0.98)),
-    url('/flower-grid-pixel-bg.jpg') center / cover no-repeat;
+  border: 1px solid #513f43;
+  border-radius: 34px;
+  background: rgba(25, 6, 10, 0.85);
 }
 
 .q2-panel .q1-story__eyebrow {
