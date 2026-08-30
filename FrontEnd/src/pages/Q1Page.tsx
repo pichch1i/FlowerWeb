@@ -40,8 +40,11 @@ function Q1Page({ onAnswer }: Q1PageProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
 
   return (
-    <main className="q1-page">
-      <section className="q1-panel" aria-labelledby="q1-title">
+    <main className="q1-page q1-page--story-one">
+      <section
+        className="q1-panel q1-panel--story-one"
+        aria-labelledby="q1-title"
+      >
         <header className="q1-progress" aria-label="เรื่องที่ 1 จาก 7">
           <div className="q1-progress__track" aria-hidden="true">
             <span className="q1-progress__value" data-step="1" />

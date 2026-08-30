@@ -39,6 +39,16 @@
   box-sizing: border-box;
 }
 
+.q1-page.q1-page--story-one {
+  background: #140c14 url('/q1-pixel-garden-bg.png') center / cover no-repeat;
+}
+
+.q1-panel.q1-panel--story-one {
+  border: 1px solid #140c14;
+  border-radius: 34px;
+  background: rgba(20, 12, 20, 0.85);
+}
+
 @supports (min-height: 100svh) {
   .q1-panel {
     min-height: calc(100svh - 24px);
