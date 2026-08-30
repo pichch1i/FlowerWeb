@@ -1,10 +1,10 @@
 @import './Q1Page.css';
 
-.q2-page {
+.q1-page.q2-page {
   background: #19060a url('/q2-pixel-garden-bg.png') center / cover no-repeat;
 }
 
-.q2-panel {
+.q1-panel.q2-panel {
   --question-accent: #c9a58d;
   --question-accent-soft: #edd0ba;
   border: 1px solid #513f43;
