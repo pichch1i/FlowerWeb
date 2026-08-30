@@ -8,14 +8,6 @@ function IntroPage({ onStart }: IntroPageProps) {
   return (
     <main className="intro-page">
       <section className="intro-card" aria-labelledby="intro-title">
-        <div className="intro-flower" aria-hidden="true">
-          <span className="intro-flower__petal intro-flower__petal--top" />
-          <span className="intro-flower__petal intro-flower__petal--right" />
-          <span className="intro-flower__petal intro-flower__petal--bottom" />
-          <span className="intro-flower__petal intro-flower__petal--left" />
-          <span className="intro-flower__center" />
-        </div>
-
         <p className="intro-eyebrow">การเดินทางเล็ก ๆ ของคุณ</p>
         <h1 id="intro-title">
           ดอกไม้ของคุณ

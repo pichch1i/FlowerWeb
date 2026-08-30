@@ -227,58 +227,6 @@
   transform: translateX(4px);
 }
 
-.intro-flower {
-  position: relative;
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 18px;
-}
-
-.intro-flower__petal,
-.intro-flower__center {
-  position: absolute;
-  border-radius: 50%;
-}
-
-.intro-flower__petal {
-  width: 22px;
-  height: 22px;
-  background: linear-gradient(145deg, #a75f64, #d38b79);
-  box-shadow: 0 0 18px rgba(212, 124, 99, 0.2);
-}
-
-.intro-flower__petal--top {
-  top: 0;
-  left: 15px;
-}
-
-.intro-flower__petal--right {
-  top: 15px;
-  right: 0;
-}
-
-.intro-flower__petal--bottom {
-  bottom: 0;
-  left: 15px;
-}
-
-.intro-flower__petal--left {
-  top: 15px;
-  left: 0;
-}
-
-.intro-flower__center {
-  z-index: 1;
-  top: 17px;
-  left: 17px;
-  width: 18px;
-  height: 18px;
-  background: #dca85d;
-  box-shadow:
-    0 0 0 4px rgba(255, 235, 211, 0.9),
-    0 0 24px rgba(228, 151, 77, 0.42);
-}
-
 .intro-sprig {
   position: absolute;
   right: -22px;

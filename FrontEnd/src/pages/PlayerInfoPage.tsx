@@ -51,14 +51,6 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
   return (
     <main className="player-info-page">
       <section className="journey-card" aria-labelledby="journey-title">
-        <div className="flower-mark" aria-hidden="true">
-          <span className="flower-mark__petal flower-mark__petal--top" />
-          <span className="flower-mark__petal flower-mark__petal--right" />
-          <span className="flower-mark__petal flower-mark__petal--bottom" />
-          <span className="flower-mark__petal flower-mark__petal--left" />
-          <span className="flower-mark__center" />
-        </div>
-
         <div className="journey-card__intro">
           <p className="journey-eyebrow">จุดเริ่มต้นของเรื่องราว</p>
           <h1 id="journey-title">ก่อนเริ่มออกเดินทาง</h1>
