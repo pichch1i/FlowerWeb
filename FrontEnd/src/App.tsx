@@ -42,6 +42,9 @@ function App() {
     useState<PrivacyConsent | null>(null)
   const [answers, setAnswers] = useState<QuizAnswer[]>([])
   const [submissionId, setSubmissionId] = useState('')
+  const [submissionStatus, setSubmissionStatus] = useState<
+    'idle' | 'submitting' | 'submitted' | 'not-configured' | 'failed'
+  >('idle')
   const submissionAttempted = useRef(false)
 
   const resultEmotion = detectDominantEmotion(
@@ -61,6 +64,7 @@ function App() {
     }
 
     submissionAttempted.current = true
+    setSubmissionStatus('submitting')
     const result = emotionResults[resultEmotion]
 
     void submitQuizResponse({
@@ -74,9 +78,14 @@ function App() {
         flower: result.flower,
         resultTitle: result.resultTitle,
       },
-    }).catch(() => {
-      submissionAttempted.current = false
     })
+      .then((status) => {
+        setSubmissionStatus(status)
+      })
+      .catch(() => {
+        submissionAttempted.current = false
+        setSubmissionStatus('failed')
+      })
 
     void publishTouchDesignerResult({
       submissionId,
@@ -109,6 +118,7 @@ function App() {
     setPrivacyConsent(nextPrivacyConsent)
     setAnswers([])
     setSubmissionId(nextSubmissionId)
+    setSubmissionStatus('idle')
     submissionAttempted.current = false
     setCurrentPage('q1')
   }
@@ -202,7 +212,13 @@ function App() {
     }
 
     if (currentPage === 'result') {
-      return <ResultPage emotion={resultEmotion} />
+      return (
+        <ResultPage
+          emotion={resultEmotion}
+          submissionId={submissionId}
+          feedbackReady={submissionStatus === 'submitted'}
+        />
+      )
     }
 
     return <IntroPage onStart={() => setCurrentPage('player-info')} />
