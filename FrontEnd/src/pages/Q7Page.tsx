@@ -84,9 +84,6 @@ function Q7Page({ onAnswer }: Q7PageProps) {
                 }}
               >
                 <span className="q1-option__text">{option.text}</span>
-                <span className="q1-option__check" aria-hidden="true">
-                  ✓
-                </span>
               </button>
             )
           })}

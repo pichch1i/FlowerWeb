@@ -80,9 +80,6 @@ function Q3Page({ onAnswer }: Q3PageProps) {
                 }}
               >
                 <span className="q1-option__text">{option.text}</span>
-                <span className="q1-option__check" aria-hidden="true">
-                  ✓
-                </span>
               </button>
             )
           })}

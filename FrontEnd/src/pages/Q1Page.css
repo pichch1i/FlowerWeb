@@ -236,25 +236,6 @@
   text-align: center;
 }
 
-.q1-option__check {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  color: #fff6e9;
-  font-family: system-ui, sans-serif;
-  font-size: 1rem;
-  opacity: 0;
-  transform: translateY(-50%) scale(0.65);
-  transition:
-    opacity 170ms ease,
-    transform 170ms ease;
-}
-
-.q1-option--selected .q1-option__check {
-  opacity: 1;
-  transform: translateY(-50%) scale(1);
-}
-
 @media (min-width: 641px) {
   .q1-page {
     padding: 28px;
@@ -287,8 +268,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .q1-option,
-  .q1-option__check {
+  .q1-option {
     transition: none;
   }
 }
