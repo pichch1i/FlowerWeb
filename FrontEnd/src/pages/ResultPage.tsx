@@ -2,10 +2,23 @@ import {
   emotionResults,
   type Emotion,
 } from '../data/emotionResults'
+import daisyImage from '../assets/pict/daisy-transparent.png'
+import dandelionImage from '../assets/pict/dandelion-transparent.png'
+import lavenderImage from '../assets/pict/lavender-transparent.png'
+import stripedCarnationImage from '../assets/pict/striped-carnation-transparent.png'
+import sunflowerImage from '../assets/pict/sunflower-transparent.png'
 import './ResultPage.css'
 
 type ResultPageProps = {
   emotion: Emotion
+}
+
+const flowerImages: Record<Emotion, string> = {
+  Hope: sunflowerImage,
+  Anxiety: lavenderImage,
+  Serenity: daisyImage,
+  Sadness: stripedCarnationImage,
+  Frustration: dandelionImage,
 }
 
 function ResultPage({ emotion }: ResultPageProps) {
@@ -18,17 +31,11 @@ function ResultPage({ emotion }: ResultPageProps) {
         aria-labelledby="result-title"
         data-emotion={emotion.toLowerCase()}
       >
-        <div className="result-flower" aria-hidden="true">
-          <span className="result-flower__petal result-flower__petal--one" />
-          <span className="result-flower__petal result-flower__petal--two" />
-          <span className="result-flower__petal result-flower__petal--three" />
-          <span className="result-flower__petal result-flower__petal--four" />
-          <span className="result-flower__petal result-flower__petal--five" />
-          <span className="result-flower__center" />
-          <span className="result-flower__stem" />
-          <span className="result-flower__leaf result-flower__leaf--left" />
-          <span className="result-flower__leaf result-flower__leaf--right" />
-        </div>
+        <img
+          className="result-flower-image"
+          src={flowerImages[emotion]}
+          alt={result.flower}
+        />
 
         <p className="result-eyebrow">ดอกไม้ของคุณกำลังบาน</p>
         <p className="result-flower-name">{result.flower}</p>
