@@ -63,96 +63,98 @@ function ResultPage({
 
   return (
     <main className="result-page">
-      <section
-        className="result-card"
-        aria-labelledby="result-title"
-        data-emotion={emotion.toLowerCase()}
-      >
-        <img
-          className="result-flower-image"
-          src={flowerImages[emotion]}
-          alt={result.flower}
-        />
-
-        <p className="result-eyebrow">ดอกไม้ของคุณกำลังบาน</p>
-        <p className="result-flower-name">{result.flower}</p>
-        <h1 id="result-title">“{result.resultTitle}”</h1>
-
-        <p className="result-description">{result.reason}</p>
-
-        <div className="result-message">
-          <p>วันนี้ดอกไม้ของคุณมีบางอย่างอยากบอกว่า...</p>
-          <blockquote>“{result.message}”</blockquote>
-        </div>
-
-        <div className="result-emotion">
-          <span>Emotional State</span>
-          <strong>{emotion}</strong>
-        </div>
-
+      <div className="result-hero">
         <section
-          className="result-feedback"
-          aria-labelledby="result-feedback-title"
+          className="result-card"
+          aria-labelledby="result-title"
+          data-emotion={emotion.toLowerCase()}
         >
-          <h2 id="result-feedback-title">ข้อความนี้ตรงกับคุณไหม?</h2>
-          <p>
-            บอกเราได้ว่าความหมายและข้อความของดอกไม้นี้
-            สะท้อนความรู้สึกของคุณมากน้อยแค่ไหน
-          </p>
+          <img
+            className="result-flower-image"
+            src={flowerImages[emotion]}
+            alt={result.flower}
+          />
 
-          <form onSubmit={submitFeedback}>
-            <label htmlFor="result-feedback-message">ความคิดเห็นของคุณ</label>
-            <textarea
-              id="result-feedback-message"
-              name="resultFeedback"
-              value={feedback}
-              onChange={(event) => {
-                setFeedback(event.target.value)
-                if (feedbackStatus === 'error') {
-                  setFeedbackStatus('idle')
-                }
-              }}
-              placeholder="พิมพ์ความคิดเห็นของคุณ..."
-              maxLength={500}
-              rows={4}
-              disabled={feedbackStatus === 'submitted'}
-            />
+          <p className="result-eyebrow">ดอกไม้ของคุณกำลังบาน</p>
+          <p className="result-flower-name">{result.flower}</p>
+          <h1 id="result-title">“{result.resultTitle}”</h1>
 
-            <div className="result-feedback__footer">
-              <span>{feedback.length}/500</span>
-              <button
-                type="submit"
-                disabled={
-                  !feedback.trim() ||
-                  !feedbackReady ||
-                  feedbackStatus === 'submitting' ||
-                  feedbackStatus === 'submitted'
-                }
-              >
-                {feedbackStatus === 'submitting'
-                  ? 'กำลังส่ง...'
-                  : feedbackStatus === 'submitted'
-                    ? 'ส่งแล้ว'
-                    : 'ส่งความคิดเห็น'}
-              </button>
-            </div>
-          </form>
+          <p className="result-description">{result.reason}</p>
 
-          <p className="result-feedback__status" aria-live="polite">
-            {feedbackStatus === 'submitted' &&
-              'ขอบคุณสำหรับความคิดเห็นของคุณ'}
-            {feedbackStatus === 'error' &&
-              'ยังส่งความคิดเห็นไม่ได้ กรุณาลองใหม่อีกครั้ง'}
-            {!feedbackReady && feedbackStatus === 'idle' &&
-              'กำลังเตรียมพื้นที่รับความคิดเห็น...'}
-          </p>
+          <div className="result-message">
+            <p>วันนี้ดอกไม้ของคุณมีบางอย่างอยากบอกว่า...</p>
+            <blockquote>“{result.message}”</blockquote>
+          </div>
+
+          <div className="result-emotion">
+            <span>Emotional State</span>
+            <strong>{emotion}</strong>
+          </div>
+
+          <div className="result-sparkles" aria-hidden="true">
+            <span>✦</span>
+            <span>✦</span>
+            <span>✦</span>
+          </div>
         </section>
+      </div>
 
-        <div className="result-sparkles" aria-hidden="true">
-          <span>✦</span>
-          <span>✦</span>
-          <span>✦</span>
-        </div>
+      <section
+        className="result-feedback"
+        aria-labelledby="result-feedback-title"
+      >
+        <h2 id="result-feedback-title">ข้อความนี้ตรงกับคุณไหม?</h2>
+        <p>
+          บอกเราได้ว่าความหมายและข้อความของดอกไม้นี้
+          สะท้อนความรู้สึกของคุณมากน้อยแค่ไหน
+        </p>
+
+        <form onSubmit={submitFeedback}>
+          <label htmlFor="result-feedback-message">ความคิดเห็นของคุณ</label>
+          <textarea
+            id="result-feedback-message"
+            name="resultFeedback"
+            value={feedback}
+            onChange={(event) => {
+              setFeedback(event.target.value)
+              if (feedbackStatus === 'error') {
+                setFeedbackStatus('idle')
+              }
+            }}
+            placeholder="พิมพ์ความคิดเห็นของคุณ..."
+            maxLength={500}
+            rows={4}
+            disabled={feedbackStatus === 'submitted'}
+          />
+
+          <div className="result-feedback__footer">
+            <span>{feedback.length}/500</span>
+            <button
+              type="submit"
+              disabled={
+                !feedback.trim() ||
+                !feedbackReady ||
+                feedbackStatus === 'submitting' ||
+                feedbackStatus === 'submitted'
+              }
+            >
+              {feedbackStatus === 'submitting'
+                ? 'กำลังส่ง...'
+                : feedbackStatus === 'submitted'
+                  ? 'ส่งแล้ว'
+                  : 'ส่งความคิดเห็น'}
+            </button>
+          </div>
+        </form>
+
+        <p className="result-feedback__status" aria-live="polite">
+          {feedbackStatus === 'submitted' &&
+            'ขอบคุณสำหรับความคิดเห็นของคุณ'}
+          {feedbackStatus === 'error' &&
+            'ยังส่งความคิดเห็นไม่ได้ กรุณาลองใหม่อีกครั้ง'}
+          {!feedbackReady && feedbackStatus === 'idle' &&
+            'กำลังเตรียมพื้นที่รับความคิดเห็น...'}
+        </p>
       </section>
     </main>
   )
