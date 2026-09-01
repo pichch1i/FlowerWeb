@@ -1,12 +1,15 @@
 @import './Q1Page.css';
 
-.q4-panel {
+.q1-page.q4-page {
+  background: #251440 url('/q4-pixel-garden-bg.png') center / cover no-repeat;
+}
+
+.q1-panel.q4-panel {
   --question-accent: #d0a07c;
   --question-accent-soft: #efd0b3;
-  background:
-    radial-gradient(circle at 8% 3%, rgba(135, 76, 65, 0.24), transparent 38%),
-    linear-gradient(160deg, rgba(32, 16, 24, 0.97), rgba(7, 5, 9, 0.98)),
-    url('/flower-grid-pixel-bg.jpg') center / cover no-repeat;
+  border: 1px solid #473e55;
+  border-radius: 34px;
+  background: rgba(37, 20, 64, 0.85);
 }
 
 .q4-panel .q1-story__eyebrow {
