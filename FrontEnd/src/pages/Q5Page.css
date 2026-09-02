@@ -1,7 +1,7 @@
 @import './Q1Page.css';
 
 .q1-page.q5-page {
-  background: #160a02 url('/q5-pixel-garden-bg.png') center / cover no-repeat;
+  background: #160a02 url('/q5-pixel-garden-bg.webp') center / cover no-repeat;
 }
 
 .q1-panel.q5-panel {

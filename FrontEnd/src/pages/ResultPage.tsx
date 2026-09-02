@@ -3,11 +3,11 @@ import {
   emotionResults,
   type Emotion,
 } from '../data/emotionResults'
-import daisyImage from '../assets/pict/daisy-transparent.png'
-import dandelionImage from '../assets/pict/dandelion-transparent.png'
-import lavenderImage from '../assets/pict/lavender-transparent.png'
-import stripedCarnationImage from '../assets/pict/striped-carnation-transparent.png'
-import sunflowerImage from '../assets/pict/sunflower-transparent.png'
+import daisyImage from '../assets/pict/daisy-transparent.webp'
+import dandelionImage from '../assets/pict/dandelion-transparent.webp'
+import lavenderImage from '../assets/pict/lavender-transparent.webp'
+import stripedCarnationImage from '../assets/pict/striped-carnation-transparent.webp'
+import sunflowerImage from '../assets/pict/sunflower-transparent.webp'
 import { submitResultFeedback } from '../services/googleSheets'
 import './ResultPage.css'
 

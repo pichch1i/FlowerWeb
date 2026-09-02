@@ -12,6 +12,7 @@ import type {
 } from './data/quizSubmission'
 import { submitQuizResponse } from './services/googleSheets'
 import { publishTouchDesignerResult } from './services/touchDesigner'
+import { preloadExperienceAssets } from './preloadAssets'
 import IntroPage from './pages/IntroPage'
 import PlayerInfoPage from './pages/PlayerInfoPage'
 import ResultPage from './pages/ResultPage'
@@ -124,6 +125,10 @@ function App() {
         window.clearTimeout(pageTimer.current)
       }
     }
+  }, [])
+
+  useEffect(() => {
+    preloadExperienceAssets()
   }, [])
 
   const goToPage = (nextPage: Page) => {

@@ -9,7 +9,7 @@
     max(12px, env(safe-area-inset-right))
     max(12px, env(safe-area-inset-bottom))
     max(12px, env(safe-area-inset-left));
-  background: #050405 url('/flower-grid-pixel-bg.jpg') center / cover no-repeat;
+  background: #050405 url('/flower-grid-pixel-bg.webp') center / cover no-repeat;
   box-sizing: border-box;
   animation: q-page-bg-bloom 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
   will-change: background-position, filter;
@@ -41,7 +41,7 @@
   color: #fffdf7;
   background:
     linear-gradient(160deg, rgba(35, 16, 26, 0.97), rgba(7, 5, 9, 0.98)),
-    url('/flower-grid-pixel-bg.jpg') center / cover no-repeat;
+    url('/flower-grid-pixel-bg.webp') center / cover no-repeat;
   box-shadow:
     0 20px 54px rgba(0, 0, 0, 0.42),
     inset 0 1px rgba(255, 232, 206, 0.07);
@@ -50,7 +50,7 @@
 }
 
 .q1-page.q1-page--story-one {
-  background: #140c14 url('/q1-pixel-garden-bg.png') center / cover no-repeat;
+  background: #140c14 url('/q1-pixel-garden-bg.webp') center / cover no-repeat;
 }
 
 .q1-panel.q1-panel--story-one {
