@@ -42,8 +42,43 @@ const FEEDBACK_HEADERS = [
   'เวลาที่ส่งความคิดเห็น (อุปกรณ์)',
 ];
 
-function doGet() {
-  return jsonResponse({ ok: true, service: 'Flower quiz responses' });
+function doGet(event) {
+  const action = String(
+    event && event.parameter ? event.parameter.action || '' : '',
+  );
+
+  if (action !== 'latest') {
+    return jsonResponse({ ok: true, service: 'Flower quiz responses' });
+  }
+
+  const properties = PropertiesService.getScriptProperties();
+  const expectedKey = properties.getProperty('TOUCHDESIGNER_API_KEY');
+  const suppliedKey = String(
+    event && event.parameter ? event.parameter.key || '' : '',
+  );
+
+  if (!expectedKey || suppliedKey !== expectedKey) {
+    return jsonResponse({ ok: false, error: 'unauthorized' });
+  }
+
+  const latestJson = properties.getProperty('TOUCHDESIGNER_LATEST_RESULT');
+
+  if (!latestJson) {
+    return jsonResponse({ ok: true, hasResult: false });
+  }
+
+  return jsonResponse(JSON.parse(latestJson));
+}
+
+function setupTouchDesignerApiKey() {
+  const key = Utilities.getUuid().replace(/-/g, '') +
+    Utilities.getUuid().replace(/-/g, '');
+  PropertiesService.getScriptProperties().setProperty(
+    'TOUCHDESIGNER_API_KEY',
+    key,
+  );
+  console.log('TouchDesigner API key: ' + key);
+  return key;
 }
 
 function doPost(event) {
@@ -112,6 +147,7 @@ function doPost(event) {
     );
 
     sheet.appendRow(row);
+    saveLatestTouchDesignerResult(payload);
     return jsonResponse({ ok: true, duplicate: false });
   } catch (error) {
     return jsonResponse({ ok: false, error: 'invalid_request' });
@@ -120,6 +156,40 @@ function doPost(event) {
       lock.releaseLock();
     }
   }
+}
+
+function saveLatestTouchDesignerResult(payload) {
+  const flowerIds = {
+    Hope: 'sunflower',
+    Anxiety: 'lavender',
+    Serenity: 'daisy',
+    Sadness: 'striped_carnation',
+    Frustration: 'dandelion',
+  };
+  const visualIndices = {
+    sunflower: 0,
+    lavender: 1,
+    daisy: 2,
+    striped_carnation: 3,
+    dandelion: 4,
+  };
+  const flowerId = flowerIds[payload.result.emotion] || 'sunflower';
+  const result = {
+    ok: true,
+    hasResult: true,
+    eventId: payload.submissionId,
+    emotion: payload.result.emotion,
+    flowerId: flowerId,
+    flower: payload.result.flower,
+    resultTitle: payload.result.resultTitle,
+    visualIndex: visualIndices[flowerId],
+    submittedAt: payload.submittedAt.toISOString(),
+  };
+
+  PropertiesService.getScriptProperties().setProperty(
+    'TOUCHDESIGNER_LATEST_RESULT',
+    JSON.stringify(result),
+  );
 }
 
 function parseRequestBody(event) {
