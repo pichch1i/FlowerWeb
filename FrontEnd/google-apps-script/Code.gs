@@ -36,6 +36,12 @@ const ALLOWED_EMOTIONS = [
 
 const ALLOWED_OPTIONS = ['A', 'B', 'C', 'D', 'E'];
 
+const FEEDBACK_HEADERS = [
+  'ความคิดเห็นต่อผลลัพธ์',
+  'เวลาที่บันทึกความคิดเห็น (Google)',
+  'เวลาที่ส่งความคิดเห็น (อุปกรณ์)',
+];
+
 function doGet() {
   return jsonResponse({ ok: true, service: 'Flower quiz responses' });
 }
@@ -44,7 +50,7 @@ function doPost(event) {
   const lock = LockService.getScriptLock();
 
   try {
-    const payload = parseAndValidatePayload(event);
+    const requestPayload = parseRequestBody(event);
     lock.waitLock(10000);
 
     const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
@@ -53,6 +59,34 @@ function doPost(event) {
       spreadsheet.insertSheet(SHEET_NAME);
 
     ensureHeaders(sheet);
+
+    if (String(requestPayload.action || '') === 'feedback') {
+      const feedback = parseAndValidateFeedback(requestPayload);
+      const submissionRow = findSubmissionRow(
+        sheet,
+        feedback.submissionId,
+      );
+
+      if (!submissionRow) {
+        throw new Error('Submission not found');
+      }
+
+      const feedbackColumns = ensureFeedbackColumns(sheet);
+
+      sheet
+        .getRange(submissionRow, feedbackColumns[0], 1, 3)
+        .setValues([
+          [
+            protectCell(feedback.feedback, 500),
+            new Date(),
+            feedback.feedbackSubmittedAt,
+          ],
+        ]);
+
+      return jsonResponse({ ok: true, feedbackUpdated: true });
+    }
+
+    const payload = parseAndValidatePayload(requestPayload);
 
     if (hasSubmission(sheet, payload.submissionId)) {
       return jsonResponse({ ok: true, duplicate: true });
@@ -88,12 +122,41 @@ function doPost(event) {
   }
 }
 
-function parseAndValidatePayload(event) {
+function parseRequestBody(event) {
   if (!event || !event.postData || !event.postData.contents) {
     throw new Error('Missing request body');
   }
 
-  const payload = JSON.parse(event.postData.contents);
+  return JSON.parse(event.postData.contents);
+}
+
+function parseAndValidateFeedback(payload) {
+  const submissionId = String(payload.submissionId || '');
+  const feedback = String(payload.feedback || '').trim();
+  const feedbackSubmittedAt = new Date(
+    String(payload.feedbackSubmittedAt || ''),
+  );
+
+  if (!/^[a-zA-Z0-9-]{10,100}$/.test(submissionId)) {
+    throw new Error('Invalid submission ID');
+  }
+
+  if (!feedback || feedback.length > 500) {
+    throw new Error('Invalid feedback');
+  }
+
+  if (Number.isNaN(feedbackSubmittedAt.getTime())) {
+    throw new Error('Invalid feedback time');
+  }
+
+  return {
+    submissionId: submissionId,
+    feedback: feedback,
+    feedbackSubmittedAt: feedbackSubmittedAt,
+  };
+}
+
+function parseAndValidatePayload(payload) {
   const age = Number(payload.player && payload.player.age);
   const answers = Array.isArray(payload.answers) ? payload.answers : [];
   const submissionId = String(payload.submissionId || '');
@@ -177,19 +240,45 @@ function ensureHeaders(sheet) {
 }
 
 function hasSubmission(sheet, submissionId) {
+  return Boolean(findSubmissionRow(sheet, submissionId));
+}
+
+function findSubmissionRow(sheet, submissionId) {
   const lastRow = sheet.getLastRow();
 
   if (lastRow < 2) {
-    return false;
+    return 0;
   }
 
-  return Boolean(
-    sheet
-      .getRange(2, 1, lastRow - 1, 1)
-      .createTextFinder(submissionId)
-      .matchEntireCell(true)
-      .findNext(),
-  );
+  const match = sheet
+    .getRange(2, 1, lastRow - 1, 1)
+    .createTextFinder(submissionId)
+    .matchEntireCell(true)
+    .findNext();
+
+  return match ? match.getRow() : 0;
+}
+
+function ensureFeedbackColumns(sheet) {
+  const headerWidth = Math.max(sheet.getLastColumn(), HEADERS.length);
+  const headers = sheet
+    .getRange(1, 1, 1, headerWidth)
+    .getDisplayValues()[0];
+  const columns = [];
+
+  FEEDBACK_HEADERS.forEach(function (header) {
+    let column = headers.indexOf(header) + 1;
+
+    if (!column) {
+      column = headers.length + 1;
+      sheet.getRange(1, column).setValue(header);
+      headers.push(header);
+    }
+
+    columns.push(column);
+  });
+
+  return columns;
 }
 
 function protectCell(value, maxLength) {

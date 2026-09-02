@@ -6,7 +6,7 @@ export type PlayerInfo = {
   occupation: string
 }
 
-export const PRIVACY_NOTICE_VERSION = '2026-08-27'
+export const PRIVACY_NOTICE_VERSION = '2026-09-02'
 
 export type PrivacyConsent = {
   accepted: true
@@ -33,4 +33,11 @@ export type QuizSubmission = {
     flower: string
     resultTitle: string
   }
+}
+
+export type ResultFeedback = {
+  action: 'feedback'
+  submissionId: string
+  feedback: string
+  feedbackSubmittedAt: string
 }

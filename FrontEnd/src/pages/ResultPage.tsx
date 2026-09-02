@@ -8,10 +8,13 @@ import dandelionImage from '../assets/pict/dandelion-transparent.png'
 import lavenderImage from '../assets/pict/lavender-transparent.png'
 import stripedCarnationImage from '../assets/pict/striped-carnation-transparent.png'
 import sunflowerImage from '../assets/pict/sunflower-transparent.png'
+import { submitResultFeedback } from '../services/googleSheets'
 import './ResultPage.css'
 
 type ResultPageProps = {
   emotion: Emotion
+  submissionId: string
+  feedbackReady: boolean
 }
 
 const flowerImages: Record<Emotion, string> = {
@@ -22,19 +25,44 @@ const flowerImages: Record<Emotion, string> = {
   Frustration: dandelionImage,
 }
 
-function ResultPage({ emotion }: ResultPageProps) {
+function ResultPage({
+  emotion,
+  submissionId,
+  feedbackReady,
+}: ResultPageProps) {
   const result = emotionResults[emotion]
   const [feedback, setFeedback] = useState('')
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
+  const [feedbackStatus, setFeedbackStatus] = useState<
+    'idle' | 'submitting' | 'submitted' | 'error'
+  >('idle')
 
-  const submitFeedback = (event: FormEvent<HTMLFormElement>) => {
+  const submitFeedback = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!feedback.trim()) {
+    const normalizedFeedback = feedback.trim()
+
+    if (
+      !normalizedFeedback ||
+      !feedbackReady ||
+      feedbackStatus === 'submitting'
+    ) {
       return
     }
 
-    setFeedbackSubmitted(true)
+    setFeedbackStatus('submitting')
+
+    try {
+      const status = await submitResultFeedback({
+        action: 'feedback',
+        submissionId,
+        feedback: normalizedFeedback,
+        feedbackSubmittedAt: new Date().toISOString(),
+      })
+
+      setFeedbackStatus(status === 'submitted' ? 'submitted' : 'error')
+    } catch {
+      setFeedbackStatus('error')
+    }
   }
 
   return (
@@ -93,23 +121,43 @@ function ResultPage({ emotion }: ResultPageProps) {
             value={feedback}
             onChange={(event) => {
               setFeedback(event.target.value)
-              setFeedbackSubmitted(false)
+              if (feedbackStatus === 'error') {
+                setFeedbackStatus('idle')
+              }
             }}
             placeholder="พิมพ์ความคิดเห็นของคุณ..."
             maxLength={500}
             rows={4}
+            disabled={feedbackStatus === 'submitted'}
           />
 
           <div className="result-feedback__footer">
             <span>{feedback.length}/500</span>
-            <button type="submit" disabled={!feedback.trim()}>
-              ส่งความคิดเห็น
+            <button
+              type="submit"
+              disabled={
+                !feedback.trim() ||
+                !feedbackReady ||
+                feedbackStatus === 'submitting' ||
+                feedbackStatus === 'submitted'
+              }
+            >
+              {feedbackStatus === 'submitting'
+                ? 'กำลังส่ง...'
+                : feedbackStatus === 'submitted'
+                  ? 'ส่งแล้ว'
+                  : 'ส่งความคิดเห็น'}
             </button>
           </div>
         </form>
 
         <p className="result-feedback__status" aria-live="polite">
-          {feedbackSubmitted && 'ขอบคุณสำหรับความคิดเห็นของคุณ'}
+          {feedbackStatus === 'submitted' &&
+            'ขอบคุณสำหรับความคิดเห็นของคุณ'}
+          {feedbackStatus === 'error' &&
+            'ยังส่งความคิดเห็นไม่ได้ กรุณาลองใหม่อีกครั้ง'}
+          {!feedbackReady && feedbackStatus === 'idle' &&
+            'กำลังเตรียมพื้นที่รับความคิดเห็น...'}
         </p>
       </section>
     </main>
