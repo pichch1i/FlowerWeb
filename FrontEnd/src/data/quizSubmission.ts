@@ -41,3 +41,22 @@ export type ResultFeedback = {
   feedback: string
   feedbackSubmittedAt: string
 }
+
+export type UsageLogEvent = {
+  action: 'log'
+  eventId: string
+  sessionId: string
+  eventType: 'page_view' | 'button_click' | 'answer_select' | 'form_submit'
+  page: string
+  target: string
+  occurredAt: string
+  submissionId?: string
+  details?: Record<string, string | number | boolean | null>
+  path: string
+  referrer: string
+  userAgent: string
+  language: string
+  viewport: string
+  screen: string
+  timezone: string
+}

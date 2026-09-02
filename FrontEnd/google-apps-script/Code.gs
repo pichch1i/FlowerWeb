@@ -1,4 +1,6 @@
 const SHEET_NAME = 'Responses';
+const USAGE_LOG_SHEET_NAME = 'Usage Logs';
+const DEFAULT_ADMIN_PASSWORD = 'boomscape-admin-2026';
 
 const HEADERS = [
   'Submission ID',
@@ -42,15 +44,42 @@ const FEEDBACK_HEADERS = [
   'เวลาที่ส่งความคิดเห็น (อุปกรณ์)',
 ];
 
+const USAGE_LOG_HEADERS = [
+  'Log ID',
+  'เวลาที่บันทึก (Google)',
+  'เวลาที่เกิดเหตุการณ์ (อุปกรณ์)',
+  'Session ID',
+  'Submission ID',
+  'Event Type',
+  'Page',
+  'Target',
+  'Details',
+  'Path',
+  'Referrer',
+  'User Agent',
+  'Language',
+  'Viewport',
+  'Screen',
+  'Timezone',
+];
+
 function doGet(event) {
   const action = String(
     event && event.parameter ? event.parameter.action || '' : '',
   );
 
-  if (action !== 'latest') {
-    return jsonResponse({ ok: true, service: 'Flower quiz responses' });
+  if (action === 'latest') {
+    return getLatestTouchDesignerResult(event);
   }
 
+  if (action === 'admin') {
+    return getAdminDashboard(event);
+  }
+
+  return jsonResponse({ ok: true, service: 'Flower quiz responses' });
+}
+
+function getLatestTouchDesignerResult(event) {
   const properties = PropertiesService.getScriptProperties();
   const expectedKey = properties.getProperty('TOUCHDESIGNER_API_KEY');
   const suppliedKey = String(
@@ -68,6 +97,42 @@ function doGet(event) {
   }
 
   return jsonResponse(JSON.parse(latestJson));
+}
+
+function getAdminDashboard(event) {
+  const params = event && event.parameter ? event.parameter : {};
+  const suppliedPassword = String(params.password || '');
+  const callback = sanitizeJsonpCallback(params.callback);
+  const properties = PropertiesService.getScriptProperties();
+  const expectedPassword =
+    properties.getProperty('ADMIN_PASSWORD') || DEFAULT_ADMIN_PASSWORD;
+
+  if (suppliedPassword !== expectedPassword) {
+    return callback
+      ? jsonpResponse(callback, { ok: false, error: 'unauthorized' })
+      : jsonResponse({ ok: false, error: 'unauthorized' });
+  }
+
+  const limit = Math.min(Math.max(Number(params.limit) || 200, 1), 1000);
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const responsesSheet =
+    spreadsheet.getSheetByName(SHEET_NAME) ||
+    spreadsheet.insertSheet(SHEET_NAME);
+  const usageLogSheet =
+    spreadsheet.getSheetByName(USAGE_LOG_SHEET_NAME) ||
+    spreadsheet.insertSheet(USAGE_LOG_SHEET_NAME);
+
+  ensureHeaders(responsesSheet);
+  ensureUsageLogHeaders(usageLogSheet);
+
+  const body = {
+    ok: true,
+    generatedAt: new Date().toISOString(),
+    responses: readSheetRecords(responsesSheet, limit),
+    logs: readSheetRecords(usageLogSheet, limit),
+  };
+
+  return callback ? jsonpResponse(callback, body) : jsonResponse(body);
 }
 
 function setupTouchDesignerApiKey() {
@@ -94,6 +159,17 @@ function doPost(event) {
       spreadsheet.insertSheet(SHEET_NAME);
 
     ensureHeaders(sheet);
+
+    if (String(requestPayload.action || '') === 'log') {
+      const usageLog = parseAndValidateUsageLog(requestPayload);
+      const usageLogSheet =
+        spreadsheet.getSheetByName(USAGE_LOG_SHEET_NAME) ||
+        spreadsheet.insertSheet(USAGE_LOG_SHEET_NAME);
+
+      ensureUsageLogHeaders(usageLogSheet);
+      appendUsageLog(usageLogSheet, usageLog);
+      return jsonResponse({ ok: true, logged: true });
+    }
 
     if (String(requestPayload.action || '') === 'feedback') {
       const feedback = parseAndValidateFeedback(requestPayload);
@@ -156,6 +232,27 @@ function doPost(event) {
       lock.releaseLock();
     }
   }
+}
+
+function appendUsageLog(sheet, usageLog) {
+  sheet.appendRow([
+    usageLog.eventId,
+    new Date(),
+    usageLog.occurredAt,
+    usageLog.sessionId,
+    usageLog.submissionId,
+    usageLog.eventType,
+    usageLog.page,
+    usageLog.target,
+    usageLog.details,
+    usageLog.path,
+    usageLog.referrer,
+    usageLog.userAgent,
+    usageLog.language,
+    usageLog.viewport,
+    usageLog.screen,
+    usageLog.timezone,
+  ]);
 }
 
 function saveLatestTouchDesignerResult(payload) {
@@ -223,6 +320,67 @@ function parseAndValidateFeedback(payload) {
     submissionId: submissionId,
     feedback: feedback,
     feedbackSubmittedAt: feedbackSubmittedAt,
+  };
+}
+
+function parseAndValidateUsageLog(payload) {
+  const eventId = String(payload.eventId || '');
+  const sessionId = String(payload.sessionId || '');
+  const submissionId = String(payload.submissionId || '');
+  const eventType = String(payload.eventType || '');
+  const page = String(payload.page || '');
+  const target = String(payload.target || '');
+  const occurredAt = new Date(String(payload.occurredAt || ''));
+  const allowedEventTypes = [
+    'page_view',
+    'button_click',
+    'answer_select',
+    'form_submit',
+  ];
+
+  if (!/^[a-zA-Z0-9-]{10,120}$/.test(eventId)) {
+    throw new Error('Invalid log ID');
+  }
+
+  if (!/^[a-zA-Z0-9-]{10,120}$/.test(sessionId)) {
+    throw new Error('Invalid session ID');
+  }
+
+  if (
+    submissionId &&
+    !/^[a-zA-Z0-9-]{10,120}$/.test(submissionId)
+  ) {
+    throw new Error('Invalid submission ID');
+  }
+
+  if (allowedEventTypes.indexOf(eventType) === -1) {
+    throw new Error('Invalid event type');
+  }
+
+  if (!page || page.length > 80 || !target || target.length > 120) {
+    throw new Error('Invalid log target');
+  }
+
+  if (Number.isNaN(occurredAt.getTime())) {
+    throw new Error('Invalid log time');
+  }
+
+  return {
+    eventId: eventId,
+    sessionId: sessionId,
+    submissionId: submissionId,
+    eventType: eventType,
+    page: protectCell(page, 80),
+    target: protectCell(target, 120),
+    occurredAt: occurredAt,
+    details: protectCell(JSON.stringify(payload.details || {}), 1000),
+    path: protectCell(payload.path, 300),
+    referrer: protectCell(payload.referrer, 300),
+    userAgent: protectCell(payload.userAgent, 500),
+    language: protectCell(payload.language, 40),
+    viewport: protectCell(payload.viewport, 40),
+    screen: protectCell(payload.screen, 40),
+    timezone: protectCell(payload.timezone, 80),
   };
 }
 
@@ -351,6 +509,51 @@ function ensureFeedbackColumns(sheet) {
   return columns;
 }
 
+function ensureUsageLogHeaders(sheet) {
+  if (sheet.getLastRow() === 0) {
+    sheet
+      .getRange(1, 1, 1, USAGE_LOG_HEADERS.length)
+      .setValues([USAGE_LOG_HEADERS]);
+    sheet.setFrozenRows(1);
+  }
+}
+
+function readSheetRecords(sheet, limit) {
+  const lastRow = sheet.getLastRow();
+  const lastColumn = sheet.getLastColumn();
+
+  if (lastRow < 2 || lastColumn < 1) {
+    return [];
+  }
+
+  const headers = sheet.getRange(1, 1, 1, lastColumn).getDisplayValues()[0];
+  const rowCount = Math.min(limit, lastRow - 1);
+  const startRow = Math.max(2, lastRow - rowCount + 1);
+  const values = sheet
+    .getRange(startRow, 1, rowCount, lastColumn)
+    .getDisplayValues()
+    .reverse();
+
+  return values.map(function (row) {
+    const record = {};
+
+    headers.forEach(function (header, index) {
+      if (header) {
+        record[header] = row[index] || '';
+      }
+    });
+
+    return record;
+  });
+}
+
+function sanitizeJsonpCallback(callback) {
+  const text = String(callback || '');
+  return /^[a-zA-Z_$][0-9a-zA-Z_$]*(\.[a-zA-Z_$][0-9a-zA-Z_$]*)*$/.test(text)
+    ? text
+    : '';
+}
+
 function protectCell(value, maxLength) {
   const text = String(value || '').trim().slice(0, maxLength);
   return /^[=+\-@]/.test(text) ? "'" + text : text;
@@ -360,4 +563,10 @@ function jsonResponse(body) {
   return ContentService.createTextOutput(JSON.stringify(body)).setMimeType(
     ContentService.MimeType.JSON,
   );
+}
+
+function jsonpResponse(callback, body) {
+  return ContentService
+    .createTextOutput(callback + '(' + JSON.stringify(body) + ');')
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
 }

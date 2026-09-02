@@ -11,11 +11,13 @@ import type {
   QuizOptionId,
 } from './data/quizSubmission'
 import { submitQuizResponse } from './services/googleSheets'
+import { logUsageEvent } from './services/usageLog'
 import { publishTouchDesignerResult } from './services/touchDesigner'
 import { preloadExperienceAssets } from './preloadAssets'
 import IntroPage from './pages/IntroPage'
 import PlayerInfoPage from './pages/PlayerInfoPage'
 import ResultPage from './pages/ResultPage'
+import AdminPage from './pages/AdminPage'
 import Q1Page from './pages/Q1Page'
 import Q2Page from './pages/Q2Page'
 import Q3Page from './pages/Q3Page'
@@ -56,6 +58,9 @@ const questionNumbers: Partial<Record<Page, number>> = {
 }
 
 function App() {
+  const isAdminPage =
+    window.location.pathname.replace(/\/+$/, '').endsWith('/admin') ||
+    new URLSearchParams(window.location.search).get('admin') === '1'
   const [currentPage, setCurrentPage] = useState<Page>('intro')
   const [pageMotion, setPageMotion] = useState<'idle' | 'leaving'>('idle')
   const [playerInfo, setPlayerInfo] = useState<PlayerInfo | null>(null)
@@ -71,6 +76,23 @@ function App() {
   )
 
   useEffect(() => {
+    if (isAdminPage) {
+      return
+    }
+
+    logUsageEvent('page_view', currentPage, currentPage, {
+      submissionId: submissionId || undefined,
+      details: {
+        answersCount: answers.length,
+      },
+    })
+  }, [answers.length, currentPage, isAdminPage, submissionId])
+
+  useEffect(() => {
+    if (isAdminPage) {
+      return
+    }
+
     if (
       currentPage !== 'result' ||
       !playerInfo ||
@@ -113,6 +135,7 @@ function App() {
   }, [
     answers,
     currentPage,
+    isAdminPage,
     playerInfo,
     privacyConsent,
     resultEmotion,
@@ -162,6 +185,13 @@ function App() {
     setAnswers([])
     setSubmissionId(nextSubmissionId)
     submissionAttempted.current = false
+    logUsageEvent('form_submit', 'player-info', 'player-info-submit', {
+      submissionId: nextSubmissionId,
+      details: {
+        age: nextPlayerInfo.age,
+        occupation: nextPlayerInfo.occupation,
+      },
+    })
     goToPage('q1')
   }
 
@@ -171,6 +201,14 @@ function App() {
     emotion: Emotion,
     nextPage: Page,
   ) => {
+    logUsageEvent('answer_select', `q${question}`, `q${question}-${optionId}`, {
+      submissionId: submissionId || undefined,
+      details: {
+        question,
+        optionId,
+        emotion,
+      },
+    })
     setAnswers((currentAnswers) => [
       ...currentAnswers,
       { question, optionId, emotion },
@@ -193,7 +231,18 @@ function App() {
       )
     }
 
+    logUsageEvent('button_click', currentPage, 'back-to-previous-question', {
+      submissionId: submissionId || undefined,
+      details: {
+        from: currentPage,
+        to: previousPage,
+      },
+    })
     goToPage(previousPage)
+  }
+
+  if (isAdminPage) {
+    return <AdminPage />
   }
 
   const pageContent = (() => {
@@ -276,11 +325,24 @@ function App() {
         <ResultPage
           emotion={resultEmotion}
           submissionId={submissionId}
+          onLog={(eventType, target, details) =>
+            logUsageEvent(eventType, 'result', target, {
+              submissionId: submissionId || undefined,
+              details,
+            })
+          }
         />
       )
     }
 
-    return <IntroPage onStart={() => goToPage('player-info')} />
+    return (
+      <IntroPage
+        onStart={() => {
+          logUsageEvent('button_click', 'intro', 'start-quiz')
+          goToPage('player-info')
+        }}
+      />
+    )
   })()
 
   const canGoBack = previousQuestionPages[currentPage] !== undefined
