@@ -190,6 +190,39 @@
   font-size: 0.65rem;
 }
 
+@media (max-width: 640px) {
+  .result-hero {
+    display: block;
+    min-height: 100svh;
+    padding: 0;
+  }
+
+  .result-card {
+    display: flex;
+    width: 100%;
+    min-height: 100svh;
+    flex-direction: column;
+    justify-content: center;
+    padding:
+      max(18px, env(safe-area-inset-top))
+      max(18px, env(safe-area-inset-right))
+      max(18px, env(safe-area-inset-bottom))
+      max(18px, env(safe-area-inset-left));
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  @supports (height: 100dvh) {
+    .result-page,
+    .result-hero,
+    .result-card {
+      min-height: 100dvh;
+    }
+  }
+}
+
 @media (min-width: 641px) {
   .result-hero {
     padding: 28px 24px;
