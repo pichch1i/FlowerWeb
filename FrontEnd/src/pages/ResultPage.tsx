@@ -89,6 +89,11 @@ function ResultPage({
             <strong>{emotion}</strong>
           </div>
 
+          <a className="result-feedback-invitation" href="#result-feedback">
+            <span>ความคิดเห็นของคุณมีความหมายกับเรา</span>
+            <strong>เลื่อนลงเพื่อแสดงความคิดเห็น ↓</strong>
+          </a>
+
           <div className="result-sparkles" aria-hidden="true">
             <span>✦</span>
             <span>✦</span>
@@ -98,6 +103,7 @@ function ResultPage({
       </div>
 
       <section
+        id="result-feedback"
         className="result-feedback"
         aria-labelledby="result-feedback-title"
       >
