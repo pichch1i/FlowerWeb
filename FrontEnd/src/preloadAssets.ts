@@ -6,12 +6,9 @@ import sunflowerImage from './assets/pict/sunflower-transparent.webp'
 
 const publicAsset = (path: string) => `${import.meta.env.BASE_URL}${path}`
 
-const criticalAssets = [
+const backgroundAssets = [
   publicAsset('flower-grid-pixel-bg.webp'),
   publicAsset('q1-pixel-garden-bg.webp'),
-]
-
-const backgroundAssets = [
   publicAsset('q2-pixel-garden-bg.webp'),
   publicAsset('q3-pixel-garden-bg.webp'),
   publicAsset('q4-pixel-garden-bg.webp'),
@@ -43,13 +40,6 @@ function preloadImage(src: string) {
 }
 
 export function preloadExperienceAssets() {
-  criticalAssets.forEach(preloadImage)
-
-  window.setTimeout(() => {
-    backgroundAssets.forEach(preloadImage)
-  }, 400)
-
-  window.setTimeout(() => {
-    resultFlowerAssets.forEach(preloadImage)
-  }, 900)
+  backgroundAssets.forEach(preloadImage)
+  resultFlowerAssets.forEach(preloadImage)
 }
