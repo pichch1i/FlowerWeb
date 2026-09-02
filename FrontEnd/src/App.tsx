@@ -131,6 +131,10 @@ function App() {
       window.clearTimeout(pageTimer.current)
     }
 
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
+
     setPageMotion('leaving')
     pageTimer.current = window.setTimeout(() => {
       setCurrentPage(nextPage)

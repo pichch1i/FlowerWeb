@@ -97,15 +97,17 @@ body {
   line-height: 0.7;
 }
 
-.app-back-button:hover {
-  border-color: rgba(227, 166, 117, 0.52);
-  background: rgba(35, 16, 26, 0.76);
-  transform: translateX(-2px);
-}
-
 .app-back-button:focus-visible {
   outline: 3px solid rgba(224, 155, 109, 0.48);
   outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .app-back-button:hover {
+    border-color: rgba(227, 166, 117, 0.52);
+    background: rgba(35, 16, 26, 0.76);
+    transform: translateX(-2px);
+  }
 }
 
 @supports (min-height: 100svh) {
