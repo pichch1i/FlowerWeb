@@ -1,3 +1,4 @@
+import { useState, type FormEvent } from 'react'
 import {
   emotionResults,
   type Emotion,
@@ -23,6 +24,18 @@ const flowerImages: Record<Emotion, string> = {
 
 function ResultPage({ emotion }: ResultPageProps) {
   const result = emotionResults[emotion]
+  const [feedback, setFeedback] = useState('')
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
+
+  const submitFeedback = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (!feedback.trim()) {
+      return
+    }
+
+    setFeedbackSubmitted(true)
+  }
 
   return (
     <main className="result-page">
@@ -62,6 +75,43 @@ function ResultPage({ emotion }: ResultPageProps) {
         </section>
       </div>
 
+      <section
+        className="result-feedback"
+        aria-labelledby="result-feedback-title"
+      >
+        <h2 id="result-feedback-title">ข้อความนี้ตรงกับคุณไหม?</h2>
+        <p>
+          บอกเราได้ว่าความหมายและข้อความของดอกไม้นี้
+          สะท้อนความรู้สึกของคุณมากน้อยแค่ไหน
+        </p>
+
+        <form onSubmit={submitFeedback}>
+          <label htmlFor="result-feedback-message">ความคิดเห็นของคุณ</label>
+          <textarea
+            id="result-feedback-message"
+            name="resultFeedback"
+            value={feedback}
+            onChange={(event) => {
+              setFeedback(event.target.value)
+              setFeedbackSubmitted(false)
+            }}
+            placeholder="พิมพ์ความคิดเห็นของคุณ..."
+            maxLength={500}
+            rows={4}
+          />
+
+          <div className="result-feedback__footer">
+            <span>{feedback.length}/500</span>
+            <button type="submit" disabled={!feedback.trim()}>
+              ส่งความคิดเห็น
+            </button>
+          </div>
+        </form>
+
+        <p className="result-feedback__status" aria-live="polite">
+          {feedbackSubmitted && 'ขอบคุณสำหรับความคิดเห็นของคุณ'}
+        </p>
+      </section>
     </main>
   )
 }

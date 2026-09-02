@@ -151,6 +151,130 @@
   font-weight: 600;
 }
 
+.result-feedback {
+  width: min(calc(100% - 24px), 680px);
+  margin: 16px auto 36px;
+  padding: 20px 17px 17px;
+  border: 1px solid rgba(244, 200, 166, 0.14);
+  border-radius: 22px 7px 22px 7px;
+  background: rgba(255, 246, 233, 0.045);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.result-feedback h2 {
+  margin: 0;
+  color: #f4d2bb;
+  font-size: 1.08rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+.result-feedback > p {
+  margin: 7px auto 0;
+  max-width: 480px;
+  color: #b9aaa6;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.result-feedback form {
+  display: grid;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.result-feedback label {
+  color: #d6b39e;
+  font-size: 0.76rem;
+}
+
+.result-feedback textarea {
+  width: 100%;
+  min-height: 112px;
+  resize: vertical;
+  padding: 14px 15px;
+  border: 1px solid rgba(244, 200, 166, 0.18);
+  border-radius: 16px 5px 16px 5px;
+  outline: 0;
+  color: #fff6e9;
+  background: rgba(7, 5, 9, 0.44);
+  font: inherit;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+  box-sizing: border-box;
+}
+
+.result-feedback textarea::placeholder {
+  color: #8f8180;
+  opacity: 1;
+}
+
+.result-feedback textarea:hover,
+.result-feedback textarea:focus {
+  border-color: rgba(227, 166, 117, 0.6);
+  background: rgba(255, 246, 233, 0.07);
+}
+
+.result-feedback textarea:focus {
+  box-shadow: 0 0 0 4px rgba(216, 154, 112, 0.12);
+}
+
+.result-feedback__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.result-feedback__footer > span {
+  color: #8f8180;
+  font-size: 0.65rem;
+}
+
+.result-feedback button {
+  min-height: 42px;
+  padding: 0 20px;
+  border: 1px solid rgba(255, 220, 194, 0.18);
+  border-radius: 999px;
+  color: #fff6e9;
+  background: linear-gradient(110deg, #8f493e, #c77855);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  transition:
+    transform 170ms ease,
+    filter 170ms ease,
+    opacity 170ms ease;
+}
+
+.result-feedback button:not(:disabled):hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.result-feedback button:focus-visible {
+  outline: 3px solid rgba(224, 155, 109, 0.5);
+  outline-offset: 3px;
+}
+
+.result-feedback button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.result-feedback .result-feedback__status {
+  min-height: 1.3em;
+  margin-top: 9px;
+  color: #d7af93;
+  font-size: 0.7rem;
+}
+
 .result-flower-image {
   display: block;
   width: clamp(170px, 55vw, 240px);
@@ -195,7 +319,8 @@
     width: 100vw;
     max-width: 100%;
     min-height: 100svh;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 
   .result-hero {
@@ -213,14 +338,14 @@
   }
 
   .result-card {
-    display: flex;
+    display: grid;
     width: 100%;
     max-width: 100%;
     height: 100%;
     min-height: 0;
     max-height: 100%;
-    flex-direction: column;
-    justify-content: center;
+    grid-template-rows: minmax(0, 1fr) repeat(6, auto);
+    align-items: center;
     padding: clamp(12px, 2.2svh, 18px) clamp(14px, 4vw, 20px);
     border: 1px solid rgba(244, 200, 166, 0.2);
     border-radius: clamp(22px, 7vw, 30px) clamp(6px, 2vw, 9px)
@@ -231,8 +356,10 @@
   }
 
   .result-flower-image {
-    width: clamp(128px, min(54vw, 29svh), 230px);
-    height: clamp(144px, min(60vw, 31svh), 250px);
+    align-self: end;
+    width: clamp(160px, min(66vw, 35svh), 270px);
+    height: clamp(178px, min(72vw, 37svh), 290px);
+    transform: scale(1.08);
   }
 
   .result-eyebrow {
@@ -247,7 +374,7 @@
 
   .result-card h1 {
     margin-top: clamp(1px, 0.4svh, 2px);
-    font-size: clamp(1.4rem, min(7.2vw, 4.2svh), 2.1rem);
+    font-size: clamp(1.5rem, min(7.6vw, 4.5svh), 2.25rem);
   }
 
   .result-description {
@@ -267,7 +394,7 @@
 
   .result-message blockquote {
     margin-top: clamp(3px, 0.6svh, 4px);
-    font-size: clamp(0.92rem, min(5vw, 2.8svh), 1.4rem);
+    font-size: clamp(1rem, min(5.5vw, 3.1svh), 1.5rem);
     line-height: 1.24;
   }
 
@@ -275,6 +402,11 @@
     margin-top: clamp(7px, 1.2svh, 10px);
     padding: 5px 11px;
     font-size: clamp(0.58rem, 1.3svh, 0.62rem);
+  }
+
+  .result-feedback {
+    margin-top: 18px;
+    margin-bottom: max(36px, env(safe-area-inset-bottom));
   }
 
   @supports (height: 100dvh) {
@@ -344,6 +476,12 @@
     font-size: 0.67rem;
   }
 
+  .result-feedback {
+    margin-top: 24px;
+    margin-bottom: 56px;
+    padding: 22px 22px 19px;
+  }
+
 }
 
 @media (max-width: 640px) and (max-height: 700px) {
@@ -353,8 +491,8 @@
   }
 
   .result-flower-image {
-    width: clamp(118px, min(44vw, 25svh), 175px);
-    height: clamp(128px, min(48vw, 26svh), 180px);
+    width: clamp(135px, min(52vw, 29svh), 195px);
+    height: clamp(148px, min(57vw, 30svh), 205px);
   }
 
   .result-card h1 {
@@ -363,5 +501,12 @@
 
   .result-message {
     border-radius: 18px 5px 18px 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result-feedback textarea,
+  .result-feedback button {
+    transition: none;
   }
 }
