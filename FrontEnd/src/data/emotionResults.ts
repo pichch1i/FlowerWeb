@@ -40,7 +40,7 @@ export const emotionResults: Record<Emotion, EmotionResult> = {
   Frustration: {
     flower: 'แดนดิไลออน',
     reason: 'ความเข้มแข็ง ความแน่วแน่ และการเผชิญความท้าทาย',
-    resultTitle: 'ดอกไม้แห่งแรงผลัก',
+    resultTitle: 'ดอกไม้แห่งแรงผลักดัน',
     message: 'แรงที่อยู่ข้างในคุณ ค่อย ๆ เปลี่ยนเป็นการเติบโตได้',
   },
 }
