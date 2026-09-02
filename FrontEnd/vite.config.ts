@@ -9,9 +9,12 @@ export default defineConfig(async () => {
   process.env.MINIFLARE_REGISTRY_PATH ??= '.wrangler/registry'
 
   const { cloudflare } = await import('@cloudflare/vite-plugin')
+  const base =
+    process.env.VITE_BASE_PATH ??
+    (process.env.GITHUB_ACTIONS ? '/FlowerWeb/' : '/')
 
   return {
-    base: process.env.GITHUB_ACTIONS ? '/FlowerWeb/' : '/',
+    base,
     plugins: [
       react(),
       sites(),
