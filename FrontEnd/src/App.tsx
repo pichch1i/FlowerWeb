@@ -42,7 +42,6 @@ function App() {
     useState<PrivacyConsent | null>(null)
   const [answers, setAnswers] = useState<QuizAnswer[]>([])
   const [submissionId, setSubmissionId] = useState('')
-  const [submissionReady, setSubmissionReady] = useState(false)
   const submissionAttempted = useRef(false)
 
   const resultEmotion = detectDominantEmotion(
@@ -75,14 +74,9 @@ function App() {
         flower: result.flower,
         resultTitle: result.resultTitle,
       },
+    }).catch(() => {
+      submissionAttempted.current = false
     })
-      .then((status) => {
-        setSubmissionReady(status === 'submitted')
-      })
-      .catch(() => {
-        setSubmissionReady(false)
-        submissionAttempted.current = false
-      })
 
     void publishTouchDesignerResult({
       submissionId,
@@ -115,7 +109,6 @@ function App() {
     setPrivacyConsent(nextPrivacyConsent)
     setAnswers([])
     setSubmissionId(nextSubmissionId)
-    setSubmissionReady(false)
     submissionAttempted.current = false
     setCurrentPage('q1')
   }
@@ -213,7 +206,6 @@ function App() {
         <ResultPage
           emotion={resultEmotion}
           submissionId={submissionId}
-          feedbackReady={submissionReady}
         />
       )
     }

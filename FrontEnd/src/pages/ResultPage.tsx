@@ -14,7 +14,6 @@ import './ResultPage.css'
 type ResultPageProps = {
   emotion: Emotion
   submissionId: string
-  feedbackReady: boolean
 }
 
 const flowerImages: Record<Emotion, string> = {
@@ -28,7 +27,6 @@ const flowerImages: Record<Emotion, string> = {
 function ResultPage({
   emotion,
   submissionId,
-  feedbackReady,
 }: ResultPageProps) {
   const result = emotionResults[emotion]
   const [feedback, setFeedback] = useState('')
@@ -41,11 +39,7 @@ function ResultPage({
 
     const normalizedFeedback = feedback.trim()
 
-    if (
-      !normalizedFeedback ||
-      !feedbackReady ||
-      feedbackStatus === 'submitting'
-    ) {
+    if (!normalizedFeedback || feedbackStatus === 'submitting') {
       return
     }
 
@@ -137,7 +131,6 @@ function ResultPage({
               type="submit"
               disabled={
                 !feedback.trim() ||
-                !feedbackReady ||
                 feedbackStatus === 'submitting' ||
                 feedbackStatus === 'submitted'
               }
@@ -156,8 +149,6 @@ function ResultPage({
             'ขอบคุณสำหรับความคิดเห็นของคุณ'}
           {feedbackStatus === 'error' &&
             'ยังส่งความคิดเห็นไม่ได้ กรุณาลองใหม่อีกครั้ง'}
-          {!feedbackReady && feedbackStatus === 'idle' &&
-            'กำลังเตรียมพื้นที่รับความคิดเห็น...'}
         </p>
       </section>
     </main>
