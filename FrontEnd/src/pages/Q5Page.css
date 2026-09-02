@@ -7,6 +7,13 @@
 .q1-panel.q5-panel {
   --question-accent: #d39b8a;
   --question-accent-soft: #f0c9bd;
+  --question-selected-bg: linear-gradient(
+    110deg,
+    rgba(80, 37, 10, 0.9),
+    rgba(137, 71, 29, 0.76)
+  );
+  --question-selected-text: #ffdcc3;
+  --question-selected-ring: rgba(211, 130, 74, 0.16);
   border: 1px solid #5b4b40;
   border-radius: 34px;
   background: rgba(22, 10, 2, 0.85);
