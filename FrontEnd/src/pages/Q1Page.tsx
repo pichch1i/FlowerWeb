@@ -80,7 +80,7 @@ function Q1Page({ onAnswer }: Q1PageProps) {
                   setSelectedAnswer(option.id)
                   window.setTimeout(
                     () => onAnswer(option.id, option.emotion),
-                    220,
+                    320,
                   )
                 }}
               >

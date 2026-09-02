@@ -79,7 +79,7 @@ function Q7Page({ onAnswer }: Q7PageProps) {
                   setSelectedAnswer(option.id)
                   window.setTimeout(
                     () => onAnswer(option.id, option.emotion),
-                    220,
+                    320,
                   )
                 }}
               >

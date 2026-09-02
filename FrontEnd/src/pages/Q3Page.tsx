@@ -75,7 +75,7 @@ function Q3Page({ onAnswer }: Q3PageProps) {
                   setSelectedAnswer(option.id)
                   window.setTimeout(
                     () => onAnswer(option.id, option.emotion),
-                    220,
+                    320,
                   )
                 }}
               >

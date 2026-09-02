@@ -81,7 +81,7 @@ function Q2Page({ onAnswer }: Q2PageProps) {
                   setSelectedAnswer(option.id)
                   window.setTimeout(
                     () => onAnswer(option.id, option.emotion),
-                    220,
+                    320,
                   )
                 }}
               >

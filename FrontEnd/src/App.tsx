@@ -37,12 +37,14 @@ type Page =
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('intro')
+  const [pageMotion, setPageMotion] = useState<'idle' | 'leaving'>('idle')
   const [playerInfo, setPlayerInfo] = useState<PlayerInfo | null>(null)
   const [privacyConsent, setPrivacyConsent] =
     useState<PrivacyConsent | null>(null)
   const [answers, setAnswers] = useState<QuizAnswer[]>([])
   const [submissionId, setSubmissionId] = useState('')
   const submissionAttempted = useRef(false)
+  const pageTimer = useRef<number | null>(null)
 
   const resultEmotion = detectDominantEmotion(
     answers.map((answer) => answer.emotion),
@@ -97,6 +99,28 @@ function App() {
     submissionId,
   ])
 
+  useEffect(() => {
+    return () => {
+      if (pageTimer.current !== null) {
+        window.clearTimeout(pageTimer.current)
+      }
+    }
+  }, [])
+
+  const goToPage = (nextPage: Page) => {
+    if (pageTimer.current !== null) {
+      window.clearTimeout(pageTimer.current)
+    }
+
+    setPageMotion('leaving')
+    pageTimer.current = window.setTimeout(() => {
+      setCurrentPage(nextPage)
+      setPageMotion('idle')
+      pageTimer.current = null
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 210)
+  }
+
   const startQuiz = (
     nextPlayerInfo: PlayerInfo,
     nextPrivacyConsent: PrivacyConsent,
@@ -110,7 +134,7 @@ function App() {
     setAnswers([])
     setSubmissionId(nextSubmissionId)
     submissionAttempted.current = false
-    setCurrentPage('q1')
+    goToPage('q1')
   }
 
   const recordAnswer = (
@@ -123,7 +147,7 @@ function App() {
       ...currentAnswers,
       { question, optionId, emotion },
     ])
-    setCurrentPage(nextPage)
+    goToPage(nextPage)
   }
 
   const pageContent = (() => {
@@ -210,11 +234,14 @@ function App() {
       )
     }
 
-    return <IntroPage onStart={() => setCurrentPage('player-info')} />
+    return <IntroPage onStart={() => goToPage('player-info')} />
   })()
 
   return (
-    <div className="app-page-transition" key={currentPage}>
+    <div
+      className={`app-page-transition app-page-transition--${pageMotion}`}
+      key={currentPage}
+    >
       {pageContent}
     </div>
   )
