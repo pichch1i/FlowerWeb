@@ -136,10 +136,10 @@ function ResultPage({
               }
             >
               {feedbackStatus === 'submitting'
-                ? 'กำลังส่ง...'
+                ? 'กำลังส่ง'
                 : feedbackStatus === 'submitted'
                   ? 'ส่งแล้ว'
-                  : 'ส่งความคิดเห็น'}
+                  : 'ส่งข้อความ'}
             </button>
           </div>
         </form>
