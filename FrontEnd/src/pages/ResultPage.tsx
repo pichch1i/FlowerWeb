@@ -1,4 +1,3 @@
-import { useState, type FormEvent } from 'react'
 import {
   emotionResults,
   type Emotion,
@@ -8,13 +7,10 @@ import dandelionImage from '../assets/pict/dandelion-transparent.png'
 import lavenderImage from '../assets/pict/lavender-transparent.png'
 import stripedCarnationImage from '../assets/pict/striped-carnation-transparent.png'
 import sunflowerImage from '../assets/pict/sunflower-transparent.png'
-import { submitResultFeedback } from '../services/googleSheets'
 import './ResultPage.css'
 
 type ResultPageProps = {
   emotion: Emotion
-  submissionId: string
-  feedbackReady: boolean
 }
 
 const flowerImages: Record<Emotion, string> = {
@@ -25,41 +21,8 @@ const flowerImages: Record<Emotion, string> = {
   Frustration: dandelionImage,
 }
 
-function ResultPage({
-  emotion,
-  submissionId,
-  feedbackReady,
-}: ResultPageProps) {
+function ResultPage({ emotion }: ResultPageProps) {
   const result = emotionResults[emotion]
-  const [feedback, setFeedback] = useState('')
-  const [feedbackStatus, setFeedbackStatus] = useState<
-    'idle' | 'submitting' | 'submitted' | 'error'
-  >('idle')
-
-  const submitFeedback = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const normalizedFeedback = feedback.trim()
-
-    if (!normalizedFeedback || !feedbackReady || feedbackStatus === 'submitting') {
-      return
-    }
-
-    setFeedbackStatus('submitting')
-
-    try {
-      const status = await submitResultFeedback({
-        action: 'feedback',
-        submissionId,
-        feedback: normalizedFeedback,
-        feedbackSubmittedAt: new Date().toISOString(),
-      })
-
-      setFeedbackStatus(status === 'submitted' ? 'submitted' : 'error')
-    } catch {
-      setFeedbackStatus('error')
-    }
-  }
 
   return (
     <main className="result-page">
@@ -99,63 +62,6 @@ function ResultPage({
         </section>
       </div>
 
-      <section
-        className="result-feedback"
-        aria-labelledby="result-feedback-title"
-      >
-        <h2 id="result-feedback-title">ข้อความนี้ตรงกับคุณไหม?</h2>
-        <p>
-          บอกเราได้ว่าความหมายและข้อความของดอกไม้นี้
-          สะท้อนความรู้สึกของคุณมากน้อยแค่ไหน
-        </p>
-
-        <form onSubmit={submitFeedback}>
-          <label htmlFor="result-feedback-message">ความคิดเห็นของคุณ</label>
-          <textarea
-            id="result-feedback-message"
-            name="resultFeedback"
-            value={feedback}
-            onChange={(event) => {
-              setFeedback(event.target.value)
-              if (feedbackStatus === 'error') {
-                setFeedbackStatus('idle')
-              }
-            }}
-            placeholder="พิมพ์ความคิดเห็นของคุณ..."
-            maxLength={500}
-            rows={4}
-            disabled={feedbackStatus === 'submitted'}
-          />
-
-          <div className="result-feedback__footer">
-            <span>{feedback.length}/500</span>
-            <button
-              type="submit"
-              disabled={
-                !feedback.trim() ||
-                !feedbackReady ||
-                feedbackStatus === 'submitting' ||
-                feedbackStatus === 'submitted'
-              }
-            >
-              {feedbackStatus === 'submitting'
-                ? 'กำลังส่ง...'
-                : feedbackStatus === 'submitted'
-                  ? 'ส่งแล้ว'
-                  : 'ส่งความคิดเห็น'}
-            </button>
-          </div>
-        </form>
-
-        <p className="result-feedback__status" aria-live="polite">
-          {feedbackStatus === 'submitted' &&
-            'ขอบคุณสำหรับความคิดเห็นของคุณ'}
-          {feedbackStatus === 'error' &&
-            'ยังส่งความคิดเห็นไม่ได้ กรุณาลองใหม่อีกครั้ง'}
-          {!feedbackReady && feedbackStatus === 'idle' &&
-            'กำลังเตรียมพื้นที่รับความคิดเห็น...'}
-        </p>
-      </section>
     </main>
   )
 }

@@ -190,9 +190,8 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
 
             <p className="journey-privacy__summary">
               เราจะเก็บชื่อ–นามสกุล อายุ อาชีพ คำตอบทั้ง 7 ข้อ
-              ผลลัพธ์ และความคิดเห็นที่คุณเลือกส่ง
-              เพื่อบันทึกและประเมินการใช้งานแบบทดสอบ โดยจัดเก็บใน Google
-              Sheets
+              และผลลัพธ์ เพื่อบันทึกและประเมินการใช้งานแบบทดสอบ โดยจัดเก็บใน
+              Google Sheets
             </p>
 
             <details className="journey-privacy__details">
@@ -204,8 +203,7 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
                 <h3>ข้อมูลที่เก็บและวัตถุประสงค์</h3>
                 <p>
                   เก็บชื่อ–นามสกุล อายุ อาชีพ ตัวเลือกและอารมณ์ของแต่ละข้อ
-                  รวมถึงผลลัพธ์และความคิดเห็นที่คุณเลือกส่ง
-                  เพื่อสร้างผลแบบทดสอบ บันทึกการเข้าร่วม
+                  รวมถึงผลลัพธ์ เพื่อสร้างผลแบบทดสอบ บันทึกการเข้าร่วม
                   และวิเคราะห์ภาพรวมของโครงการ โดยอาศัยความยินยอมของคุณ
                 </p>
 
@@ -237,7 +235,7 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
                   และบันทึกผลให้คุณได้
                 </p>
 
-                <small>ปรับปรุงล่าสุด: 1 กันยายน 2569</small>
+                <small>ปรับปรุงล่าสุด: 27 สิงหาคม 2569</small>
               </div>
             </details>
           </section>

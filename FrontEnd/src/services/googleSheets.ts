@@ -3,15 +3,8 @@ import type { QuizSubmission } from '../data/quizSubmission'
 const googleSheetsWebAppUrl = import.meta.env
   .VITE_GOOGLE_SHEETS_WEB_APP_URL as string | undefined
 
-type ResultFeedbackSubmission = {
-  action: 'feedback'
-  submissionId: string
-  feedback: string
-  feedbackSubmittedAt: string
-}
-
-async function postToGoogleSheets(
-  body: QuizSubmission | ResultFeedbackSubmission,
+export async function submitQuizResponse(
+  submission: QuizSubmission,
 ): Promise<'submitted' | 'not-configured'> {
   if (!googleSheetsWebAppUrl) {
     return 'not-configured'
@@ -24,20 +17,8 @@ async function postToGoogleSheets(
     headers: {
       'Content-Type': 'text/plain;charset=UTF-8',
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(submission),
   })
 
   return 'submitted'
-}
-
-export async function submitQuizResponse(
-  submission: QuizSubmission,
-): Promise<'submitted' | 'not-configured'> {
-  return postToGoogleSheets(submission)
-}
-
-export async function submitResultFeedback(
-  submission: ResultFeedbackSubmission,
-): Promise<'submitted' | 'not-configured'> {
-  return postToGoogleSheets(submission)
 }
