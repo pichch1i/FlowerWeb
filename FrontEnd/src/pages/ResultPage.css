@@ -191,34 +191,99 @@
 }
 
 @media (max-width: 640px) {
+  .result-page {
+    width: 100vw;
+    max-width: 100%;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
   .result-hero {
     display: block;
-    min-height: 100svh;
+    width: 100%;
+    height: 100svh;
+    min-height: 0;
+    overflow: hidden;
     padding: 0;
   }
 
   .result-card {
     display: flex;
     width: 100%;
-    min-height: 100svh;
+    max-width: 100%;
+    height: 100%;
+    min-height: 0;
+    max-height: 100svh;
     flex-direction: column;
     justify-content: center;
     padding:
-      max(18px, env(safe-area-inset-top))
-      max(18px, env(safe-area-inset-right))
-      max(18px, env(safe-area-inset-bottom))
-      max(18px, env(safe-area-inset-left));
-    border-right: 0;
-    border-left: 0;
+      max(10px, env(safe-area-inset-top))
+      max(clamp(14px, 4vw, 20px), env(safe-area-inset-right))
+      max(10px, env(safe-area-inset-bottom))
+      max(clamp(14px, 4vw, 20px), env(safe-area-inset-left));
+    border: 0;
     border-radius: 0;
     box-shadow: none;
   }
 
+  .result-flower-image {
+    width: clamp(128px, min(54vw, 29svh), 230px);
+    height: clamp(144px, min(60vw, 31svh), 250px);
+  }
+
+  .result-eyebrow {
+    margin-top: clamp(3px, 0.8svh, 7px);
+    font-size: clamp(0.62rem, 1.45svh, 0.7rem);
+  }
+
+  .result-flower-name {
+    margin-top: clamp(2px, 0.5svh, 3px);
+    font-size: clamp(0.76rem, 1.75svh, 0.85rem);
+  }
+
+  .result-card h1 {
+    margin-top: clamp(1px, 0.4svh, 2px);
+    font-size: clamp(1.4rem, min(7.2vw, 4.2svh), 2.1rem);
+  }
+
+  .result-description {
+    margin-top: clamp(5px, 1svh, 9px);
+    font-size: clamp(0.68rem, 1.55svh, 0.76rem);
+    line-height: 1.42;
+  }
+
+  .result-message {
+    margin-top: clamp(7px, 1.25svh, 11px);
+    padding: clamp(8px, 1.3svh, 11px) 12px;
+  }
+
+  .result-message p {
+    font-size: clamp(0.61rem, 1.4svh, 0.68rem);
+  }
+
+  .result-message blockquote {
+    margin-top: clamp(3px, 0.6svh, 4px);
+    font-size: clamp(0.92rem, min(5vw, 2.8svh), 1.4rem);
+    line-height: 1.24;
+  }
+
+  .result-emotion {
+    margin-top: clamp(7px, 1.2svh, 10px);
+    padding: 5px 11px;
+    font-size: clamp(0.58rem, 1.3svh, 0.62rem);
+  }
+
   @supports (height: 100dvh) {
-    .result-page,
-    .result-hero,
-    .result-card {
+    .result-page {
       min-height: 100dvh;
+    }
+
+    .result-hero {
+      height: 100dvh;
+    }
+
+    .result-card {
+      max-height: 100dvh;
     }
   }
 }
@@ -279,24 +344,20 @@
 
 @media (max-width: 640px) and (max-height: 700px) {
   .result-card {
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: max(7px, env(safe-area-inset-top));
+    padding-bottom: max(7px, env(safe-area-inset-bottom));
   }
 
   .result-flower-image {
-    width: clamp(150px, 46vw, 190px);
-    height: clamp(156px, 48vw, 182px);
-    min-height: 156px;
-  }
-
-
-  @supports (height: 100svh) {
-    .result-flower-image {
-      height: 26svh;
-    }
+    width: clamp(118px, min(44vw, 25svh), 175px);
+    height: clamp(128px, min(48vw, 26svh), 180px);
   }
 
   .result-card h1 {
-    font-size: clamp(1.55rem, 7.2vw, 1.9rem);
+    font-size: clamp(1.32rem, min(7vw, 4.4svh), 1.8rem);
+  }
+
+  .result-message {
+    border-radius: 18px 5px 18px 5px;
   }
 }
