@@ -338,14 +338,16 @@
   }
 
   .result-card {
-    display: grid;
+    display: flex;
     width: 100%;
     max-width: 100%;
     height: 100%;
     min-height: 0;
     max-height: 100%;
-    grid-template-rows: minmax(0, 1fr) repeat(6, auto);
+    flex-direction: column;
+    justify-content: space-evenly;
     align-items: center;
+    gap: clamp(2px, 0.55svh, 6px);
     padding: clamp(12px, 2.2svh, 18px) clamp(14px, 4vw, 20px);
     border: 1px solid rgba(244, 200, 166, 0.2);
     border-radius: clamp(22px, 7vw, 30px) clamp(6px, 2vw, 9px)
@@ -356,10 +358,27 @@
   }
 
   .result-flower-image {
-    align-self: end;
-    width: clamp(160px, min(66vw, 35svh), 270px);
-    height: clamp(178px, min(72vw, 37svh), 290px);
-    transform: scale(1.08);
+    width: clamp(175px, min(72vw, 38svh), 290px);
+    height: clamp(195px, min(78vw, 40svh), 315px);
+    flex: 0 1 auto;
+    transform: scale(1.12);
+  }
+
+  .result-eyebrow,
+  .result-flower-name,
+  .result-card h1,
+  .result-description,
+  .result-message,
+  .result-emotion {
+    flex: 0 0 auto;
+  }
+
+  .result-eyebrow,
+  .result-flower-name,
+  .result-card h1,
+  .result-description,
+  .result-message {
+    width: 100%;
   }
 
   .result-eyebrow {
@@ -491,8 +510,9 @@
   }
 
   .result-flower-image {
-    width: clamp(135px, min(52vw, 29svh), 195px);
-    height: clamp(148px, min(57vw, 30svh), 205px);
+    width: clamp(145px, min(58vw, 31svh), 210px);
+    height: clamp(160px, min(63vw, 32svh), 225px);
+    transform: scale(1.1);
   }
 
   .result-card h1 {
