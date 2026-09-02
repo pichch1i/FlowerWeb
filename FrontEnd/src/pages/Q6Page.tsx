@@ -77,7 +77,7 @@ function Q6Page({ onAnswer }: Q6PageProps) {
                   setSelectedAnswer(option.id)
                   window.setTimeout(
                     () => onAnswer(option.id, option.emotion),
-                    320,
+                    240,
                   )
                 }}
               >

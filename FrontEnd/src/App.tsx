@@ -118,7 +118,7 @@ function App() {
       setPageMotion('idle')
       pageTimer.current = null
       window.scrollTo({ top: 0, behavior: 'smooth' })
-    }, 210)
+    }, 140)
   }
 
   const startQuiz = (

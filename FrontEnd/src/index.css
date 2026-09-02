@@ -54,13 +54,13 @@ body {
 .app-page-transition {
   width: 100%;
   min-height: 100vh;
-  animation: app-page-enter 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: app-page-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
   transform-origin: center;
   will-change: opacity, filter, transform;
 }
 
 .app-page-transition--leaving {
-  animation: app-page-leave 210ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: app-page-leave 140ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 @supports (min-height: 100svh) {

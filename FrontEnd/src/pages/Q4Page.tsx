@@ -77,7 +77,7 @@ function Q4Page({ onAnswer }: Q4PageProps) {
                   setSelectedAnswer(option.id)
                   window.setTimeout(
                     () => onAnswer(option.id, option.emotion),
-                    320,
+                    240,
                   )
                 }}
               >
