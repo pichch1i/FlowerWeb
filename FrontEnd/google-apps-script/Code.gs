@@ -83,7 +83,7 @@ function doGet(event) {
   const action = String(
     event && event.parameter && event.parameter.action
       ? event.parameter.action
-      : '',
+      : ''
   );
 
   if (action === 'latest') {
@@ -111,7 +111,7 @@ function doPost(event) {
       const feedback = parseAndValidateFeedback(requestPayload);
       const submissionRow = findSubmissionRow(
         sheet,
-        feedback.submissionId,
+        feedback.submissionId
       );
 
       if (!submissionRow) {
@@ -159,7 +159,7 @@ function doPost(event) {
       protectCell(payload.result.resultTitle, 120),
       payload.consent.accepted ? 'ยินยอม' : 'ไม่ยินยอม',
       payload.consent.acceptedAt,
-      payload.consent.noticeVersion,
+      payload.consent.noticeVersion
     );
 
     sheet.appendRow(row);
@@ -177,12 +177,12 @@ function doPost(event) {
 function setupTouchDesignerApiKey() {
   const apiKey = (Utilities.getUuid() + Utilities.getUuid()).replace(
     /-/g,
-    '',
+    ''
   );
 
   PropertiesService.getScriptProperties().setProperty(
     TOUCHDESIGNER_API_KEY_PROPERTY,
-    apiKey,
+    apiKey
   );
 
   console.log('TouchDesigner API key: ' + apiKey);
@@ -209,19 +209,19 @@ function publishTouchDesignerResult(payload) {
 
   PropertiesService.getScriptProperties().setProperty(
     TOUCHDESIGNER_LATEST_RESULT_PROPERTY,
-    JSON.stringify(publicResult),
+    JSON.stringify(publicResult)
   );
 }
 
 function getLatestTouchDesignerResult(event) {
   const properties = PropertiesService.getScriptProperties();
   const configuredApiKey = String(
-    properties.getProperty(TOUCHDESIGNER_API_KEY_PROPERTY) || '',
+    properties.getProperty(TOUCHDESIGNER_API_KEY_PROPERTY) || ''
   );
   const requestedApiKey = String(
     event && event.parameter && event.parameter.key
       ? event.parameter.key
-      : '',
+      : ''
   );
 
   if (!configuredApiKey) {
@@ -236,7 +236,7 @@ function getLatestTouchDesignerResult(event) {
   }
 
   const latestResult = String(
-    properties.getProperty(TOUCHDESIGNER_LATEST_RESULT_PROPERTY) || '',
+    properties.getProperty(TOUCHDESIGNER_LATEST_RESULT_PROPERTY) || ''
   );
 
   if (!latestResult) {
@@ -280,7 +280,7 @@ function parseAndValidateFeedback(payload) {
   const submissionId = String(payload.submissionId || '');
   const feedback = String(payload.feedback || '').trim();
   const feedbackSubmittedAt = new Date(
-    String(payload.feedbackSubmittedAt || ''),
+    String(payload.feedbackSubmittedAt || '')
   );
 
   if (!/^[a-zA-Z0-9-]{10,100}$/.test(submissionId)) {
@@ -311,13 +311,13 @@ function parseAndValidatePayload(payload) {
     String(
       payload.consent && payload.consent.acceptedAt
         ? payload.consent.acceptedAt
-        : '',
-    ),
+        : ''
+    )
   );
   const noticeVersion = String(
     payload.consent && payload.consent.noticeVersion
       ? payload.consent.noticeVersion
-      : '',
+      : ''
   );
 
   if (!/^[a-zA-Z0-9-]{10,100}$/.test(submissionId)) {
@@ -423,7 +423,7 @@ function detectDominantEmotion(answers) {
     null,
     ALLOWED_EMOTIONS.map(function (emotion) {
       return scores[emotion];
-    }),
+    })
   );
   const highestEmotions = ALLOWED_EMOTIONS.filter(function (emotion) {
     return scores[emotion] === highestScore;
@@ -474,6 +474,6 @@ function protectCell(value, maxLength) {
 
 function jsonResponse(body) {
   return ContentService.createTextOutput(JSON.stringify(body)).setMimeType(
-    ContentService.MimeType.JSON,
+    ContentService.MimeType.JSON
   );
 }
