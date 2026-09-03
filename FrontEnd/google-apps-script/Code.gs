@@ -1,143 +1,60 @@
-const SHEET_NAME = 'Responses';
-const USAGE_LOG_SHEET_NAME = 'Usage Logs';
-const DEFAULT_ADMIN_PASSWORD = 'boomscape-admin-2026';
-
-const HEADERS = [
-  'Submission ID',
-  'เวลาที่บันทึก (Google)',
-  'เวลาที่ส่ง (อุปกรณ์)',
-  'ชื่อ–นามสกุล',
-  'อายุ',
-  'อาชีพ',
-  'Q1 ตัวเลือก',
-  'Q1 อารมณ์',
-  'Q2 ตัวเลือก',
-  'Q2 อารมณ์',
-  'Q3 ตัวเลือก',
-  'Q3 อารมณ์',
-  'Q4 ตัวเลือก',
-  'Q4 อารมณ์',
-  'Q5 ตัวเลือก',
-  'Q5 อารมณ์',
-  'Q6 ตัวเลือก',
-  'Q6 อารมณ์',
-  'Q7 ตัวเลือก',
-  'Q7 อารมณ์',
-  'ผลอารมณ์',
-  'ดอกไม้',
-  'ชื่อผลลัพธ์',
-];
-
-const ALLOWED_EMOTIONS = [
-  'Hope',
-  'Anxiety',
-  'Serenity',
-  'Sadness',
-  'Frustration',
-];
-
-const ALLOWED_OPTIONS = ['A', 'B', 'C', 'D', 'E'];
-
-const FEEDBACK_HEADERS = [
-  'ความคิดเห็นต่อผลลัพธ์',
-  'เวลาที่บันทึกความคิดเห็น (Google)',
-  'เวลาที่ส่งความคิดเห็น (อุปกรณ์)',
-];
-
-const USAGE_LOG_HEADERS = [
-  'Log ID',
-  'เวลาที่บันทึก (Google)',
-  'เวลาที่เกิดเหตุการณ์ (อุปกรณ์)',
-  'Session ID',
-  'Submission ID',
-  'Event Type',
-  'Page',
-  'Target',
-  'Details',
-  'Path',
-  'Referrer',
-  'User Agent',
-  'Language',
-  'Viewport',
-  'Screen',
-  'Timezone',
-];
-
 function doGet(event) {
-  const action = String(
-    event && event.parameter ? event.parameter.action || '' : '',
-  );
+  var action = String(event && event.parameter ? event.parameter.action || '' : '');
 
   if (action === 'latest') {
-    return getLatestTouchDesignerResult(event);
+    return FW_getLatestTouchDesignerResult_(event);
   }
 
   if (action === 'admin') {
-    return getAdminDashboard(event);
+    return FW_getAdminDashboard_(event);
   }
 
-  return jsonResponse({ ok: true, service: 'Flower quiz responses' });
+  return FW_jsonResponse_({ ok: true, service: 'Flower quiz responses' });
 }
 
-function getLatestTouchDesignerResult(event) {
-  const properties = PropertiesService.getScriptProperties();
-  const expectedKey = properties.getProperty('TOUCHDESIGNER_API_KEY');
-  const suppliedKey = String(
-    event && event.parameter ? event.parameter.key || '' : '',
-  );
+function doPost(event) {
+  var lock = LockService.getScriptLock();
 
-  if (!expectedKey || suppliedKey !== expectedKey) {
-    return jsonResponse({ ok: false, error: 'unauthorized' });
+  try {
+    var payload = FW_parseRequestBody_(event);
+    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    var responseSheet;
+
+    lock.waitLock(10000);
+
+    if (String(payload.action || '') === 'log') {
+      var logSheet = FW_getOrCreateSheet_(spreadsheet, FW_usageLogSheetName_());
+      FW_ensureHeaders_(logSheet, FW_usageLogHeaders_());
+      FW_appendUsageLog_(logSheet, FW_parseAndValidateUsageLog_(payload));
+      return FW_jsonResponse_({ ok: true, logged: true });
+    }
+
+    responseSheet = FW_getOrCreateSheet_(spreadsheet, FW_responseSheetName_());
+    FW_ensureHeaders_(responseSheet, FW_responseHeaders_());
+
+    if (String(payload.action || '') === 'feedback') {
+      return FW_saveFeedback_(responseSheet, payload);
+    }
+
+    return FW_saveQuizResponse_(responseSheet, payload);
+  } catch (error) {
+    return FW_jsonResponse_({
+      ok: false,
+      error: 'invalid_request',
+      message: String(error && error.message ? error.message : error),
+    });
+  } finally {
+    if (lock.hasLock()) {
+      lock.releaseLock();
+    }
   }
-
-  const latestJson = properties.getProperty('TOUCHDESIGNER_LATEST_RESULT');
-
-  if (!latestJson) {
-    return jsonResponse({ ok: true, hasResult: false });
-  }
-
-  return jsonResponse(JSON.parse(latestJson));
-}
-
-function getAdminDashboard(event) {
-  const params = event && event.parameter ? event.parameter : {};
-  const suppliedPassword = String(params.password || '');
-  const callback = sanitizeJsonpCallback(params.callback);
-  const properties = PropertiesService.getScriptProperties();
-  const expectedPassword =
-    properties.getProperty('ADMIN_PASSWORD') || DEFAULT_ADMIN_PASSWORD;
-
-  if (suppliedPassword !== expectedPassword) {
-    return callback
-      ? jsonpResponse(callback, { ok: false, error: 'unauthorized' })
-      : jsonResponse({ ok: false, error: 'unauthorized' });
-  }
-
-  const limit = Math.min(Math.max(Number(params.limit) || 200, 1), 1000);
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  const responsesSheet =
-    spreadsheet.getSheetByName(SHEET_NAME) ||
-    spreadsheet.insertSheet(SHEET_NAME);
-  const usageLogSheet =
-    spreadsheet.getSheetByName(USAGE_LOG_SHEET_NAME) ||
-    spreadsheet.insertSheet(USAGE_LOG_SHEET_NAME);
-
-  ensureHeaders(responsesSheet);
-  ensureUsageLogHeaders(usageLogSheet);
-
-  const body = {
-    ok: true,
-    generatedAt: new Date().toISOString(),
-    responses: readSheetRecords(responsesSheet, limit),
-    logs: readSheetRecords(usageLogSheet, limit),
-  };
-
-  return callback ? jsonpResponse(callback, body) : jsonResponse(body);
 }
 
 function setupTouchDesignerApiKey() {
-  const key = Utilities.getUuid().replace(/-/g, '') +
+  var key =
+    Utilities.getUuid().replace(/-/g, '') +
     Utilities.getUuid().replace(/-/g, '');
+
   PropertiesService.getScriptProperties().setProperty(
     'TOUCHDESIGNER_API_KEY',
     key,
@@ -146,150 +63,178 @@ function setupTouchDesignerApiKey() {
   return key;
 }
 
-function doPost(event) {
-  const lock = LockService.getScriptLock();
+function setupBoomscapeAdminPassword() {
+  var password = 'boomscape-admin-2026';
+  PropertiesService.getScriptProperties().setProperty('ADMIN_PASSWORD', password);
+  console.log('Admin password: ' + password);
+  return password;
+}
 
-  try {
-    const requestPayload = parseRequestBody(event);
-    lock.waitLock(10000);
+function FW_saveFeedback_(sheet, payload) {
+  var feedback = FW_parseAndValidateFeedback_(payload);
+  var submissionRow = FW_findSubmissionRow_(sheet, feedback.submissionId);
+  var feedbackColumns;
 
-    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet =
-      spreadsheet.getSheetByName(SHEET_NAME) ||
-      spreadsheet.insertSheet(SHEET_NAME);
-
-    ensureHeaders(sheet);
-
-    if (String(requestPayload.action || '') === 'log') {
-      const usageLog = parseAndValidateUsageLog(requestPayload);
-      const usageLogSheet =
-        spreadsheet.getSheetByName(USAGE_LOG_SHEET_NAME) ||
-        spreadsheet.insertSheet(USAGE_LOG_SHEET_NAME);
-
-      ensureUsageLogHeaders(usageLogSheet);
-      appendUsageLog(usageLogSheet, usageLog);
-      return jsonResponse({ ok: true, logged: true });
-    }
-
-    if (String(requestPayload.action || '') === 'feedback') {
-      const feedback = parseAndValidateFeedback(requestPayload);
-      const submissionRow = findSubmissionRow(
-        sheet,
-        feedback.submissionId,
-      );
-
-      if (!submissionRow) {
-        throw new Error('Submission not found');
-      }
-
-      const feedbackColumns = ensureFeedbackColumns(sheet);
-
-      sheet
-        .getRange(submissionRow, feedbackColumns[0], 1, 3)
-        .setValues([
-          [
-            protectCell(feedback.feedback, 500),
-            new Date(),
-            feedback.feedbackSubmittedAt,
-          ],
-        ]);
-
-      return jsonResponse({ ok: true, feedbackUpdated: true });
-    }
-
-    const payload = parseAndValidatePayload(requestPayload);
-
-    if (hasSubmission(sheet, payload.submissionId)) {
-      return jsonResponse({ ok: true, duplicate: true });
-    }
-
-    const row = [
-      payload.submissionId,
-      new Date(),
-      payload.submittedAt,
-      protectCell(payload.player.fullName, 120),
-      payload.player.age,
-      protectCell(payload.player.occupation, 120),
-    ];
-
-    payload.answers.forEach(function (answer) {
-      row.push(answer.optionId, answer.emotion);
-    });
-
-    row.push(
-      payload.result.emotion,
-      protectCell(payload.result.flower, 80),
-      protectCell(payload.result.resultTitle, 120),
-    );
-
-    sheet.appendRow(row);
-    saveLatestTouchDesignerResult(payload);
-    return jsonResponse({ ok: true, duplicate: false });
-  } catch (error) {
-    return jsonResponse({ ok: false, error: 'invalid_request' });
-  } finally {
-    if (lock.hasLock()) {
-      lock.releaseLock();
-    }
+  if (!submissionRow) {
+    throw new Error('Submission not found');
   }
+
+  feedbackColumns = FW_ensureFeedbackColumns_(sheet);
+  sheet
+    .getRange(submissionRow, feedbackColumns[0], 1, 3)
+    .setValues([
+      [
+        FW_protectCell_(feedback.feedback, 500),
+        new Date(),
+        feedback.feedbackSubmittedAt,
+      ],
+    ]);
+
+  return FW_jsonResponse_({ ok: true, feedbackUpdated: true });
 }
 
-function appendUsageLog(sheet, usageLog) {
-  sheet.appendRow([
-    usageLog.eventId,
+function FW_saveQuizResponse_(sheet, payload) {
+  var quiz = FW_parseAndValidateQuizResponse_(payload);
+  var row;
+
+  if (FW_hasSubmission_(sheet, quiz.submissionId)) {
+    return FW_jsonResponse_({ ok: true, duplicate: true });
+  }
+
+  row = [
+    quiz.submissionId,
     new Date(),
-    usageLog.occurredAt,
-    usageLog.sessionId,
-    usageLog.submissionId,
-    usageLog.eventType,
-    usageLog.page,
-    usageLog.target,
-    usageLog.details,
-    usageLog.path,
-    usageLog.referrer,
-    usageLog.userAgent,
-    usageLog.language,
-    usageLog.viewport,
-    usageLog.screen,
-    usageLog.timezone,
-  ]);
+    quiz.submittedAt,
+    FW_protectCell_(quiz.player.fullName, 120),
+    quiz.player.age,
+    FW_protectCell_(quiz.player.occupation, 120),
+  ];
+
+  quiz.answers.forEach(function (answer) {
+    row.push(answer.optionId, answer.emotion);
+  });
+
+  row.push(
+    quiz.result.emotion,
+    FW_protectCell_(quiz.result.flower, 80),
+    FW_protectCell_(quiz.result.resultTitle, 120),
+  );
+
+  sheet.appendRow(row);
+  FW_saveLatestTouchDesignerResult_(quiz);
+  return FW_jsonResponse_({ ok: true, duplicate: false });
 }
 
-function saveLatestTouchDesignerResult(payload) {
-  const flowerIds = {
+function FW_getLatestTouchDesignerResult_(event) {
+  var properties = PropertiesService.getScriptProperties();
+  var expectedKey = properties.getProperty('TOUCHDESIGNER_API_KEY');
+  var suppliedKey = String(event && event.parameter ? event.parameter.key || '' : '');
+  var latestJson;
+
+  if (!expectedKey || suppliedKey !== expectedKey) {
+    return FW_jsonResponse_({ ok: false, error: 'unauthorized' });
+  }
+
+  latestJson = properties.getProperty('TOUCHDESIGNER_LATEST_RESULT');
+
+  if (!latestJson) {
+    return FW_jsonResponse_({ ok: true, hasResult: false });
+  }
+
+  return FW_jsonResponse_(JSON.parse(latestJson));
+}
+
+function FW_getAdminDashboard_(event) {
+  var params = event && event.parameter ? event.parameter : {};
+  var callback = FW_sanitizeJsonpCallback_(params.callback);
+  var suppliedPassword = String(params.password || '');
+  var expectedPassword =
+    PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD') ||
+    'boomscape-admin-2026';
+  var spreadsheet;
+  var responsesSheet;
+  var logsSheet;
+  var limit;
+  var body;
+
+  if (suppliedPassword !== expectedPassword) {
+    body = { ok: false, error: 'unauthorized' };
+    return callback ? FW_jsonpResponse_(callback, body) : FW_jsonResponse_(body);
+  }
+
+  spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  responsesSheet = FW_getOrCreateSheet_(spreadsheet, FW_responseSheetName_());
+  logsSheet = FW_getOrCreateSheet_(spreadsheet, FW_usageLogSheetName_());
+  limit = Math.min(Math.max(Number(params.limit) || 200, 1), 1000);
+
+  FW_ensureHeaders_(responsesSheet, FW_responseHeaders_());
+  FW_ensureHeaders_(logsSheet, FW_usageLogHeaders_());
+
+  body = {
+    ok: true,
+    generatedAt: new Date().toISOString(),
+    responses: FW_readSheetRecords_(responsesSheet, limit),
+    logs: FW_readSheetRecords_(logsSheet, limit),
+  };
+
+  return callback ? FW_jsonpResponse_(callback, body) : FW_jsonResponse_(body);
+}
+
+function FW_saveLatestTouchDesignerResult_(quiz) {
+  var flowerIds = {
     Hope: 'sunflower',
     Anxiety: 'lavender',
     Serenity: 'daisy',
     Sadness: 'striped_carnation',
     Frustration: 'dandelion',
   };
-  const visualIndices = {
+  var visualIndices = {
     sunflower: 0,
     lavender: 1,
     daisy: 2,
     striped_carnation: 3,
     dandelion: 4,
   };
-  const flowerId = flowerIds[payload.result.emotion] || 'sunflower';
-  const result = {
-    ok: true,
-    hasResult: true,
-    eventId: payload.submissionId,
-    emotion: payload.result.emotion,
-    flowerId: flowerId,
-    flower: payload.result.flower,
-    resultTitle: payload.result.resultTitle,
-    visualIndex: visualIndices[flowerId],
-    submittedAt: payload.submittedAt.toISOString(),
-  };
+  var flowerId = flowerIds[quiz.result.emotion] || 'sunflower';
 
   PropertiesService.getScriptProperties().setProperty(
     'TOUCHDESIGNER_LATEST_RESULT',
-    JSON.stringify(result),
+    JSON.stringify({
+      ok: true,
+      hasResult: true,
+      eventId: quiz.submissionId,
+      emotion: quiz.result.emotion,
+      flowerId: flowerId,
+      flower: quiz.result.flower,
+      resultTitle: quiz.result.resultTitle,
+      visualIndex: visualIndices[flowerId],
+      submittedAt: quiz.submittedAt.toISOString(),
+    }),
   );
 }
 
-function parseRequestBody(event) {
+function FW_appendUsageLog_(sheet, log) {
+  sheet.appendRow([
+    log.eventId,
+    new Date(),
+    log.occurredAt,
+    log.sessionId,
+    log.submissionId,
+    log.eventType,
+    log.page,
+    log.target,
+    log.details,
+    log.path,
+    log.referrer,
+    log.userAgent,
+    log.language,
+    log.viewport,
+    log.screen,
+    log.timezone,
+  ]);
+}
+
+function FW_parseRequestBody_(event) {
   if (!event || !event.postData || !event.postData.contents) {
     throw new Error('Missing request body');
   }
@@ -297,14 +242,12 @@ function parseRequestBody(event) {
   return JSON.parse(event.postData.contents);
 }
 
-function parseAndValidateFeedback(payload) {
-  const submissionId = String(payload.submissionId || '');
-  const feedback = String(payload.feedback || '').trim();
-  const feedbackSubmittedAt = new Date(
-    String(payload.feedbackSubmittedAt || ''),
-  );
+function FW_parseAndValidateFeedback_(payload) {
+  var submissionId = String(payload.submissionId || '');
+  var feedback = String(payload.feedback || '').trim();
+  var feedbackSubmittedAt = new Date(String(payload.feedbackSubmittedAt || ''));
 
-  if (!/^[a-zA-Z0-9-]{10,100}$/.test(submissionId)) {
+  if (!/^[a-zA-Z0-9-]{10,120}$/.test(submissionId)) {
     throw new Error('Invalid submission ID');
   }
 
@@ -323,15 +266,15 @@ function parseAndValidateFeedback(payload) {
   };
 }
 
-function parseAndValidateUsageLog(payload) {
-  const eventId = String(payload.eventId || '');
-  const sessionId = String(payload.sessionId || '');
-  const submissionId = String(payload.submissionId || '');
-  const eventType = String(payload.eventType || '');
-  const page = String(payload.page || '');
-  const target = String(payload.target || '');
-  const occurredAt = new Date(String(payload.occurredAt || ''));
-  const allowedEventTypes = [
+function FW_parseAndValidateUsageLog_(payload) {
+  var eventId = String(payload.eventId || '');
+  var sessionId = String(payload.sessionId || '');
+  var submissionId = String(payload.submissionId || '');
+  var eventType = String(payload.eventType || '');
+  var page = String(payload.page || '');
+  var target = String(payload.target || '');
+  var occurredAt = new Date(String(payload.occurredAt || ''));
+  var allowedEventTypes = [
     'page_view',
     'button_click',
     'answer_select',
@@ -346,10 +289,7 @@ function parseAndValidateUsageLog(payload) {
     throw new Error('Invalid session ID');
   }
 
-  if (
-    submissionId &&
-    !/^[a-zA-Z0-9-]{10,120}$/.test(submissionId)
-  ) {
+  if (submissionId && !/^[a-zA-Z0-9-]{10,120}$/.test(submissionId)) {
     throw new Error('Invalid submission ID');
   }
 
@@ -370,27 +310,30 @@ function parseAndValidateUsageLog(payload) {
     sessionId: sessionId,
     submissionId: submissionId,
     eventType: eventType,
-    page: protectCell(page, 80),
-    target: protectCell(target, 120),
+    page: FW_protectCell_(page, 80),
+    target: FW_protectCell_(target, 120),
     occurredAt: occurredAt,
-    details: protectCell(JSON.stringify(payload.details || {}), 1000),
-    path: protectCell(payload.path, 300),
-    referrer: protectCell(payload.referrer, 300),
-    userAgent: protectCell(payload.userAgent, 500),
-    language: protectCell(payload.language, 40),
-    viewport: protectCell(payload.viewport, 40),
-    screen: protectCell(payload.screen, 40),
-    timezone: protectCell(payload.timezone, 80),
+    details: FW_protectCell_(JSON.stringify(payload.details || {}), 1000),
+    path: FW_protectCell_(payload.path, 300),
+    referrer: FW_protectCell_(payload.referrer, 300),
+    userAgent: FW_protectCell_(payload.userAgent, 500),
+    language: FW_protectCell_(payload.language, 40),
+    viewport: FW_protectCell_(payload.viewport, 40),
+    screen: FW_protectCell_(payload.screen, 40),
+    timezone: FW_protectCell_(payload.timezone, 80),
   };
 }
 
-function parseAndValidatePayload(payload) {
-  const age = Number(payload.player && payload.player.age);
-  const answers = Array.isArray(payload.answers) ? payload.answers : [];
-  const submissionId = String(payload.submissionId || '');
-  const submittedAt = new Date(String(payload.submittedAt || ''));
+function FW_parseAndValidateQuizResponse_(payload) {
+  var age = Number(payload.player && payload.player.age);
+  var answers = Array.isArray(payload.answers) ? payload.answers : [];
+  var submissionId = String(payload.submissionId || '');
+  var submittedAt = new Date(String(payload.submittedAt || ''));
+  var allowedOptions = FW_allowedOptions_();
+  var allowedEmotions = FW_allowedEmotions_();
+  var normalizedAnswers;
 
-  if (!/^[a-zA-Z0-9-]{10,100}$/.test(submissionId)) {
+  if (!/^[a-zA-Z0-9-]{10,120}$/.test(submissionId)) {
     throw new Error('Invalid submission ID');
   }
 
@@ -402,7 +345,7 @@ function parseAndValidatePayload(payload) {
     throw new Error('Invalid name');
   }
 
-  if (!Number.isInteger(age) || age < 1 || age > 70) {
+  if (!Number.isInteger(age) || age < 1 || age > 120) {
     throw new Error('Invalid age');
   }
 
@@ -414,7 +357,7 @@ function parseAndValidatePayload(payload) {
     throw new Error('Seven answers are required');
   }
 
-  const normalizedAnswers = answers
+  normalizedAnswers = answers
     .map(function (answer) {
       return {
         question: Number(answer.question),
@@ -429,8 +372,8 @@ function parseAndValidatePayload(payload) {
   normalizedAnswers.forEach(function (answer, index) {
     if (
       answer.question !== index + 1 ||
-      ALLOWED_OPTIONS.indexOf(answer.optionId) === -1 ||
-      ALLOWED_EMOTIONS.indexOf(answer.emotion) === -1
+      allowedOptions.indexOf(answer.optionId) === -1 ||
+      allowedEmotions.indexOf(answer.emotion) === -1
     ) {
       throw new Error('Invalid answer');
     }
@@ -438,7 +381,7 @@ function parseAndValidatePayload(payload) {
 
   if (
     !payload.result ||
-    ALLOWED_EMOTIONS.indexOf(String(payload.result.emotion || '')) === -1
+    allowedEmotions.indexOf(String(payload.result.emotion || '')) === -1
   ) {
     throw new Error('Invalid result');
   }
@@ -460,25 +403,30 @@ function parseAndValidatePayload(payload) {
   };
 }
 
-function ensureHeaders(sheet) {
+function FW_getOrCreateSheet_(spreadsheet, sheetName) {
+  return spreadsheet.getSheetByName(sheetName) || spreadsheet.insertSheet(sheetName);
+}
+
+function FW_ensureHeaders_(sheet, headers) {
   if (sheet.getLastRow() === 0) {
-    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.setFrozenRows(1);
   }
 }
 
-function hasSubmission(sheet, submissionId) {
-  return Boolean(findSubmissionRow(sheet, submissionId));
+function FW_hasSubmission_(sheet, submissionId) {
+  return Boolean(FW_findSubmissionRow_(sheet, submissionId));
 }
 
-function findSubmissionRow(sheet, submissionId) {
-  const lastRow = sheet.getLastRow();
+function FW_findSubmissionRow_(sheet, submissionId) {
+  var lastRow = sheet.getLastRow();
+  var match;
 
   if (lastRow < 2) {
     return 0;
   }
 
-  const match = sheet
+  match = sheet
     .getRange(2, 1, lastRow - 1, 1)
     .createTextFinder(submissionId)
     .matchEntireCell(true)
@@ -487,15 +435,14 @@ function findSubmissionRow(sheet, submissionId) {
   return match ? match.getRow() : 0;
 }
 
-function ensureFeedbackColumns(sheet) {
-  const headerWidth = Math.max(sheet.getLastColumn(), HEADERS.length);
-  const headers = sheet
-    .getRange(1, 1, 1, headerWidth)
+function FW_ensureFeedbackColumns_(sheet) {
+  var headers = sheet
+    .getRange(1, 1, 1, Math.max(sheet.getLastColumn(), FW_responseHeaders_().length))
     .getDisplayValues()[0];
-  const columns = [];
+  var columns = [];
 
-  FEEDBACK_HEADERS.forEach(function (header) {
-    let column = headers.indexOf(header) + 1;
+  FW_feedbackHeaders_().forEach(function (header) {
+    var column = headers.indexOf(header) + 1;
 
     if (!column) {
       column = headers.length + 1;
@@ -509,33 +456,28 @@ function ensureFeedbackColumns(sheet) {
   return columns;
 }
 
-function ensureUsageLogHeaders(sheet) {
-  if (sheet.getLastRow() === 0) {
-    sheet
-      .getRange(1, 1, 1, USAGE_LOG_HEADERS.length)
-      .setValues([USAGE_LOG_HEADERS]);
-    sheet.setFrozenRows(1);
-  }
-}
-
-function readSheetRecords(sheet, limit) {
-  const lastRow = sheet.getLastRow();
-  const lastColumn = sheet.getLastColumn();
+function FW_readSheetRecords_(sheet, limit) {
+  var lastRow = sheet.getLastRow();
+  var lastColumn = sheet.getLastColumn();
+  var headers;
+  var rowCount;
+  var startRow;
+  var values;
 
   if (lastRow < 2 || lastColumn < 1) {
     return [];
   }
 
-  const headers = sheet.getRange(1, 1, 1, lastColumn).getDisplayValues()[0];
-  const rowCount = Math.min(limit, lastRow - 1);
-  const startRow = Math.max(2, lastRow - rowCount + 1);
-  const values = sheet
+  headers = sheet.getRange(1, 1, 1, lastColumn).getDisplayValues()[0];
+  rowCount = Math.min(limit, lastRow - 1);
+  startRow = Math.max(2, lastRow - rowCount + 1);
+  values = sheet
     .getRange(startRow, 1, rowCount, lastColumn)
     .getDisplayValues()
     .reverse();
 
   return values.map(function (row) {
-    const record = {};
+    var record = {};
 
     headers.forEach(function (header, index) {
       if (header) {
@@ -547,25 +489,98 @@ function readSheetRecords(sheet, limit) {
   });
 }
 
-function sanitizeJsonpCallback(callback) {
-  const text = String(callback || '');
+function FW_responseSheetName_() {
+  return 'Responses';
+}
+
+function FW_usageLogSheetName_() {
+  return 'Usage Logs';
+}
+
+function FW_responseHeaders_() {
+  return [
+    'Submission ID',
+    'เวลาที่บันทึก (Google)',
+    'เวลาที่ส่ง (อุปกรณ์)',
+    'ชื่อ–นามสกุล',
+    'อายุ',
+    'อาชีพ',
+    'Q1 ตัวเลือก',
+    'Q1 อารมณ์',
+    'Q2 ตัวเลือก',
+    'Q2 อารมณ์',
+    'Q3 ตัวเลือก',
+    'Q3 อารมณ์',
+    'Q4 ตัวเลือก',
+    'Q4 อารมณ์',
+    'Q5 ตัวเลือก',
+    'Q5 อารมณ์',
+    'Q6 ตัวเลือก',
+    'Q6 อารมณ์',
+    'Q7 ตัวเลือก',
+    'Q7 อารมณ์',
+    'ผลอารมณ์',
+    'ดอกไม้',
+    'ชื่อผลลัพธ์',
+  ];
+}
+
+function FW_feedbackHeaders_() {
+  return [
+    'ความคิดเห็นต่อผลลัพธ์',
+    'เวลาที่บันทึกความคิดเห็น (Google)',
+    'เวลาที่ส่งความคิดเห็น (อุปกรณ์)',
+  ];
+}
+
+function FW_usageLogHeaders_() {
+  return [
+    'Log ID',
+    'เวลาที่บันทึก (Google)',
+    'เวลาที่เกิดเหตุการณ์ (อุปกรณ์)',
+    'Session ID',
+    'Submission ID',
+    'Event Type',
+    'Page',
+    'Target',
+    'Details',
+    'Path',
+    'Referrer',
+    'User Agent',
+    'Language',
+    'Viewport',
+    'Screen',
+    'Timezone',
+  ];
+}
+
+function FW_allowedEmotions_() {
+  return ['Hope', 'Anxiety', 'Serenity', 'Sadness', 'Frustration'];
+}
+
+function FW_allowedOptions_() {
+  return ['A', 'B', 'C', 'D', 'E'];
+}
+
+function FW_sanitizeJsonpCallback_(callback) {
+  var text = String(callback || '');
   return /^[a-zA-Z_$][0-9a-zA-Z_$]*(\.[a-zA-Z_$][0-9a-zA-Z_$]*)*$/.test(text)
     ? text
     : '';
 }
 
-function protectCell(value, maxLength) {
-  const text = String(value || '').trim().slice(0, maxLength);
+function FW_protectCell_(value, maxLength) {
+  var text = String(value || '').trim().slice(0, maxLength);
   return /^[=+\-@]/.test(text) ? "'" + text : text;
 }
 
-function jsonResponse(body) {
+function FW_jsonResponse_(body) {
   return ContentService.createTextOutput(JSON.stringify(body)).setMimeType(
     ContentService.MimeType.JSON,
   );
 }
 
-function jsonpResponse(callback, body) {
+function FW_jsonpResponse_(callback, body) {
   return ContentService
     .createTextOutput(callback + '(' + JSON.stringify(body) + ');')
     .setMimeType(ContentService.MimeType.JAVASCRIPT);
