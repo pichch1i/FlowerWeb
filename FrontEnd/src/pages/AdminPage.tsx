@@ -1,4 +1,11 @@
-import { type FormEvent, useEffect, useMemo, useState } from 'react'
+import {
+  type FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import {
   fetchAdminDashboard,
   isAdminConfigured,
@@ -34,6 +41,7 @@ function AdminPage() {
   const [errorMessage, setErrorMessage] = useState('')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeView, setActiveView] = useState<AdminView>('logs')
+  const hasLoadedData = useRef(false)
 
   const summary = useMemo(() => {
     const logs = data?.logs ?? []
@@ -61,31 +69,45 @@ function AdminPage() {
     }
   }, [data])
 
-  const loadDashboard = async (nextPassword = password) => {
-    if (!nextPassword.trim()) {
-      return
-    }
+  const loadDashboard = useCallback(
+    async (nextPassword = password, options?: { silent?: boolean }) => {
+      if (!nextPassword.trim()) {
+        return
+      }
 
-    setStatus('loading')
-    setErrorMessage('')
+      if (!options?.silent) {
+        setStatus('loading')
+      }
+      setErrorMessage('')
 
-    try {
-      const nextData = await fetchAdminDashboard(nextPassword.trim(), 300)
-      window.sessionStorage.setItem(ADMIN_SESSION_KEY, nextPassword.trim())
-      setData(nextData)
-      setIsLoggedIn(true)
-      setStatus('idle')
-    } catch (error) {
-      setStatus('error')
-      setIsLoggedIn(false)
-      setData(null)
-      setErrorMessage(
-        error instanceof Error && error.message === 'unauthorized'
-          ? 'รหัสผ่านไม่ถูกต้อง'
-          : 'ยังโหลดข้อมูลไม่ได้ กรุณาตรวจ Apps Script และลองใหม่อีกครั้ง',
-      )
-    }
-  }
+      try {
+        const nextData = await fetchAdminDashboard(nextPassword.trim(), 300)
+        window.sessionStorage.setItem(ADMIN_SESSION_KEY, nextPassword.trim())
+        setData(nextData)
+        hasLoadedData.current = true
+        setIsLoggedIn(true)
+        setStatus('idle')
+      } catch (error) {
+        setStatus('error')
+
+        if (error instanceof Error && error.message === 'unauthorized') {
+          window.sessionStorage.removeItem(ADMIN_SESSION_KEY)
+          setIsLoggedIn(false)
+          setData(null)
+          hasLoadedData.current = false
+          setErrorMessage('รหัสผ่านไม่ถูกต้อง')
+          return
+        }
+
+        setErrorMessage(
+          hasLoadedData.current
+            ? 'รีเฟรชข้อมูลล่าสุดไม่สำเร็จ กำลังลองใหม่อัตโนมัติ'
+            : 'ยังโหลดข้อมูลไม่ได้ กรุณาตรวจ Apps Script และลองใหม่อีกครั้ง',
+        )
+      }
+    },
+    [password],
+  )
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -93,12 +115,34 @@ function AdminPage() {
   }
 
   useEffect(() => {
-    if (password) {
-      void loadDashboard(password)
+    const savedPassword = window.sessionStorage.getItem(ADMIN_SESSION_KEY)
+
+    if (savedPassword) {
+      void loadDashboard(savedPassword)
     }
-    // Run once to restore a previously logged-in admin session.
+    // Restore only the saved admin session on the first render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!isLoggedIn || !password) {
+      return undefined
+    }
+
+    const refresh = () => {
+      if (document.visibilityState === 'visible') {
+        void loadDashboard(password, { silent: true })
+      }
+    }
+    const intervalId = window.setInterval(refresh, 10000)
+
+    document.addEventListener('visibilitychange', refresh)
+
+    return () => {
+      window.clearInterval(intervalId)
+      document.removeEventListener('visibilitychange', refresh)
+    }
+  }, [isLoggedIn, loadDashboard, password])
 
   if (!isAdminConfigured()) {
     return (
@@ -202,6 +246,7 @@ function AdminPage() {
                   setIsLoggedIn(false)
                   setPassword('')
                   setData(null)
+                  hasLoadedData.current = false
                 }}
               >
                 ออกจากระบบ

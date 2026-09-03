@@ -17,7 +17,7 @@ type AdminError = {
 
 type AdminPayload = AdminDashboardData | AdminError
 
-const CALLBACK_TIMEOUT_MS = 12000
+const CALLBACK_TIMEOUT_MS = 30000
 
 export function isAdminConfigured(): boolean {
   return Boolean(googleSheetsWebAppUrl)
