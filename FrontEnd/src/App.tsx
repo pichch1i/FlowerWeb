@@ -359,8 +359,10 @@ function App() {
           onClick={goBackToPreviousQuestion}
           aria-label="ย้อนกลับไปข้อก่อนหน้า"
         >
-          <span aria-hidden="true">‹</span>
-          ย้อนกลับ
+          <span className="app-back-button__icon" aria-hidden="true">
+            ‹
+          </span>
+          <span className="app-back-button__label">ย้อนกลับ</span>
         </button>
       ) : null}
       {pageContent}
