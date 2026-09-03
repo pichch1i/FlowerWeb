@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   detectDominantEmotion,
   emotionResults,
@@ -75,6 +75,56 @@ function App() {
     answers.map((answer) => answer.emotion),
   )
 
+  const submitCompletedQuizResponse = useCallback(
+    (completedAnswers: QuizAnswer[]) => {
+      if (
+        isAdminPage ||
+        !playerInfo ||
+        !privacyConsent ||
+        completedAnswers.length !== 7 ||
+        !submissionId ||
+        submissionAttempted.current
+      ) {
+        return
+      }
+
+      const completedEmotion = detectDominantEmotion(
+        completedAnswers.map((answer) => answer.emotion),
+      )
+      const result = emotionResults[completedEmotion]
+      const submittedAt = new Date().toISOString()
+
+      submissionAttempted.current = true
+
+      void submitQuizResponse({
+        submissionId,
+        submittedAt,
+        player: playerInfo,
+        consent: privacyConsent,
+        answers: completedAnswers,
+        result: {
+          emotion: completedEmotion,
+          flower: result.flower,
+          resultTitle: result.resultTitle,
+        },
+      }).catch(() => {
+        submissionAttempted.current = false
+      })
+
+      void publishTouchDesignerResult({
+        submissionId,
+        completedAt: submittedAt,
+        emotion: completedEmotion,
+        flower: result.flower,
+        resultTitle: result.resultTitle,
+      }).catch(() => {
+        // TouchDesigner is an optional local output. The quiz still works when
+        // the bridge is not running, such as during normal Vite development.
+      })
+    },
+    [isAdminPage, playerInfo, privacyConsent, submissionId],
+  )
+
   useEffect(() => {
     if (isAdminPage) {
       return
@@ -93,54 +143,12 @@ function App() {
       return
     }
 
-    if (
-      currentPage !== 'result' ||
-      !playerInfo ||
-      !privacyConsent ||
-      answers.length !== 7 ||
-      !submissionId ||
-      submissionAttempted.current
-    ) {
+    if (currentPage !== 'result') {
       return
     }
 
-    submissionAttempted.current = true
-    const result = emotionResults[resultEmotion]
-
-    void submitQuizResponse({
-      submissionId,
-      submittedAt: new Date().toISOString(),
-      player: playerInfo,
-      consent: privacyConsent,
-      answers,
-      result: {
-        emotion: resultEmotion,
-        flower: result.flower,
-        resultTitle: result.resultTitle,
-      },
-    }).catch(() => {
-      submissionAttempted.current = false
-    })
-
-    void publishTouchDesignerResult({
-      submissionId,
-      completedAt: new Date().toISOString(),
-      emotion: resultEmotion,
-      flower: result.flower,
-      resultTitle: result.resultTitle,
-    }).catch(() => {
-      // TouchDesigner is an optional local output. The quiz still works when
-      // the bridge is not running, such as during normal Vite development.
-    })
-  }, [
-    answers,
-    currentPage,
-    isAdminPage,
-    playerInfo,
-    privacyConsent,
-    resultEmotion,
-    submissionId,
-  ])
+    submitCompletedQuizResponse(answers)
+  }, [answers, currentPage, isAdminPage, submitCompletedQuizResponse])
 
   useEffect(() => {
     return () => {
@@ -209,10 +217,17 @@ function App() {
         emotion,
       },
     })
-    setAnswers((currentAnswers) => [
-      ...currentAnswers,
+    const nextAnswers = [
+      ...answers.filter((answer) => answer.question < question),
       { question, optionId, emotion },
-    ])
+    ]
+
+    setAnswers(nextAnswers)
+
+    if (nextPage === 'result') {
+      submitCompletedQuizResponse(nextAnswers)
+    }
+
     goToPage(nextPage)
   }
 

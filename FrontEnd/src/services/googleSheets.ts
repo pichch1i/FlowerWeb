@@ -7,6 +7,34 @@ import type {
 const googleSheetsWebAppUrl = import.meta.env
   .VITE_GOOGLE_SHEETS_WEB_APP_URL as string | undefined
 
+async function postToGoogleSheets(body: string): Promise<void> {
+  let lastError: unknown
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await fetch(googleSheetsWebAppUrl as string, {
+        method: 'POST',
+        mode: 'no-cors',
+        cache: 'no-store',
+        keepalive: true,
+        headers: {
+          'Content-Type': 'text/plain;charset=UTF-8',
+        },
+        body,
+      })
+
+      return
+    } catch (error) {
+      lastError = error
+      await new Promise((resolve) =>
+        window.setTimeout(resolve, 450 * (attempt + 1)),
+      )
+    }
+  }
+
+  throw lastError
+}
+
 export async function submitQuizResponse(
   submission: QuizSubmission,
 ): Promise<'submitted' | 'not-configured'> {
@@ -14,15 +42,7 @@ export async function submitQuizResponse(
     return 'not-configured'
   }
 
-  await fetch(googleSheetsWebAppUrl, {
-    method: 'POST',
-    mode: 'no-cors',
-    cache: 'no-store',
-    headers: {
-      'Content-Type': 'text/plain;charset=UTF-8',
-    },
-    body: JSON.stringify(submission),
-  })
+  await postToGoogleSheets(JSON.stringify(submission))
 
   return 'submitted'
 }
@@ -34,15 +54,7 @@ export async function submitResultFeedback(
     return 'not-configured'
   }
 
-  await fetch(googleSheetsWebAppUrl, {
-    method: 'POST',
-    mode: 'no-cors',
-    cache: 'no-store',
-    headers: {
-      'Content-Type': 'text/plain;charset=UTF-8',
-    },
-    body: JSON.stringify(feedback),
-  })
+  await postToGoogleSheets(JSON.stringify(feedback))
 
   return 'submitted'
 }
