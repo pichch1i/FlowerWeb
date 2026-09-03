@@ -9,6 +9,8 @@ import './AdminPage.css'
 
 const ADMIN_SESSION_KEY = 'flower-admin-password'
 
+type AdminView = 'logs' | 'responses'
+
 function formatValue(value: string | undefined) {
   if (!value) {
     return '—'
@@ -30,6 +32,8 @@ function AdminPage() {
   const [data, setData] = useState<AdminDashboardData | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [activeView, setActiveView] = useState<AdminView>('logs')
 
   const summary = useMemo(() => {
     const logs = data?.logs ?? []
@@ -112,6 +116,72 @@ function AdminPage() {
 
   return (
     <main className="admin-page">
+      {isLoggedIn ? (
+        <>
+          <button
+            className="admin-menu-button"
+            type="button"
+            aria-label={isMenuOpen ? 'ปิดเมนู admin' : 'เปิดเมนู admin'}
+            aria-expanded={isMenuOpen}
+            aria-controls="admin-sidebar"
+            onClick={() => setIsMenuOpen((current) => !current)}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
+
+          {isMenuOpen ? (
+            <button
+              className="admin-menu-backdrop"
+              type="button"
+              aria-label="ปิดเมนู"
+              onClick={() => setIsMenuOpen(false)}
+            />
+          ) : null}
+
+          <aside
+            id="admin-sidebar"
+            className={`admin-sidebar${isMenuOpen ? ' admin-sidebar--open' : ''}`}
+            aria-label="เมนูข้อมูล admin"
+          >
+            <div className="admin-sidebar__brand">
+              <span>☰</span>
+              <div>
+                <strong>Boomscape</strong>
+                <small>Admin menu</small>
+              </div>
+            </div>
+
+            <nav className="admin-nav" aria-label="เลือกข้อมูลที่ต้องการดู">
+              <button
+                type="button"
+                className={activeView === 'logs' ? 'admin-nav__item admin-nav__item--active' : 'admin-nav__item'}
+                onClick={() => {
+                  setActiveView('logs')
+                  setIsMenuOpen(false)
+                }}
+              >
+                <span>Log</span>
+                <small>{summary.logs} รายการ</small>
+              </button>
+
+              <button
+                type="button"
+                className={activeView === 'responses' ? 'admin-nav__item admin-nav__item--active' : 'admin-nav__item'}
+                onClick={() => {
+                  setActiveView('responses')
+                  setIsMenuOpen(false)
+                }}
+              >
+                <span>Responses</span>
+                <small>{summary.responses} รายการ</small>
+              </button>
+            </nav>
+          </aside>
+        </>
+      ) : null}
+
       <section className="admin-shell" aria-labelledby="admin-title">
         <header className="admin-header">
           <div>
@@ -187,34 +257,36 @@ function AdminPage() {
             </section>
 
             <section className="admin-grid">
-              <DashboardTable
-                title="Log การใช้งานล่าสุด"
-                records={data?.logs ?? []}
-                columns={[
-                  'เวลาที่บันทึก (Google)',
-                  'Event Type',
-                  'Page',
-                  'Target',
-                  'Submission ID',
-                  'Details',
-                  'Viewport',
-                ]}
-              />
-
-              <DashboardTable
-                title="Responses ล่าสุด"
-                records={data?.responses ?? []}
-                columns={[
-                  'เวลาที่บันทึก (Google)',
-                  'ชื่อ–นามสกุล',
-                  'อายุ',
-                  'อาชีพ',
-                  'ผลอารมณ์',
-                  'ดอกไม้',
-                  'ชื่อผลลัพธ์',
-                  'ความคิดเห็นต่อผลลัพธ์',
-                ]}
-              />
+              {activeView === 'logs' ? (
+                <DashboardTable
+                  title="Log การใช้งานล่าสุด"
+                  records={data?.logs ?? []}
+                  columns={[
+                    'เวลาที่บันทึก (Google)',
+                    'Event Type',
+                    'Page',
+                    'Target',
+                    'Submission ID',
+                    'Details',
+                    'Viewport',
+                  ]}
+                />
+              ) : (
+                <DashboardTable
+                  title="Responses ล่าสุด"
+                  records={data?.responses ?? []}
+                  columns={[
+                    'เวลาที่บันทึก (Google)',
+                    'ชื่อ–นามสกุล',
+                    'อายุ',
+                    'อาชีพ',
+                    'ผลอารมณ์',
+                    'ดอกไม้',
+                    'ชื่อผลลัพธ์',
+                    'ความคิดเห็นต่อผลลัพธ์',
+                  ]}
+                />
+              )}
             </section>
           </>
         )}
