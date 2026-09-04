@@ -17,6 +17,14 @@ import './AdminPage.css'
 const ADMIN_SESSION_KEY = 'flower-admin-password'
 
 type AdminView = 'logs' | 'responses'
+type DateRange = 'today' | 'yesterday' | 'week' | 'all'
+
+const dateRangeLabels: Record<DateRange, string> = {
+  today: 'วันนี้',
+  yesterday: 'เมื่อวาน',
+  week: 'อาทิตย์นี้',
+  all: 'ทั้งหมด',
+}
 
 function formatValue(value: string | undefined) {
   if (!value) {
@@ -31,6 +39,100 @@ function pick(record: AdminRecord, keys: string[]) {
   return key ? record[key] : ''
 }
 
+function startOfDay(date: Date) {
+  const nextDate = new Date(date)
+  nextDate.setHours(0, 0, 0, 0)
+  return nextDate
+}
+
+function addDays(date: Date, days: number) {
+  const nextDate = new Date(date)
+  nextDate.setDate(nextDate.getDate() + days)
+  return nextDate
+}
+
+function getDateRangeBounds(range: DateRange) {
+  const today = startOfDay(new Date())
+
+  if (range === 'today') {
+    return {
+      start: today,
+      end: addDays(today, 1),
+    }
+  }
+
+  if (range === 'yesterday') {
+    return {
+      start: addDays(today, -1),
+      end: today,
+    }
+  }
+
+  if (range === 'week') {
+    const mondayIndex = (today.getDay() + 6) % 7
+
+    return {
+      start: addDays(today, -mondayIndex),
+      end: addDays(today, 1),
+    }
+  }
+
+  return null
+}
+
+function parseSheetDate(value: string | undefined) {
+  if (!value) {
+    return null
+  }
+
+  const text = value.trim()
+  const dateParts = text.match(
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:,\s*(\d{1,2}):(\d{2})(?::(\d{2}))?)?/,
+  )
+
+  if (dateParts) {
+    const [, day, month, year, hour = '0', minute = '0', second = '0'] =
+      dateParts
+    const parsedDate = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hour),
+      Number(minute),
+      Number(second),
+    )
+
+    return Number.isNaN(parsedDate.getTime()) ? null : parsedDate
+  }
+
+  const fallbackDate = new Date(text)
+  return Number.isNaN(fallbackDate.getTime()) ? null : fallbackDate
+}
+
+function filterRecordsByDateRange(records: AdminRecord[], range: DateRange) {
+  const bounds = getDateRangeBounds(range)
+
+  if (!bounds) {
+    return records
+  }
+
+  return records.filter((record) => {
+    const recordDate = parseSheetDate(
+      pick(record, [
+        'เวลาที่บันทึก (Google)',
+        'เวลาที่เกิดเหตุการณ์ (อุปกรณ์)',
+        'เวลาที่ส่ง (อุปกรณ์)',
+      ]),
+    )
+
+    return (
+      recordDate !== null &&
+      recordDate >= bounds.start &&
+      recordDate < bounds.end
+    )
+  })
+}
+
 function AdminPage() {
   const [password, setPassword] = useState(
     () => window.sessionStorage.getItem(ADMIN_SESSION_KEY) ?? '',
@@ -41,11 +143,22 @@ function AdminPage() {
   const [errorMessage, setErrorMessage] = useState('')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeView, setActiveView] = useState<AdminView>('logs')
+  const [dateRange, setDateRange] = useState<DateRange>('today')
   const hasLoadedData = useRef(false)
 
-  const summary = useMemo(() => {
+  const filteredData = useMemo(() => {
     const logs = data?.logs ?? []
     const responses = data?.responses ?? []
+
+    return {
+      logs: filterRecordsByDateRange(logs, dateRange),
+      responses: filterRecordsByDateRange(responses, dateRange),
+    }
+  }, [data, dateRange])
+
+  const summary = useMemo(() => {
+    const logs = filteredData.logs
+    const responses = filteredData.responses
     const uniqueSessions = new Set(
       logs
         .map((log) => pick(log, ['Session ID']))
@@ -67,7 +180,7 @@ function AdminPage() {
       firstPageViews,
       buttonClicks,
     }
-  }, [data])
+  }, [filteredData])
 
   const loadDashboard = useCallback(
     async (nextPassword = password, options?: { silent?: boolean }) => {
@@ -235,22 +348,47 @@ function AdminPage() {
           </div>
 
           {isLoggedIn ? (
-            <div className="admin-actions">
-              <button type="button" onClick={() => void loadDashboard()}>
-                รีเฟรชข้อมูล
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  window.sessionStorage.removeItem(ADMIN_SESSION_KEY)
-                  setIsLoggedIn(false)
-                  setPassword('')
-                  setData(null)
-                  hasLoadedData.current = false
-                }}
-              >
-                ออกจากระบบ
-              </button>
+            <div className="admin-header__controls">
+              <fieldset className="admin-date-filter">
+                <legend>ช่วงวันที่</legend>
+                <div className="admin-date-filter__options">
+                  {(Object.keys(dateRangeLabels) as DateRange[]).map(
+                    (range) => (
+                      <button
+                        key={range}
+                        type="button"
+                        className={
+                          dateRange === range
+                            ? 'admin-date-filter__option admin-date-filter__option--active'
+                            : 'admin-date-filter__option'
+                        }
+                        aria-pressed={dateRange === range}
+                        onClick={() => setDateRange(range)}
+                      >
+                        {dateRangeLabels[range]}
+                      </button>
+                    ),
+                  )}
+                </div>
+              </fieldset>
+
+              <div className="admin-actions">
+                <button type="button" onClick={() => void loadDashboard()}>
+                  รีเฟรชข้อมูล
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.sessionStorage.removeItem(ADMIN_SESSION_KEY)
+                    setIsLoggedIn(false)
+                    setPassword('')
+                    setData(null)
+                    hasLoadedData.current = false
+                  }}
+                >
+                  ออกจากระบบ
+                </button>
+              </div>
             </div>
           ) : null}
         </header>
@@ -305,7 +443,7 @@ function AdminPage() {
               {activeView === 'logs' ? (
                 <DashboardTable
                   title="Log การใช้งานล่าสุด"
-                  records={data?.logs ?? []}
+                  records={filteredData.logs}
                   columns={[
                     'เวลาที่บันทึก (Google)',
                     'Event Type',
@@ -319,7 +457,7 @@ function AdminPage() {
               ) : (
                 <DashboardTable
                   title="Responses ล่าสุด"
-                  records={data?.responses ?? []}
+                  records={filteredData.responses}
                   columns={[
                     'เวลาที่บันทึก (Google)',
                     'ชื่อ–นามสกุล',
