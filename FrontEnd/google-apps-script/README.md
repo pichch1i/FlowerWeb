@@ -24,5 +24,21 @@
 สคริปต์มี API สำหรับให้ TouchDesigner อ่านผลล่าสุด โดยส่งออกเฉพาะดอกไม้
 อารมณ์ ชื่อผลลัพธ์ และเวลาเท่านั้น ข้อมูลชื่อ อายุ และอาชีพจะไม่ถูกส่งออก
 
+ใช้ `action=latest` เมื่อต้องการอ่านผลล่าสุดเพียงรายการเดียว
+หรือใช้ `action=events` เมื่อต้องการให้ TouchDesigner รับทุกเหตุการณ์ที่ผู้เล่นส่งเข้ามา
+โดยแต่ละรายการจะมี `eventId` ของตัวเอง ทำให้ผลลัพธ์ดอกชนิดเดียวกันยังถูกส่งซ้ำได้ทุกครั้ง
+
+ตัวอย่าง:
+
+```text
+https://script.google.com/macros/s/DEPLOYMENT_ID/exec?action=events&key=TOUCHDESIGNER_API_KEY
+```
+
+หลังอ่านครั้งแรก ให้เก็บค่า `cursor` ที่ได้กลับมา แล้วส่งต่อด้วย `after` ในครั้งถัดไป:
+
+```text
+https://script.google.com/macros/s/DEPLOYMENT_ID/exec?action=events&key=TOUCHDESIGNER_API_KEY&after=CURSOR
+```
+
 ดูวิธีตั้งค่าและโค้ดสำหรับ TouchDesigner ที่
 [`../touchdesigner/README.md`](../touchdesigner/README.md)

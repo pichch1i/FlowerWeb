@@ -5,6 +5,10 @@ function doGet(event) {
     return FW_getLatestTouchDesignerResult_(event);
   }
 
+  if (action === 'events') {
+    return FW_getTouchDesignerEvents_(event);
+  }
+
   if (action === 'admin') {
     return FW_getAdminDashboard_(event);
   }
@@ -142,6 +146,95 @@ function FW_getLatestTouchDesignerResult_(event) {
   }
 
   return FW_jsonResponse_(JSON.parse(latestJson));
+}
+
+// Cursor-based event feed for TouchDesigner.
+// First request without `after` returns only the latest row so an installation
+// does not replay every old response. Later requests should pass the returned
+// cursor back as `after` to receive every new submission, even if the flower is
+// the same as the previous result.
+function FW_getTouchDesignerEvents_(event) {
+  var properties = PropertiesService.getScriptProperties();
+  var expectedKey = properties.getProperty('TOUCHDESIGNER_API_KEY');
+  var suppliedKey = String(event && event.parameter ? event.parameter.key || '' : '');
+  var params = event && event.parameter ? event.parameter : {};
+  var sheet;
+  var lastRow;
+  var suppliedCursor;
+  var bootstrap;
+  var after;
+  var count;
+  var events = [];
+
+  if (!expectedKey || suppliedKey !== expectedKey) {
+    return FW_jsonResponse_({ ok: false, error: 'unauthorized' });
+  }
+
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(FW_responseSheetName_());
+  lastRow = sheet ? Math.max(1, sheet.getLastRow()) : 1;
+  suppliedCursor = params.after;
+  bootstrap = suppliedCursor === undefined || suppliedCursor === '';
+  after = bootstrap ? Math.max(1, lastRow - 1) : Number(suppliedCursor);
+
+  if (!Number.isInteger(after) || after < 1 || after > lastRow) {
+    return FW_jsonResponse_({ ok: false, error: 'invalid_cursor' });
+  }
+
+  count = Math.min(50, lastRow - after);
+
+  if (sheet && count > 0) {
+    var headers = sheet
+      .getRange(1, 1, 1, Math.max(sheet.getLastColumn(), FW_responseHeaders_().length))
+      .getDisplayValues()[0];
+    var emotionColumn = headers.indexOf('ผลอารมณ์') + 1;
+    var flowerColumn = headers.indexOf('ดอกไม้') + 1;
+    var titleColumn = headers.indexOf('ชื่อผลลัพธ์') + 1;
+    var identityRows = sheet.getRange(after + 1, 1, count, 3).getDisplayValues();
+    var resultRows = sheet
+      .getRange(after + 1, emotionColumn, count, titleColumn - emotionColumn + 1)
+      .getDisplayValues();
+    var flowerMap = FW_touchDesignerFlowerMap_();
+
+    for (var i = 0; i < count; i += 1) {
+      var emotion = String(resultRows[i][0] || '');
+      var flower = flowerMap[emotion];
+
+      if (!identityRows[i][0] || !flower) {
+        return FW_jsonResponse_({
+          ok: false,
+          error: 'invalid_event_row',
+          row: after + i + 1,
+        });
+      }
+
+      events.push({
+        eventId: String(identityRows[i][0]),
+        emotion: emotion,
+        flowerId: flower.flowerId,
+        visualIndex: flower.visualIndex,
+        flower: String(resultRows[i][flowerColumn - emotionColumn] || ''),
+        resultTitle: String(resultRows[i][titleColumn - emotionColumn] || ''),
+        submittedAt: String(identityRows[i][2] || ''),
+      });
+    }
+  }
+
+  return FW_jsonResponse_({
+    ok: true,
+    events: events,
+    cursor: after + count,
+    hasMore: after + count < lastRow,
+  });
+}
+
+function FW_touchDesignerFlowerMap_() {
+  return {
+    Hope: { flowerId: 'sunflower', visualIndex: 0 },
+    Anxiety: { flowerId: 'lavender', visualIndex: 1 },
+    Serenity: { flowerId: 'daisy', visualIndex: 2 },
+    Sadness: { flowerId: 'striped_carnation', visualIndex: 3 },
+    Frustration: { flowerId: 'dandelion', visualIndex: 4 },
+  };
 }
 
 function FW_getAdminDashboard_(event) {
