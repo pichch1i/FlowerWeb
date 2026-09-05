@@ -11,7 +11,7 @@
         ↓
 Apps Script บันทึกข้อมูลเต็มลง Google Sheets
         ↓
-Apps Script เก็บผลล่าสุดสำหรับ TouchDesigner โดยไม่มีข้อมูลส่วนตัว
+Apps Script เก็บผลล่าสุดและรายการ event สำหรับ TouchDesigner โดยไม่มีข้อมูลส่วนตัว
         ↓
 TouchDesigner อ่าน JSON ทุก 1–2 วินาที
         ↓
@@ -35,16 +35,17 @@ Switch TOP เลือกภาพดอกไม้ตาม visualIndex
 
 ## 2. สร้าง URL สำหรับ TouchDesigner
 
-นำ URL เว็บแอปเดิมมาต่อท้ายด้วย `?action=latest&key=API_KEY`
+แนะนำให้ใช้ `action=events` เพื่อให้ TouchDesigner รับทุกผลลัพธ์ที่ผู้เล่นส่งเข้ามา
+แม้ผู้เล่นหลายคนจะได้ดอกไม้ชนิดเดียวกันก็ตาม
 
 ```text
-https://script.google.com/macros/s/DEPLOYMENT_ID/exec?action=latest&key=API_KEY
+https://script.google.com/macros/s/DEPLOYMENT_ID/exec?action=events&key=API_KEY
 ```
 
-เปิด URL นี้ทดสอบในเบราว์เซอร์ หากยังไม่มีผู้เล่นหลังอัปเดต จะได้:
+เปิด URL นี้ทดสอบในเบราว์เซอร์ หากเชื่อมต่อสำเร็จจะได้:
 
 ```json
-{"ok":true,"hasResult":false}
+{"ok":true,"events":[],"cursor":301,"hasMore":false}
 ```
 
 เมื่อมีผู้เล่นทำครบแล้ว จะได้ข้อมูลลักษณะนี้:
@@ -52,14 +53,19 @@ https://script.google.com/macros/s/DEPLOYMENT_ID/exec?action=latest&key=API_KEY
 ```json
 {
   "ok": true,
-  "hasResult": true,
-  "eventId": "9c976012-9b39-4e16-b6aa-6e88972b036d",
-  "emotion": "Anxiety",
-  "flowerId": "lavender",
-  "flower": "ลาเวนเดอร์",
-  "resultTitle": "ดอกไม้แห่งการปลอบประโลม",
-  "visualIndex": 1,
-  "submittedAt": "2026-08-27T09:30:00.000Z"
+  "events": [
+    {
+      "eventId": "9c976012-9b39-4e16-b6aa-6e88972b036d",
+      "emotion": "Anxiety",
+      "flowerId": "lavender",
+      "flower": "ลาเวนเดอร์",
+      "resultTitle": "ดอกไม้แห่งการปลอบประโลม",
+      "visualIndex": 1,
+      "submittedAt": "2026-08-27T09:30:00.000Z"
+    }
+  ],
+  "cursor": 302,
+  "hasMore": false
 }
 ```
 
@@ -124,7 +130,8 @@ Web Client DAT รองรับการส่ง HTTP GET และปุ่�
 
 1. เขียนข้อมูลลง `flower_result`
 2. เปลี่ยน `flower_switch.par.index` ตาม `visualIndex`
-3. ไม่สั่งซ้ำหากยังเป็นผลของผู้เล่นคนเดิม
+3. เก็บ `cursor` และเติม `after=CURSOR` กลับเข้า URL ให้อัตโนมัติ
+4. ไม่สั่งซ้ำหากยังเป็นผลของผู้เล่นคนเดิม
 
 หากชื่อโหนดในไฟล์ TouchDesigner ต่างจากตัวอย่าง ให้เปลี่ยนชื่อใน
 `web_client_callbacks.py` ให้ตรงกับโปรเจกต์จริง
@@ -133,7 +140,7 @@ Web Client DAT รองรับการส่ง HTTP GET และปุ่�
 
 - เหมาะกับการเล่นทีละคนหรือผลที่เข้ามาไม่ถี่มาก
 - มีความหน่วงประมาณช่วงเวลาที่ตั้ง Timer เช่น 1–2 วินาที
-- ระบบส่งเฉพาะผลล่าสุด หากมีหลายคนส่งพร้อมกันภายในช่วง Poll เดียว
-  TouchDesigner อาจเห็นเฉพาะคนล่าสุด
+- ระบบ `events` อ่านได้สูงสุด 50 รายการต่อรอบ หากมีผู้เล่นจำนวนมากมากในช่วงสั้น ๆ
+  ให้ตั้ง Timer ถี่ขึ้น เช่น 0.5–1 วินาที
 - สำหรับงานที่ต้องรับหลายคนพร้อมกันหรือหน่วงต่ำมาก ควรเปลี่ยนเป็น WebSocket
   หรือระบบคิวบนเซิร์ฟเวอร์
