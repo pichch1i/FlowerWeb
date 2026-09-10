@@ -105,15 +105,6 @@ function ResultPage({
             <strong>{emotion}</strong>
           </div>
 
-          <a
-            className="result-feedback-invitation"
-            href="#result-feedback"
-            onClick={() => onLog?.('button_click', 'feedback-invitation')}
-          >
-            <span>ความคิดเห็นของคุณมีความหมายกับเรา</span>
-            <strong>เลื่อนลงเพื่อแสดงความคิดเห็น ↓</strong>
-          </a>
-
           <div className="result-sparkles" aria-hidden="true">
             <span>✦</span>
             <span>✦</span>

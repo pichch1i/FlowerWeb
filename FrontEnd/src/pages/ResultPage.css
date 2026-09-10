@@ -151,75 +151,6 @@
   font-weight: 600;
 }
 
-.result-feedback-invitation {
-  position: relative;
-  display: inline-flex;
-  width: min(100%, 390px);
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-top: 14px;
-  padding: 11px 18px 12px;
-  overflow: hidden;
-  border: 1px solid rgba(239, 177, 121, 0.52);
-  border-radius: 18px 6px 18px 6px;
-  color: #f9e6d7;
-  background:
-    linear-gradient(115deg, rgba(143, 73, 62, 0.34), rgba(199, 120, 85, 0.15)),
-    rgba(255, 246, 233, 0.055);
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.25),
-    inset 0 1px rgba(255, 235, 214, 0.1),
-    0 0 18px rgba(199, 120, 85, 0.08);
-  text-align: center;
-  text-decoration: none;
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background-color 180ms ease,
-    transform 180ms ease;
-  box-sizing: border-box;
-}
-
-.result-feedback-invitation::before {
-  position: absolute;
-  top: 0;
-  left: 12%;
-  width: 76%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #ffd0a6, transparent);
-  content: '';
-}
-
-.result-feedback-invitation span {
-  color: #fff0e3;
-  font-size: 0.72rem;
-  line-height: 1.35;
-}
-
-.result-feedback-invitation strong {
-  color: #f3b47d;
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.35;
-  text-shadow: 0 0 16px rgba(239, 177, 121, 0.24);
-}
-
-.result-feedback-invitation:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 207, 164, 0.8);
-  background-color: rgba(255, 246, 233, 0.09);
-  box-shadow:
-    0 11px 28px rgba(0, 0, 0, 0.3),
-    inset 0 1px rgba(255, 235, 214, 0.14),
-    0 0 24px rgba(199, 120, 85, 0.16);
-}
-
-.result-feedback-invitation:focus-visible {
-  outline: 3px solid rgba(224, 155, 109, 0.5);
-  outline-offset: 3px;
-}
-
 .result-feedback {
   scroll-margin-top: 18px;
   width: min(calc(100% - 24px), 680px);
@@ -493,20 +424,6 @@
     font-size: clamp(0.58rem, 1.3svh, 0.62rem);
   }
 
-  .result-feedback-invitation {
-    flex: 0 0 auto;
-    margin-top: clamp(5px, 0.9svh, 9px);
-    padding: clamp(7px, 1svh, 10px) 14px;
-  }
-
-  .result-feedback-invitation span {
-    font-size: clamp(0.62rem, 1.25svh, 0.7rem);
-  }
-
-  .result-feedback-invitation strong {
-    font-size: clamp(0.68rem, 1.4svh, 0.78rem);
-  }
-
   .result-feedback {
     margin-top: 18px;
     margin-bottom: max(36px, env(safe-area-inset-bottom));
@@ -609,7 +526,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .result-feedback-invitation,
   .result-feedback textarea,
   .result-feedback button {
     transition: none;
