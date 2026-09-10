@@ -6,7 +6,7 @@ export type PlayerInfo = {
   occupation: string
 }
 
-export const PRIVACY_NOTICE_VERSION = '2026-09-02'
+export const PRIVACY_NOTICE_VERSION = '2026-09-10'
 
 export type PrivacyConsent = {
   accepted: true
@@ -40,6 +40,13 @@ export type ResultFeedback = {
   submissionId: string
   feedback: string
   feedbackSubmittedAt: string
+}
+
+export type FlowerNicknameSubmission = {
+  action: 'nickname'
+  submissionId: string
+  flowerNickname: string
+  nicknameSubmittedAt: string
 }
 
 export type UsageLogEvent = {

@@ -8,7 +8,10 @@ import dandelionImage from '../assets/pict/dandelion-transparent.webp'
 import lavenderImage from '../assets/pict/lavender-transparent.webp'
 import stripedCarnationImage from '../assets/pict/striped-carnation-transparent.webp'
 import sunflowerImage from '../assets/pict/sunflower-transparent.webp'
-import { submitResultFeedback } from '../services/googleSheets'
+import {
+  submitFlowerNickname,
+  submitResultFeedback,
+} from '../services/googleSheets'
 import './ResultPage.css'
 
 type ResultPageProps = {
@@ -36,10 +39,48 @@ function ResultPage({
 }: ResultPageProps) {
   const result = emotionResults[emotion]
   const [flowerNickname, setFlowerNickname] = useState('')
+  const [nicknameStatus, setNicknameStatus] = useState<
+    'idle' | 'submitting' | 'submitted' | 'error'
+  >('idle')
   const [feedback, setFeedback] = useState('')
   const [feedbackStatus, setFeedbackStatus] = useState<
     'idle' | 'submitting' | 'submitted' | 'error'
   >('idle')
+
+  const submitNickname = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const normalizedNickname = flowerNickname.trim()
+
+    if (!normalizedNickname || nicknameStatus === 'submitting') {
+      return
+    }
+
+    setNicknameStatus('submitting')
+    onLog?.('button_click', 'nickname-submit', {
+      nicknameLength: normalizedNickname.length,
+    })
+
+    try {
+      const status = await submitFlowerNickname({
+        action: 'nickname',
+        submissionId,
+        flowerNickname: normalizedNickname,
+        nicknameSubmittedAt: new Date().toISOString(),
+      })
+
+      setNicknameStatus(status === 'submitted' ? 'submitted' : 'error')
+      onLog?.('form_submit', 'nickname-submitted', {
+        status,
+        nicknameLength: normalizedNickname.length,
+      })
+    } catch {
+      setNicknameStatus('error')
+      onLog?.('form_submit', 'nickname-error', {
+        nicknameLength: normalizedNickname.length,
+      })
+    }
+  }
 
   const submitFeedback = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -106,21 +147,41 @@ function ResultPage({
             <strong>{emotion}</strong>
           </div>
 
-          <div className="result-flower-nickname">
+          <form className="result-flower-nickname" onSubmit={submitNickname}>
             <label htmlFor="flower-nickname">
               ตั้งชื่อเล่นให้ดอกไม้ของคุณ
             </label>
-            <input
-              id="flower-nickname"
-              name="flowerNickname"
-              type="text"
-              value={flowerNickname}
-              onChange={(event) => setFlowerNickname(event.target.value)}
-              placeholder="พิมพ์ชื่อเล่นของดอกไม้..."
-              maxLength={30}
-              autoComplete="off"
-            />
-          </div>
+            <div className="result-flower-nickname__controls">
+              <input
+                id="flower-nickname"
+                name="flowerNickname"
+                type="text"
+                value={flowerNickname}
+                onChange={(event) => {
+                  setFlowerNickname(event.target.value)
+                  if (nicknameStatus !== 'idle') {
+                    setNicknameStatus('idle')
+                  }
+                }}
+                placeholder="พิมพ์ชื่อเล่นของดอกไม้..."
+                maxLength={30}
+                autoComplete="off"
+              />
+              <button
+                type="submit"
+                disabled={
+                  !flowerNickname.trim() || nicknameStatus === 'submitting'
+                }
+              >
+                {nicknameStatus === 'submitting' ? 'กำลังบันทึก' : 'บันทึกชื่อ'}
+              </button>
+            </div>
+            <p className="result-flower-nickname__status" aria-live="polite">
+              {nicknameStatus === 'submitted' && 'บันทึกชื่อเล่นแล้ว'}
+              {nicknameStatus === 'error' &&
+                'ยังบันทึกชื่อเล่นไม่ได้ กรุณาลองใหม่อีกครั้ง'}
+            </p>
+          </form>
 
           <div className="result-sparkles" aria-hidden="true">
             <span>✦</span>

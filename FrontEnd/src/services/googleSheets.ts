@@ -1,4 +1,5 @@
 import type {
+  FlowerNicknameSubmission,
   QuizSubmission,
   ResultFeedback,
   UsageLogEvent,
@@ -55,6 +56,18 @@ export async function submitResultFeedback(
   }
 
   await postToGoogleSheets(JSON.stringify(feedback))
+
+  return 'submitted'
+}
+
+export async function submitFlowerNickname(
+  nickname: FlowerNicknameSubmission,
+): Promise<'submitted' | 'not-configured'> {
+  if (!googleSheetsWebAppUrl) {
+    return 'not-configured'
+  }
+
+  await postToGoogleSheets(JSON.stringify(nickname))
 
   return 'submitted'
 }

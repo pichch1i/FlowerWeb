@@ -40,6 +40,10 @@ function doPost(event) {
       return FW_saveFeedback_(responseSheet, payload);
     }
 
+    if (String(payload.action || '') === 'nickname') {
+      return FW_saveFlowerNickname_(responseSheet, payload);
+    }
+
     return FW_saveQuizResponse_(responseSheet, payload);
   } catch (error) {
     return FW_jsonResponse_({
@@ -95,6 +99,29 @@ function FW_saveFeedback_(sheet, payload) {
     ]);
 
   return FW_jsonResponse_({ ok: true, feedbackUpdated: true });
+}
+
+function FW_saveFlowerNickname_(sheet, payload) {
+  var nickname = FW_parseAndValidateFlowerNickname_(payload);
+  var submissionRow = FW_findSubmissionRow_(sheet, nickname.submissionId);
+  var nicknameColumns;
+
+  if (!submissionRow) {
+    throw new Error('Submission not found');
+  }
+
+  nicknameColumns = FW_ensureNicknameColumns_(sheet);
+  sheet
+    .getRange(submissionRow, nicknameColumns[0], 1, 3)
+    .setValues([
+      [
+        FW_protectCell_(nickname.flowerNickname, 30),
+        new Date(),
+        nickname.nicknameSubmittedAt,
+      ],
+    ]);
+
+  return FW_jsonResponse_({ ok: true, nicknameUpdated: true });
 }
 
 function FW_saveQuizResponse_(sheet, payload) {
@@ -359,6 +386,30 @@ function FW_parseAndValidateFeedback_(payload) {
   };
 }
 
+function FW_parseAndValidateFlowerNickname_(payload) {
+  var submissionId = String(payload.submissionId || '');
+  var flowerNickname = String(payload.flowerNickname || '').trim();
+  var nicknameSubmittedAt = new Date(String(payload.nicknameSubmittedAt || ''));
+
+  if (!/^[a-zA-Z0-9-]{10,120}$/.test(submissionId)) {
+    throw new Error('Invalid submission ID');
+  }
+
+  if (!flowerNickname || flowerNickname.length > 30) {
+    throw new Error('Invalid flower nickname');
+  }
+
+  if (Number.isNaN(nicknameSubmittedAt.getTime())) {
+    throw new Error('Invalid nickname time');
+  }
+
+  return {
+    submissionId: submissionId,
+    flowerNickname: flowerNickname,
+    nicknameSubmittedAt: nicknameSubmittedAt,
+  };
+}
+
 function FW_parseAndValidateUsageLog_(payload) {
   var eventId = String(payload.eventId || '');
   var sessionId = String(payload.sessionId || '');
@@ -549,6 +600,27 @@ function FW_ensureFeedbackColumns_(sheet) {
   return columns;
 }
 
+function FW_ensureNicknameColumns_(sheet) {
+  var headers = sheet
+    .getRange(1, 1, 1, Math.max(sheet.getLastColumn(), FW_responseHeaders_().length))
+    .getDisplayValues()[0];
+  var columns = [];
+
+  FW_nicknameHeaders_().forEach(function (header) {
+    var column = headers.indexOf(header) + 1;
+
+    if (!column) {
+      column = headers.length + 1;
+      sheet.getRange(1, column).setValue(header);
+      headers.push(header);
+    }
+
+    columns.push(column);
+  });
+
+  return columns;
+}
+
 function FW_readSheetRecords_(sheet, limit) {
   var lastRow = sheet.getLastRow();
   var lastColumn = sheet.getLastColumn();
@@ -623,6 +695,14 @@ function FW_feedbackHeaders_() {
     'ความคิดเห็นต่อผลลัพธ์',
     'เวลาที่บันทึกความคิดเห็น (Google)',
     'เวลาที่ส่งความคิดเห็น (อุปกรณ์)',
+  ];
+}
+
+function FW_nicknameHeaders_() {
+  return [
+    'ชื่อเล่นของดอกไม้',
+    'เวลาที่บันทึกชื่อเล่น (Google)',
+    'เวลาที่ส่งชื่อเล่น (อุปกรณ์)',
   ];
 }
 
