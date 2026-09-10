@@ -32,6 +32,8 @@ const flowerImages: Record<Emotion, string> = {
   Frustration: dandelionImage,
 }
 
+const FLOWER_NICKNAME_MAX_LENGTH = 7
+
 function ResultPage({
   emotion,
   submissionId,
@@ -163,12 +165,14 @@ function ResultPage({
                 }
               }}
               placeholder="พิมพ์ชื่อเล่นของดอกไม้..."
-              maxLength={15}
+              maxLength={FLOWER_NICKNAME_MAX_LENGTH}
               autoComplete="off"
               disabled={nicknameStatus === 'submitted'}
             />
             <div className="result-flower-nickname__footer">
-              <span>{flowerNickname.length}/15</span>
+              <span>
+                {flowerNickname.length}/{FLOWER_NICKNAME_MAX_LENGTH}
+              </span>
               <button
                 type="submit"
                 disabled={

@@ -126,7 +126,7 @@ function FW_saveFlowerNickname_(spreadsheet, sheet, payload) {
     .getRange(submissionRow, nicknameColumns[0], 1, 3)
     .setValues([
       [
-        FW_protectCell_(nickname.flowerNickname, 15),
+        FW_protectCell_(nickname.flowerNickname, 7),
         new Date(),
         nickname.nicknameSubmittedAt,
       ],
@@ -284,7 +284,7 @@ function FW_getTouchDesignerEvents_(event) {
       .getDisplayValues();
 
     for (var i = 0; i < count; i += 1) {
-      var flowerNickname = String(rows[i][10] || '');
+      var flowerNickname = String(rows[i][10] || '').trim().slice(0, 7);
       var flowerName = String(rows[i][7] || '');
 
       events.push({
@@ -398,7 +398,9 @@ function FW_appendTouchDesignerEvent_(spreadsheet, responseSheet, responseRow, e
       responseHeaders,
       responseValues,
       'ชื่อเล่นของดอกไม้',
-    ),
+    )
+      .trim()
+      .slice(0, 7),
     nicknameSubmittedAt: FW_responseValue_(
       responseHeaders,
       responseValues,
@@ -512,7 +514,7 @@ function FW_parseAndValidateFlowerNickname_(payload) {
     throw new Error('Invalid submission ID');
   }
 
-  if (!flowerNickname || flowerNickname.length > 15) {
+  if (!flowerNickname || flowerNickname.length > 7) {
     throw new Error('Invalid flower nickname');
   }
 

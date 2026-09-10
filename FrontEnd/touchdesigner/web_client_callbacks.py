@@ -3,6 +3,7 @@ import json
 
 _last_event_id = None
 _cursor = None
+_nickname_max_length = 7
 _flower_indices = {
     'sunflower': 0,
     'lavender': 1,
@@ -38,7 +39,7 @@ def _normalize_event(event):
     normalized['flower'] = str(event.get('flower') or '').strip()
     normalized['flowerNickname'] = str(
         event.get('flowerNickname') or ''
-    ).strip()[:15]
+    ).strip()[:_nickname_max_length]
     normalized['displayName'] = str(
         event.get('displayName')
         or normalized['flowerNickname']
