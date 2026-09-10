@@ -35,6 +35,7 @@ function ResultPage({
   onLog,
 }: ResultPageProps) {
   const result = emotionResults[emotion]
+  const [flowerNickname, setFlowerNickname] = useState('')
   const [feedback, setFeedback] = useState('')
   const [feedbackStatus, setFeedbackStatus] = useState<
     'idle' | 'submitting' | 'submitted' | 'error'
@@ -103,6 +104,22 @@ function ResultPage({
           <div className="result-emotion">
             <span>Emotional State</span>
             <strong>{emotion}</strong>
+          </div>
+
+          <div className="result-flower-nickname">
+            <label htmlFor="flower-nickname">
+              ตั้งชื่อเล่นให้ดอกไม้ของคุณ
+            </label>
+            <input
+              id="flower-nickname"
+              name="flowerNickname"
+              type="text"
+              value={flowerNickname}
+              onChange={(event) => setFlowerNickname(event.target.value)}
+              placeholder="พิมพ์ชื่อเล่นของดอกไม้..."
+              maxLength={30}
+              autoComplete="off"
+            />
           </div>
 
           <div className="result-sparkles" aria-hidden="true">
