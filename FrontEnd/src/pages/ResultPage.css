@@ -187,13 +187,20 @@
   box-sizing: border-box;
 }
 
-.result-flower-nickname__controls {
+.result-flower-nickname__footer {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
 }
 
+.result-flower-nickname__footer > span {
+  color: #8f8180;
+  font-size: 0.75rem;
+}
+
 .result-flower-nickname button {
-  min-width: 104px;
+  min-width: 110px;
   min-height: 44px;
   padding: 0 15px;
   border: 1px solid rgba(255, 220, 194, 0.18);
@@ -637,16 +644,6 @@
 
   .result-message {
     border-radius: 18px 5px 18px 5px;
-  }
-}
-
-@media (max-width: 380px) {
-  .result-flower-nickname__controls {
-    display: grid;
-  }
-
-  .result-flower-nickname button {
-    width: 100%;
   }
 }
 

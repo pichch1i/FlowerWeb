@@ -24,14 +24,17 @@ function doPost(event) {
     var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
     var responseSheet;
 
-    lock.waitLock(10000);
-
     if (String(payload.action || '') === 'log') {
       var logSheet = FW_getOrCreateSheet_(spreadsheet, FW_usageLogSheetName_());
       FW_ensureHeaders_(logSheet, FW_usageLogHeaders_());
       FW_appendUsageLog_(logSheet, FW_parseAndValidateUsageLog_(payload));
       return FW_jsonResponse_({ ok: true, logged: true });
     }
+
+    // Keep analytics traffic out of the response-writing queue. Final quiz,
+    // feedback, and nickname writes still use one lock so their rows stay
+    // consistent, while the user-facing submit is no longer delayed by logs.
+    lock.waitLock(10000);
 
     responseSheet = FW_getOrCreateSheet_(spreadsheet, FW_responseSheetName_());
     FW_ensureHeaders_(responseSheet, FW_responseHeaders_());
@@ -104,13 +107,17 @@ function FW_saveFeedback_(sheet, payload) {
 function FW_saveFlowerNickname_(sheet, payload) {
   var nickname = FW_parseAndValidateFlowerNickname_(payload);
   var submissionRow = FW_findSubmissionRow_(sheet, nickname.submissionId);
-  var nicknameColumns;
+  var nicknameColumns = FW_ensureNicknameColumns_(sheet);
+  var placeholderCreated = false;
 
+  // A nickname request can reach Apps Script before the final quiz request.
+  // Preserve it immediately, then let FW_saveQuizResponse_ fill the same row.
   if (!submissionRow) {
-    throw new Error('Submission not found');
+    sheet.appendRow([nickname.submissionId]);
+    submissionRow = sheet.getLastRow();
+    placeholderCreated = true;
   }
 
-  nicknameColumns = FW_ensureNicknameColumns_(sheet);
   sheet
     .getRange(submissionRow, nicknameColumns[0], 1, 3)
     .setValues([
@@ -121,14 +128,20 @@ function FW_saveFlowerNickname_(sheet, payload) {
       ],
     ]);
 
-  return FW_jsonResponse_({ ok: true, nicknameUpdated: true });
+  SpreadsheetApp.flush();
+  return FW_jsonResponse_({
+    ok: true,
+    nicknameUpdated: true,
+    placeholderCreated: placeholderCreated,
+  });
 }
 
 function FW_saveQuizResponse_(sheet, payload) {
   var quiz = FW_parseAndValidateQuizResponse_(payload);
+  var existingRow = FW_findSubmissionRow_(sheet, quiz.submissionId);
   var row;
 
-  if (FW_hasSubmission_(sheet, quiz.submissionId)) {
+  if (existingRow && sheet.getRange(existingRow, 2).getValue()) {
     return FW_jsonResponse_({ ok: true, duplicate: true });
   }
 
@@ -151,9 +164,19 @@ function FW_saveQuizResponse_(sheet, payload) {
     FW_protectCell_(quiz.result.resultTitle, 120),
   );
 
-  sheet.appendRow(row);
+  if (existingRow) {
+    sheet.getRange(existingRow, 1, 1, row.length).setValues([row]);
+  } else {
+    sheet.appendRow(row);
+  }
+
   FW_saveLatestTouchDesignerResult_(quiz);
-  return FW_jsonResponse_({ ok: true, duplicate: false });
+  SpreadsheetApp.flush();
+  return FW_jsonResponse_({
+    ok: true,
+    duplicate: false,
+    recoveredNicknameRow: Boolean(existingRow),
+  });
 }
 
 function FW_getLatestTouchDesignerResult_(event) {

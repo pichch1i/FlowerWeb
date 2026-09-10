@@ -36,6 +36,21 @@ async function postToGoogleSheets(body: string): Promise<void> {
   throw lastError
 }
 
+function postToGoogleSheetsFast(body: string): Promise<void> {
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(
+      googleSheetsWebAppUrl as string,
+      new Blob([body], { type: 'text/plain;charset=UTF-8' }),
+    )
+
+    if (sent) {
+      return Promise.resolve()
+    }
+  }
+
+  return postToGoogleSheets(body)
+}
+
 export async function submitQuizResponse(
   submission: QuizSubmission,
 ): Promise<'submitted' | 'not-configured'> {
@@ -67,7 +82,7 @@ export async function submitFlowerNickname(
     return 'not-configured'
   }
 
-  await postToGoogleSheets(JSON.stringify(nickname))
+  await postToGoogleSheetsFast(JSON.stringify(nickname))
 
   return 'submitted'
 }

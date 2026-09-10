@@ -151,33 +151,42 @@ function ResultPage({
             <label htmlFor="flower-nickname">
               ตั้งชื่อเล่นให้ดอกไม้ของคุณ
             </label>
-            <div className="result-flower-nickname__controls">
-              <input
-                id="flower-nickname"
-                name="flowerNickname"
-                type="text"
-                value={flowerNickname}
-                onChange={(event) => {
-                  setFlowerNickname(event.target.value)
-                  if (nicknameStatus !== 'idle') {
-                    setNicknameStatus('idle')
-                  }
-                }}
-                placeholder="พิมพ์ชื่อเล่นของดอกไม้..."
-                maxLength={30}
-                autoComplete="off"
-              />
+            <input
+              id="flower-nickname"
+              name="flowerNickname"
+              type="text"
+              value={flowerNickname}
+              onChange={(event) => {
+                setFlowerNickname(event.target.value)
+                if (nicknameStatus === 'error') {
+                  setNicknameStatus('idle')
+                }
+              }}
+              placeholder="พิมพ์ชื่อเล่นของดอกไม้..."
+              maxLength={30}
+              autoComplete="off"
+              disabled={nicknameStatus === 'submitted'}
+            />
+            <div className="result-flower-nickname__footer">
+              <span>{flowerNickname.length}/30</span>
               <button
                 type="submit"
                 disabled={
-                  !flowerNickname.trim() || nicknameStatus === 'submitting'
+                  !flowerNickname.trim() ||
+                  nicknameStatus === 'submitting' ||
+                  nicknameStatus === 'submitted'
                 }
               >
-                {nicknameStatus === 'submitting' ? 'กำลังบันทึก' : 'บันทึกชื่อ'}
+                {nicknameStatus === 'submitting'
+                  ? 'กำลังส่ง'
+                  : nicknameStatus === 'submitted'
+                    ? 'ส่งแล้ว'
+                    : 'ส่งข้อความ'}
               </button>
             </div>
             <p className="result-flower-nickname__status" aria-live="polite">
-              {nicknameStatus === 'submitted' && 'บันทึกชื่อเล่นแล้ว'}
+              {nicknameStatus === 'submitted' &&
+                'ขอบคุณสำหรับชื่อเล่นของดอกไม้'}
               {nicknameStatus === 'error' &&
                 'ยังบันทึกชื่อเล่นไม่ได้ กรุณาลองใหม่อีกครั้ง'}
             </p>
