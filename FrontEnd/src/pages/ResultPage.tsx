@@ -163,12 +163,12 @@ function ResultPage({
                 }
               }}
               placeholder="พิมพ์ชื่อเล่นของดอกไม้..."
-              maxLength={30}
+              maxLength={15}
               autoComplete="off"
               disabled={nicknameStatus === 'submitted'}
             />
             <div className="result-flower-nickname__footer">
-              <span>{flowerNickname.length}/30</span>
+              <span>{flowerNickname.length}/15</span>
               <button
                 type="submit"
                 disabled={

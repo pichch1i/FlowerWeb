@@ -122,7 +122,7 @@ function FW_saveFlowerNickname_(spreadsheet, sheet, payload) {
     .getRange(submissionRow, nicknameColumns[0], 1, 3)
     .setValues([
       [
-        FW_protectCell_(nickname.flowerNickname, 30),
+        FW_protectCell_(nickname.flowerNickname, 15),
         new Date(),
         nickname.nicknameSubmittedAt,
       ],
@@ -473,7 +473,7 @@ function FW_parseAndValidateFlowerNickname_(payload) {
     throw new Error('Invalid submission ID');
   }
 
-  if (!flowerNickname || flowerNickname.length > 30) {
+  if (!flowerNickname || flowerNickname.length > 15) {
     throw new Error('Invalid flower nickname');
   }
 
