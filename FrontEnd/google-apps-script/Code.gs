@@ -9,6 +9,10 @@ function doGet(event) {
     return FW_getTouchDesignerEvents_(event);
   }
 
+  if (action === 'touchdesigner-info') {
+    return FW_getTouchDesignerInfo_();
+  }
+
   if (action === 'admin') {
     return FW_getAdminDashboard_(event);
   }
@@ -209,6 +213,31 @@ function FW_getLatestTouchDesignerResult_(event) {
   return FW_jsonResponse_(JSON.parse(latestJson));
 }
 
+function FW_getTouchDesignerInfo_() {
+  return FW_jsonResponse_({
+    ok: true,
+    service: 'Boomscape TouchDesigner feed',
+    schemaVersion: 1,
+    actions: ['latest', 'events'],
+    eventTypes: ['result', 'nickname_updated'],
+    fields: [
+      'eventId',
+      'eventType',
+      'submissionId',
+      'emotion',
+      'flowerId',
+      'flower',
+      'resultTitle',
+      'visualIndex',
+      'flowerNickname',
+      'displayName',
+      'hasNickname',
+      'nicknameSubmittedAt',
+      'submittedAt',
+    ],
+  });
+}
+
 // Cursor-based event feed for TouchDesigner. Result and nickname updates are
 // appended to a dedicated sheet so a nickname added after a result is still a
 // new event and cannot be skipped by a Responses row cursor.
@@ -255,16 +284,22 @@ function FW_getTouchDesignerEvents_(event) {
       .getDisplayValues();
 
     for (var i = 0; i < count; i += 1) {
+      var flowerNickname = String(rows[i][10] || '');
+      var flowerName = String(rows[i][7] || '');
+
       events.push({
+        schemaVersion: 1,
         eventId: String(rows[i][0] || ''),
         eventType: String(rows[i][1] || ''),
         submissionId: String(rows[i][2] || ''),
         emotion: String(rows[i][5] || ''),
         flowerId: String(rows[i][6] || ''),
-        flower: String(rows[i][7] || ''),
+        flower: flowerName,
         resultTitle: String(rows[i][8] || ''),
         visualIndex: Number(rows[i][9] || 0),
-        flowerNickname: String(rows[i][10] || ''),
+        flowerNickname: flowerNickname,
+        displayName: flowerNickname || flowerName,
+        hasNickname: Boolean(flowerNickname),
         nicknameSubmittedAt: String(rows[i][11] || ''),
         submittedAt: String(rows[i][4] || ''),
       });
@@ -350,6 +385,7 @@ function FW_appendTouchDesignerEvent_(spreadsheet, responseSheet, responseRow, e
   body = {
     ok: true,
     hasResult: true,
+    schemaVersion: 1,
     eventId: submissionId + ':' + eventType + ':' + Utilities.getUuid(),
     eventType: eventType,
     submissionId: submissionId,
@@ -374,6 +410,9 @@ function FW_appendTouchDesignerEvent_(spreadsheet, responseSheet, responseRow, e
       'เวลาที่ส่ง (อุปกรณ์)',
     ),
   };
+
+  body.displayName = body.flowerNickname || body.flower;
+  body.hasNickname = Boolean(body.flowerNickname);
 
   FW_ensureHeaders_(eventSheet, FW_touchDesignerEventHeaders_());
   eventSheet.appendRow([

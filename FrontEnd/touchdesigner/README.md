@@ -22,6 +22,9 @@ Switch TOP เลือกภาพดอกไม้ตาม visualIndex
 `resultTitle`, `visualIndex`, `flowerNickname` และเวลา โดยไม่มีชื่อผู้เล่น อายุ
 อาชีพ หรือคำตอบรายข้อ
 
+`displayName` เป็นค่าพร้อมแสดงผล โดยจะใช้ชื่อเล่นเมื่อมีชื่อเล่น และใช้ชื่อดอกไม้
+เป็นค่าเริ่มต้นเมื่อชื่อเล่นยังว่าง ส่วน `hasNickname` จะเป็น `1` หรือ `0`
+
 Apps Script จะสร้างแท็บ `TouchDesigner Events` ใน Google Sheet โดยอัตโนมัติ
 เมื่อมีผลลัพธ์ใหม่ และเพิ่ม event อีกครั้งเมื่อผู้เล่นตั้งชื่อเล่นภายหลัง
 
@@ -68,6 +71,8 @@ https://script.google.com/macros/s/DEPLOYMENT_ID/exec?action=events&key=API_KEY
       "resultTitle": "ดอกไม้แห่งการปลอบประโลม",
       "visualIndex": 1,
       "flowerNickname": "น้องลาเวนเดอร์",
+      "displayName": "น้องลาเวนเดอร์",
+      "hasNickname": true,
       "nicknameSubmittedAt": "2026-08-27T09:31:10.000Z",
       "submittedAt": "2026-08-27T09:30:00.000Z"
     }
@@ -140,6 +145,25 @@ Web Client DAT รองรับการส่ง HTTP GET และปุ่�
 2. เปลี่ยน `flower_switch.par.index` ตาม `visualIndex`
 3. เก็บ `cursor` และเติม `after=CURSOR` กลับเข้า URL ให้อัตโนมัติ
 4. รับ event `nickname_updated` เพิ่ม แม้เป็นผู้เล่นคนเดิม เพื่ออัปเดตชื่อเล่น
+
+หลังรับข้อมูลแล้ว สามารถนำค่าไปใช้ได้ทันที เช่น:
+
+```python
+flower_id = op('flower_result')['flowerId', 'value'].val
+flower_name = op('flower_result')['flower', 'value'].val
+nickname = op('flower_result')['flowerNickname', 'value'].val
+display_name = op('flower_result')['displayName', 'value'].val
+```
+
+แนะนำให้ใช้ `displayName` กับ Text TOP เพราะมีค่าเสมอ แม้ผู้เล่นยังไม่ได้ตั้งชื่อเล่น
+callback จะตรวจ `flowerId` และกำหนด `visualIndex` จากรายการดอกไม้ที่รองรับเอง
+จึงไม่ส่ง index ที่อยู่นอกช่วงไปยัง Switch TOP
+
+ตรวจว่า Apps Script รองรับ schema นี้แล้วได้จาก URL:
+
+```text
+https://script.google.com/macros/s/DEPLOYMENT_ID/exec?action=touchdesigner-info
+```
 
 หากชื่อโหนดในไฟล์ TouchDesigner ต่างจากตัวอย่าง ให้เปลี่ยนชื่อใน
 `web_client_callbacks.py` ให้ตรงกับโปรเจกต์จริง
