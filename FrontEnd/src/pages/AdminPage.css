@@ -1,6 +1,7 @@
 .admin-page {
   min-height: 100vh;
-  padding: 24px 24px 24px 92px;
+  overflow-x: hidden;
+  padding: 24px clamp(18px, 4vw, 56px);
   color: #f5eadf;
   background:
     radial-gradient(circle at 20% 10%, rgba(227, 166, 117, 0.18), transparent 28%),
@@ -154,6 +155,7 @@
 
 .admin-shell {
   width: min(1180px, 100%);
+  min-width: 0;
   margin: 0 auto;
 }
 
@@ -299,6 +301,9 @@
 }
 
 .admin-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   border: 1px solid rgba(244, 200, 166, 0.14);
   border-radius: 24px 8px 24px 8px;
   background: rgba(17, 9, 13, 0.78);
@@ -370,6 +375,7 @@
 
 .admin-grid {
   display: grid;
+  min-width: 0;
   gap: 18px;
 }
 
@@ -394,13 +400,18 @@
 }
 
 .admin-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
   padding: 16px 20px 20px;
 }
 
 .admin-table-wrap table {
-  width: 100%;
-  min-width: 920px;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
   color: #e8ddd4;
   font-size: 0.78rem;
