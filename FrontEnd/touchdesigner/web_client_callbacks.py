@@ -30,11 +30,15 @@ def _process_event(event):
 
         for key in (
             'eventId',
+            'eventType',
+            'submissionId',
             'emotion',
             'flowerId',
             'flower',
             'resultTitle',
             'visualIndex',
+            'flowerNickname',
+            'nicknameSubmittedAt',
             'submittedAt',
         ):
             result_table.appendRow([key, event.get(key, '')])
@@ -48,6 +52,7 @@ def _process_event(event):
         'New flower result:',
         event.get('flowerId'),
         event.get('emotion'),
+        event.get('flowerNickname', ''),
     )
 
 

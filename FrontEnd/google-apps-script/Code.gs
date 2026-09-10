@@ -44,10 +44,10 @@ function doPost(event) {
     }
 
     if (String(payload.action || '') === 'nickname') {
-      return FW_saveFlowerNickname_(responseSheet, payload);
+      return FW_saveFlowerNickname_(spreadsheet, responseSheet, payload);
     }
 
-    return FW_saveQuizResponse_(responseSheet, payload);
+    return FW_saveQuizResponse_(spreadsheet, responseSheet, payload);
   } catch (error) {
     return FW_jsonResponse_({
       ok: false,
@@ -104,7 +104,7 @@ function FW_saveFeedback_(sheet, payload) {
   return FW_jsonResponse_({ ok: true, feedbackUpdated: true });
 }
 
-function FW_saveFlowerNickname_(sheet, payload) {
+function FW_saveFlowerNickname_(spreadsheet, sheet, payload) {
   var nickname = FW_parseAndValidateFlowerNickname_(payload);
   var submissionRow = FW_findSubmissionRow_(sheet, nickname.submissionId);
   var nicknameColumns = FW_ensureNicknameColumns_(sheet);
@@ -128,6 +128,15 @@ function FW_saveFlowerNickname_(sheet, payload) {
       ],
     ]);
 
+  if (FW_responseRowHasResult_(sheet, submissionRow)) {
+    FW_appendTouchDesignerEvent_(
+      spreadsheet,
+      sheet,
+      submissionRow,
+      'nickname_updated',
+    );
+  }
+
   SpreadsheetApp.flush();
   return FW_jsonResponse_({
     ok: true,
@@ -136,9 +145,10 @@ function FW_saveFlowerNickname_(sheet, payload) {
   });
 }
 
-function FW_saveQuizResponse_(sheet, payload) {
+function FW_saveQuizResponse_(spreadsheet, sheet, payload) {
   var quiz = FW_parseAndValidateQuizResponse_(payload);
   var existingRow = FW_findSubmissionRow_(sheet, quiz.submissionId);
+  var recoveredNicknameRow = Boolean(existingRow);
   var row;
 
   if (existingRow && sheet.getRange(existingRow, 2).getValue()) {
@@ -168,14 +178,15 @@ function FW_saveQuizResponse_(sheet, payload) {
     sheet.getRange(existingRow, 1, 1, row.length).setValues([row]);
   } else {
     sheet.appendRow(row);
+    existingRow = sheet.getLastRow();
   }
 
-  FW_saveLatestTouchDesignerResult_(quiz);
+  FW_appendTouchDesignerEvent_(spreadsheet, sheet, existingRow, 'result');
   SpreadsheetApp.flush();
   return FW_jsonResponse_({
     ok: true,
     duplicate: false,
-    recoveredNicknameRow: Boolean(existingRow),
+    recoveredNicknameRow: recoveredNicknameRow,
   });
 }
 
@@ -198,11 +209,9 @@ function FW_getLatestTouchDesignerResult_(event) {
   return FW_jsonResponse_(JSON.parse(latestJson));
 }
 
-// Cursor-based event feed for TouchDesigner.
-// First request without `after` returns only the latest row so an installation
-// does not replay every old response. Later requests should pass the returned
-// cursor back as `after` to receive every new submission, even if the flower is
-// the same as the previous result.
+// Cursor-based event feed for TouchDesigner. Result and nickname updates are
+// appended to a dedicated sheet so a nickname added after a result is still a
+// new event and cannot be skipped by a Responses row cursor.
 function FW_getTouchDesignerEvents_(event) {
   var properties = PropertiesService.getScriptProperties();
   var expectedKey = properties.getProperty('TOUCHDESIGNER_API_KEY');
@@ -220,51 +229,44 @@ function FW_getTouchDesignerEvents_(event) {
     return FW_jsonResponse_({ ok: false, error: 'unauthorized' });
   }
 
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(FW_responseSheetName_());
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
+    FW_touchDesignerEventSheetName_(),
+  );
   lastRow = sheet ? Math.max(1, sheet.getLastRow()) : 1;
   suppliedCursor = params.after;
   bootstrap = suppliedCursor === undefined || suppliedCursor === '';
   after = bootstrap ? Math.max(1, lastRow - 1) : Number(suppliedCursor);
 
-  if (!Number.isInteger(after) || after < 1 || after > lastRow) {
+  if (!Number.isInteger(after) || after < 1) {
     return FW_jsonResponse_({ ok: false, error: 'invalid_cursor' });
+  }
+
+  // Existing TouchDesigner projects may still hold a Responses row cursor.
+  // Reset it safely to the event queue on the first request after this upgrade.
+  if (after > lastRow) {
+    after = Math.max(1, lastRow - 1);
   }
 
   count = Math.min(50, lastRow - after);
 
   if (sheet && count > 0) {
-    var headers = sheet
-      .getRange(1, 1, 1, Math.max(sheet.getLastColumn(), FW_responseHeaders_().length))
-      .getDisplayValues()[0];
-    var emotionColumn = headers.indexOf('ผลอารมณ์') + 1;
-    var flowerColumn = headers.indexOf('ดอกไม้') + 1;
-    var titleColumn = headers.indexOf('ชื่อผลลัพธ์') + 1;
-    var identityRows = sheet.getRange(after + 1, 1, count, 3).getDisplayValues();
-    var resultRows = sheet
-      .getRange(after + 1, emotionColumn, count, titleColumn - emotionColumn + 1)
+    var rows = sheet
+      .getRange(after + 1, 1, count, FW_touchDesignerEventHeaders_().length)
       .getDisplayValues();
-    var flowerMap = FW_touchDesignerFlowerMap_();
 
     for (var i = 0; i < count; i += 1) {
-      var emotion = String(resultRows[i][0] || '');
-      var flower = flowerMap[emotion];
-
-      if (!identityRows[i][0] || !flower) {
-        return FW_jsonResponse_({
-          ok: false,
-          error: 'invalid_event_row',
-          row: after + i + 1,
-        });
-      }
-
       events.push({
-        eventId: String(identityRows[i][0]),
-        emotion: emotion,
-        flowerId: flower.flowerId,
-        visualIndex: flower.visualIndex,
-        flower: String(resultRows[i][flowerColumn - emotionColumn] || ''),
-        resultTitle: String(resultRows[i][titleColumn - emotionColumn] || ''),
-        submittedAt: String(identityRows[i][2] || ''),
+        eventId: String(rows[i][0] || ''),
+        eventType: String(rows[i][1] || ''),
+        submissionId: String(rows[i][2] || ''),
+        emotion: String(rows[i][5] || ''),
+        flowerId: String(rows[i][6] || ''),
+        flower: String(rows[i][7] || ''),
+        resultTitle: String(rows[i][8] || ''),
+        visualIndex: Number(rows[i][9] || 0),
+        flowerNickname: String(rows[i][10] || ''),
+        nicknameSubmittedAt: String(rows[i][11] || ''),
+        submittedAt: String(rows[i][4] || ''),
       });
     }
   }
@@ -323,37 +325,90 @@ function FW_getAdminDashboard_(event) {
   return callback ? FW_jsonpResponse_(callback, body) : FW_jsonResponse_(body);
 }
 
-function FW_saveLatestTouchDesignerResult_(quiz) {
-  var flowerIds = {
-    Hope: 'sunflower',
-    Anxiety: 'lavender',
-    Serenity: 'daisy',
-    Sadness: 'striped_carnation',
-    Frustration: 'dandelion',
+function FW_appendTouchDesignerEvent_(spreadsheet, responseSheet, responseRow, eventType) {
+  var eventSheet = FW_getOrCreateSheet_(
+    spreadsheet,
+    FW_touchDesignerEventSheetName_(),
+  );
+  var responseHeaders = responseSheet
+    .getRange(1, 1, 1, responseSheet.getLastColumn())
+    .getDisplayValues()[0];
+  var responseValues = responseSheet
+    .getRange(responseRow, 1, 1, responseHeaders.length)
+    .getDisplayValues()[0];
+  var emotion = FW_responseValue_(responseHeaders, responseValues, 'ผลอารมณ์');
+  var flowerMap = FW_touchDesignerFlowerMap_();
+  var flower = flowerMap[emotion];
+  var submissionId;
+  var body;
+
+  if (!flower) {
+    return;
+  }
+
+  submissionId = FW_responseValue_(responseHeaders, responseValues, 'Submission ID');
+  body = {
+    ok: true,
+    hasResult: true,
+    eventId: submissionId + ':' + eventType + ':' + Utilities.getUuid(),
+    eventType: eventType,
+    submissionId: submissionId,
+    emotion: emotion,
+    flowerId: flower.flowerId,
+    flower: FW_responseValue_(responseHeaders, responseValues, 'ดอกไม้'),
+    resultTitle: FW_responseValue_(responseHeaders, responseValues, 'ชื่อผลลัพธ์'),
+    visualIndex: flower.visualIndex,
+    flowerNickname: FW_responseValue_(
+      responseHeaders,
+      responseValues,
+      'ชื่อเล่นของดอกไม้',
+    ),
+    nicknameSubmittedAt: FW_responseValue_(
+      responseHeaders,
+      responseValues,
+      'เวลาที่ส่งชื่อเล่น (อุปกรณ์)',
+    ),
+    submittedAt: FW_responseValue_(
+      responseHeaders,
+      responseValues,
+      'เวลาที่ส่ง (อุปกรณ์)',
+    ),
   };
-  var visualIndices = {
-    sunflower: 0,
-    lavender: 1,
-    daisy: 2,
-    striped_carnation: 3,
-    dandelion: 4,
-  };
-  var flowerId = flowerIds[quiz.result.emotion] || 'sunflower';
+
+  FW_ensureHeaders_(eventSheet, FW_touchDesignerEventHeaders_());
+  eventSheet.appendRow([
+    body.eventId,
+    body.eventType,
+    body.submissionId,
+    new Date(),
+    body.submittedAt,
+    body.emotion,
+    body.flowerId,
+    body.flower,
+    body.resultTitle,
+    body.visualIndex,
+    body.flowerNickname,
+    body.nicknameSubmittedAt,
+  ]);
 
   PropertiesService.getScriptProperties().setProperty(
     'TOUCHDESIGNER_LATEST_RESULT',
-    JSON.stringify({
-      ok: true,
-      hasResult: true,
-      eventId: quiz.submissionId,
-      emotion: quiz.result.emotion,
-      flowerId: flowerId,
-      flower: quiz.result.flower,
-      resultTitle: quiz.result.resultTitle,
-      visualIndex: visualIndices[flowerId],
-      submittedAt: quiz.submittedAt.toISOString(),
-    }),
+    JSON.stringify(body),
   );
+}
+
+function FW_responseRowHasResult_(sheet, row) {
+  var headers = sheet
+    .getRange(1, 1, 1, sheet.getLastColumn())
+    .getDisplayValues()[0];
+  var emotionColumn = headers.indexOf('ผลอารมณ์') + 1;
+
+  return Boolean(emotionColumn && sheet.getRange(row, emotionColumn).getValue());
+}
+
+function FW_responseValue_(headers, values, header) {
+  var index = headers.indexOf(header);
+  return index === -1 ? '' : String(values[index] || '');
 }
 
 function FW_appendUsageLog_(sheet, log) {
@@ -685,6 +740,10 @@ function FW_usageLogSheetName_() {
   return 'Usage Logs';
 }
 
+function FW_touchDesignerEventSheetName_() {
+  return 'TouchDesigner Events';
+}
+
 function FW_responseHeaders_() {
   return [
     'Submission ID',
@@ -725,6 +784,23 @@ function FW_nicknameHeaders_() {
   return [
     'ชื่อเล่นของดอกไม้',
     'เวลาที่บันทึกชื่อเล่น (Google)',
+    'เวลาที่ส่งชื่อเล่น (อุปกรณ์)',
+  ];
+}
+
+function FW_touchDesignerEventHeaders_() {
+  return [
+    'Event ID',
+    'Event Type',
+    'Submission ID',
+    'เวลาที่สร้าง Event (Google)',
+    'เวลาที่ส่งผลลัพธ์ (อุปกรณ์)',
+    'Emotional State',
+    'Flower ID',
+    'ดอกไม้',
+    'ชื่อผลลัพธ์',
+    'Visual Index',
+    'ชื่อเล่นของดอกไม้',
     'เวลาที่ส่งชื่อเล่น (อุปกรณ์)',
   ];
 }

@@ -18,8 +18,12 @@ TouchDesigner อ่าน JSON ทุก 1–2 วินาที
 Switch TOP เลือกภาพดอกไม้ตาม visualIndex
 ```
 
-ข้อมูลที่ TouchDesigner จะได้รับมีเพียง `emotion`, `flowerId`, `flower`,
-`resultTitle`, `visualIndex` และเวลา ไม่มีชื่อ อายุ อาชีพ หรือคำตอบรายข้อ
+ข้อมูลที่ TouchDesigner จะได้รับมี `emotion`, `flowerId`, `flower`,
+`resultTitle`, `visualIndex`, `flowerNickname` และเวลา โดยไม่มีชื่อผู้เล่น อายุ
+อาชีพ หรือคำตอบรายข้อ
+
+Apps Script จะสร้างแท็บ `TouchDesigner Events` ใน Google Sheet โดยอัตโนมัติ
+เมื่อมีผลลัพธ์ใหม่ และเพิ่ม event อีกครั้งเมื่อผู้เล่นตั้งชื่อเล่นภายหลัง
 
 ## 1. อัปเดต Google Apps Script
 
@@ -56,11 +60,15 @@ https://script.google.com/macros/s/DEPLOYMENT_ID/exec?action=events&key=API_KEY
   "events": [
     {
       "eventId": "9c976012-9b39-4e16-b6aa-6e88972b036d",
+      "eventType": "nickname_updated",
+      "submissionId": "9c976012-9b39-4e16-b6aa-6e88972b036d",
       "emotion": "Anxiety",
       "flowerId": "lavender",
       "flower": "ลาเวนเดอร์",
       "resultTitle": "ดอกไม้แห่งการปลอบประโลม",
       "visualIndex": 1,
+      "flowerNickname": "น้องลาเวนเดอร์",
+      "nicknameSubmittedAt": "2026-08-27T09:31:10.000Z",
       "submittedAt": "2026-08-27T09:30:00.000Z"
     }
   ],
@@ -128,10 +136,10 @@ Web Client DAT รองรับการส่ง HTTP GET และปุ่�
 
 เมื่อพบ `eventId` ใหม่ โค้ด callback จะ:
 
-1. เขียนข้อมูลลง `flower_result`
+1. เขียนข้อมูลดอกไม้และชื่อเล่นลง `flower_result`
 2. เปลี่ยน `flower_switch.par.index` ตาม `visualIndex`
 3. เก็บ `cursor` และเติม `after=CURSOR` กลับเข้า URL ให้อัตโนมัติ
-4. ไม่สั่งซ้ำหากยังเป็นผลของผู้เล่นคนเดิม
+4. รับ event `nickname_updated` เพิ่ม แม้เป็นผู้เล่นคนเดิม เพื่ออัปเดตชื่อเล่น
 
 หากชื่อโหนดในไฟล์ TouchDesigner ต่างจากตัวอย่าง ให้เปลี่ยนชื่อใน
 `web_client_callbacks.py` ให้ตรงกับโปรเจกต์จริง
