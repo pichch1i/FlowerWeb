@@ -120,8 +120,12 @@ function filterRecordsByDateRange(records: AdminRecord[], range: DateRange) {
     const recordDate = parseSheetDate(
       pick(record, [
         'เวลาที่บันทึก (Google)',
+        'เวลาที่บันทึกชื่อเล่น (Google)',
+        'เวลาที่บันทึกความคิดเห็น (Google)',
         'เวลาที่เกิดเหตุการณ์ (อุปกรณ์)',
         'เวลาที่ส่ง (อุปกรณ์)',
+        'เวลาที่ส่งชื่อเล่น (อุปกรณ์)',
+        'เวลาที่ส่งความคิดเห็น (อุปกรณ์)',
       ]),
     )
 
@@ -142,8 +146,9 @@ function AdminPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [activeView, setActiveView] = useState<AdminView>('logs')
-  const [dateRange, setDateRange] = useState<DateRange>('today')
+  const [activeView, setActiveView] = useState<AdminView>('responses')
+  const [dateRange, setDateRange] = useState<DateRange>('all')
+  const [lastSyncedAt, setLastSyncedAt] = useState('')
   const hasLoadedData = useRef(false)
 
   const filteredData = useMemo(() => {
@@ -194,9 +199,10 @@ function AdminPage() {
       setErrorMessage('')
 
       try {
-        const nextData = await fetchAdminDashboard(nextPassword.trim(), 300)
+        const nextData = await fetchAdminDashboard(nextPassword.trim(), 1000)
         window.sessionStorage.setItem(ADMIN_SESSION_KEY, nextPassword.trim())
         setData(nextData)
+        setLastSyncedAt(nextData.generatedAt)
         hasLoadedData.current = true
         setIsLoggedIn(true)
         setStatus('idle')
@@ -247,7 +253,7 @@ function AdminPage() {
         void loadDashboard(password, { silent: true })
       }
     }
-    const intervalId = window.setInterval(refresh, 10000)
+    const intervalId = window.setInterval(refresh, 5000)
 
     document.addEventListener('visibilitychange', refresh)
 
@@ -373,8 +379,12 @@ function AdminPage() {
               </fieldset>
 
               <div className="admin-actions">
-                <button type="button" onClick={() => void loadDashboard()}>
-                  รีเฟรชข้อมูล
+                <button
+                  type="button"
+                  onClick={() => void loadDashboard()}
+                  disabled={status === 'loading'}
+                >
+                  {status === 'loading' ? 'กำลังรีเฟรช' : 'รีเฟรชข้อมูล'}
                 </button>
                 <button
                   type="button"
@@ -389,6 +399,13 @@ function AdminPage() {
                   ออกจากระบบ
                 </button>
               </div>
+              <p className="admin-sync-status" aria-live="polite">
+                {lastSyncedAt
+                  ? `ซิงก์จาก Google Sheet ล่าสุด ${new Date(
+                      lastSyncedAt,
+                    ).toLocaleTimeString('th-TH')}`
+                  : 'กำลังซิงก์ข้อมูลจาก Google Sheet'}
+              </p>
             </div>
           ) : null}
         </header>
@@ -446,11 +463,14 @@ function AdminPage() {
                   records={filteredData.logs}
                   columns={[
                     'เวลาที่บันทึก (Google)',
+                    'เวลาที่เกิดเหตุการณ์ (อุปกรณ์)',
                     'Event Type',
                     'Page',
                     'Target',
+                    'Session ID',
                     'Submission ID',
                     'Details',
+                    'Path',
                     'Viewport',
                   ]}
                 />
@@ -460,13 +480,17 @@ function AdminPage() {
                   records={filteredData.responses}
                   columns={[
                     'เวลาที่บันทึก (Google)',
+                    'Submission ID',
                     'ชื่อ–นามสกุล',
                     'อายุ',
                     'อาชีพ',
                     'ผลอารมณ์',
                     'ดอกไม้',
                     'ชื่อผลลัพธ์',
+                    'ชื่อเล่นของดอกไม้',
+                    'เวลาที่บันทึกชื่อเล่น (Google)',
                     'ความคิดเห็นต่อผลลัพธ์',
+                    'เวลาที่บันทึกความคิดเห็น (Google)',
                   ]}
                 />
               )}

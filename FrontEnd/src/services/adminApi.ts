@@ -64,6 +64,7 @@ export function fetchAdminDashboard(
     url.searchParams.set('password', password)
     url.searchParams.set('limit', String(limit))
     url.searchParams.set('callback', callbackName)
+    url.searchParams.set('_', String(Date.now()))
 
     script.src = url.toString()
     script.async = true

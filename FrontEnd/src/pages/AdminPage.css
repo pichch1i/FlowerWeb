@@ -208,6 +208,18 @@
   gap: 10px;
 }
 
+.admin-sync-status {
+  margin: 0;
+  color: rgba(236, 211, 194, 0.68);
+  font-size: 0.82rem;
+  text-align: right;
+}
+
+.admin-actions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .admin-actions button,
 .admin-card--login button {
   min-height: 42px;
