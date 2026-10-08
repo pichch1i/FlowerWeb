@@ -36,13 +36,16 @@ jobs:
       - name: Build website
         working-directory: FrontEnd
         env:
-          VITE_BASE_PATH: /FlowerWeb/
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: npm run build
 
       - name: Prepare static site
-        run: touch FrontEnd/dist/.nojekyll
+        run: |
+          mkdir -p FrontEnd/dist/admin
+          cp FrontEnd/dist/index.html FrontEnd/dist/admin/index.html
+          touch FrontEnd/dist/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

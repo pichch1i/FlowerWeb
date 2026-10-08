@@ -56,7 +56,7 @@ SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... GOOGLE_SHEETS_WEB_APP_URL=... GOO
 
 ## GitHub Pages
 
-เพิ่ม Repository Variables `VITE_SUPABASE_URL` และ `VITE_SUPABASE_PUBLISHABLE_KEY` ก่อน deploy จากนั้น workflow จะ build ด้วย base path `/FlowerWeb/`
+เพิ่ม Repository Variables `VITE_SUPABASE_URL` และ `VITE_SUPABASE_PUBLISHABLE_KEY` ก่อน deploy จากนั้น workflow จะ build ด้วย base path ตามชื่อ repository และสร้างเส้นทาง `/admin` สำหรับหน้า Admin โดยอัตโนมัติ
 
 ## ตรวจสอบ
 
