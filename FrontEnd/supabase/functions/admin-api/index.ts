@@ -70,7 +70,6 @@ function responseRecord(row: Record<string, unknown>): Record<string, string> {
   const record: Record<string, string> = {
     'Submission ID': text(row.submission_id),
     'เวลาที่บันทึก (Supabase)': text(row.created_at),
-    'เวลาที่บันทึก (Google)': text(row.created_at),
     'เวลาที่ส่ง (อุปกรณ์)': text(row.submitted_at),
     'ชื่อ–นามสกุล': text(row.full_name),
     อายุ: text(row.age),
@@ -83,10 +82,8 @@ function responseRecord(row: Record<string, unknown>): Record<string, string> {
     'ชื่อผลลัพธ์': text(row.result_title),
     'ชื่อเล่นของดอกไม้': text(row.flower_nickname),
     'เวลาที่บันทึกชื่อเล่น (Supabase)': text(row.nickname_submitted_at),
-    'เวลาที่บันทึกชื่อเล่น (Google)': text(row.nickname_submitted_at),
     'ความคิดเห็นต่อผลลัพธ์': text(row.feedback),
     'เวลาที่บันทึกความคิดเห็น (Supabase)': text(row.feedback_submitted_at),
-    'เวลาที่บันทึกความคิดเห็น (Google)': text(row.feedback_submitted_at),
   }
 
   for (const answer of answers) {
@@ -103,7 +100,6 @@ function logRecord(row: Record<string, unknown>): Record<string, string> {
   return {
     'Log ID': text(row.event_id),
     'เวลาที่บันทึก (Supabase)': text(row.created_at),
-    'เวลาที่บันทึก (Google)': text(row.created_at),
     'เวลาที่เกิดเหตุการณ์ (อุปกรณ์)': text(row.occurred_at),
     'Session ID': text(row.session_id),
     'Submission ID': text(row.submission_id),
