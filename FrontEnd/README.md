@@ -7,7 +7,7 @@
 - Supabase Postgres เก็บคำตอบ ความยินยอม ชื่อเล่น feedback และ usage logs
 - Supabase Edge Function `quiz-api` รับข้อมูลจากผู้เล่นและเป็น feed ให้ TouchDesigner
 - Supabase Auth + Edge Function `admin-api` สำหรับหน้า Admin
-- GitHub Pages ให้บริการ frontend ที่ `/boomscape/`
+- GitHub Pages ให้บริการ frontend ที่ `/FlowerWeb/`
 
 ข้อมูลทั้งหมดผ่าน Edge Functions เท่านั้น ตารางเปิด RLS และไม่ให้ browser อ่านหรือเขียนโดยตรง
 
@@ -56,7 +56,7 @@ SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... GOOGLE_SHEETS_WEB_APP_URL=... GOO
 
 ## GitHub Pages
 
-เพิ่ม Repository Variables `VITE_SUPABASE_URL` และ `VITE_SUPABASE_PUBLISHABLE_KEY` ก่อน deploy จากนั้น workflow จะ build ด้วย base path `/boomscape/`
+เพิ่ม Repository Variables `VITE_SUPABASE_URL` และ `VITE_SUPABASE_PUBLISHABLE_KEY` ก่อน deploy จากนั้น workflow จะ build ด้วย base path `/FlowerWeb/`
 
 ## ตรวจสอบ
 

@@ -5,7 +5,7 @@ import { defineConfig } from 'vite'
 export default defineConfig(() => {
   const base =
     process.env.VITE_BASE_PATH ??
-    (process.env.GITHUB_ACTIONS ? '/boomscape/' : '/')
+    (process.env.GITHUB_ACTIONS ? '/FlowerWeb/' : '/')
 
   return {
     base,
