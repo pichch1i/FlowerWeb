@@ -11,7 +11,7 @@ import sunflowerImage from '../assets/pict/sunflower-transparent.webp'
 import {
   submitFlowerNickname,
   submitResultFeedback,
-} from '../services/googleSheets'
+} from '../services/backendApi'
 import './ResultPage.css'
 
 type ResultPageProps = {

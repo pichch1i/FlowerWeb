@@ -1,5 +1,4 @@
-const googleSheetsWebAppUrl = import.meta.env
-  .VITE_GOOGLE_SHEETS_WEB_APP_URL as string | undefined
+import { isSupabaseConfigured, requireSupabase } from './supabaseClient'
 
 export type AdminRecord = Record<string, string>
 
@@ -10,68 +9,83 @@ export type AdminDashboardData = {
   logs: AdminRecord[]
 }
 
-type AdminError = {
-  ok: false
-  error: string
-}
-
-type AdminPayload = AdminDashboardData | AdminError
-
-const CALLBACK_TIMEOUT_MS = 30000
+type AdminPayload =
+  | AdminDashboardData
+  | {
+      ok: false
+      error: string
+    }
 
 export function isAdminConfigured(): boolean {
-  return Boolean(googleSheetsWebAppUrl)
+  return isSupabaseConfigured
 }
 
-export function fetchAdminDashboard(
-  password: string,
-  limit = 200,
-): Promise<AdminDashboardData> {
-  if (!googleSheetsWebAppUrl) {
-    return Promise.reject(new Error('not_configured'))
+export async function restoreAdminSession(): Promise<boolean> {
+  if (!isSupabaseConfigured) {
+    return false
   }
 
-  return new Promise((resolve, reject) => {
-    const callbackName = `__flowerAdmin_${Date.now()}_${Math.random()
-      .toString(36)
-      .slice(2)}`
-    const script = document.createElement('script')
-    const cleanup = () => {
-      window.clearTimeout(timeout)
-      delete (window as unknown as Record<string, unknown>)[callbackName]
-      script.remove()
-    }
-    const timeout = window.setTimeout(() => {
-      cleanup()
-      reject(new Error('timeout'))
-    }, CALLBACK_TIMEOUT_MS)
+  const client = requireSupabase()
+  const { data, error } = await client.auth.getSession()
 
-    ;(window as unknown as Record<string, (payload: AdminPayload) => void>)[
-      callbackName
-    ] = (payload) => {
-      cleanup()
+  if (error) {
+    throw error
+  }
 
-      if (!payload.ok) {
-        reject(new Error(payload.error || 'admin_error'))
-        return
+  return Boolean(data.session)
+}
+
+export async function signInAdmin(
+  email: string,
+  password: string,
+): Promise<void> {
+  const client = requireSupabase()
+  const { error } = await client.auth.signInWithPassword({ email, password })
+
+  if (error) {
+    throw new Error('unauthorized')
+  }
+}
+
+export async function signOutAdmin(): Promise<void> {
+  if (!isSupabaseConfigured) {
+    return
+  }
+
+  const client = requireSupabase()
+  const { error } = await client.auth.signOut()
+
+  if (error) {
+    throw error
+  }
+}
+
+export async function fetchAdminDashboard(
+  limit = 200,
+): Promise<AdminDashboardData> {
+  const client = requireSupabase()
+  const { data, error } = await client.functions.invoke<AdminPayload>(
+    'admin-api',
+    { body: { limit } },
+  )
+
+  if (error) {
+    if ('context' in error && error.context instanceof Response) {
+      const payload = (await error.context.json().catch(() => null)) as
+        | { error?: string }
+        | null
+
+      if (payload?.error === 'unauthorized' || payload?.error === 'forbidden') {
+        throw new Error('unauthorized')
       }
-
-      resolve(payload)
     }
 
-    const url = new URL(googleSheetsWebAppUrl)
-    url.searchParams.set('action', 'admin')
-    url.searchParams.set('password', password)
-    url.searchParams.set('limit', String(limit))
-    url.searchParams.set('callback', callbackName)
-    url.searchParams.set('_', String(Date.now()))
+    throw error
+  }
 
-    script.src = url.toString()
-    script.async = true
-    script.onerror = () => {
-      cleanup()
-      reject(new Error('network_error'))
-    }
-    document.head.appendChild(script)
-  })
+  if (!data?.ok) {
+    throw new Error(data?.error || 'admin_error')
+  }
+
+  return data
 }

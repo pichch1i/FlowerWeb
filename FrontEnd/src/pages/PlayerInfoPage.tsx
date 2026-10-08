@@ -192,7 +192,7 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
               เราจะเก็บชื่อ–นามสกุล อายุ อาชีพ คำตอบทั้ง 7 ข้อ ผลลัพธ์
               ชื่อเล่นของดอกไม้และความคิดเห็นต่อผลลัพธ์ (ถ้ามี)
               รวมถึงข้อมูลการใช้งานเว็บไซต์แบบพื้นฐาน
-              เพื่อบันทึกและประเมินการใช้งานแบบทดสอบ โดยจัดเก็บใน Google Sheets
+              เพื่อบันทึกและประเมินการใช้งานแบบทดสอบ โดยจัดเก็บใน Supabase
             </p>
 
             <details className="journey-privacy__details">
@@ -212,7 +212,7 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
 
                 <h3>การจัดเก็บและการเปิดเผย</h3>
                 <p>
-                  ข้อมูลถูกส่งไปยัง Google Sheets ภายใต้บัญชีของผู้จัดทำ
+                  ข้อมูลถูกส่งไปยัง Supabase ภายใต้โครงการของผู้จัดทำ
                   จำกัดการเข้าถึงเฉพาะผู้ดูแลโครงการและผู้ให้บริการระบบที่จำเป็น
                   และจะไม่นำไปจำหน่ายหรือใช้เพื่อการโฆษณา
                 </p>
@@ -238,7 +238,7 @@ function PlayerInfoPage({ onContinue }: PlayerInfoPageProps) {
                   และบันทึกผลให้คุณได้
                 </p>
 
-                <small>ปรับปรุงล่าสุด: 2 กันยายน 2569</small>
+                <small>ปรับปรุงล่าสุด: 8 ตุลาคม 2569</small>
               </div>
             </details>
           </section>

@@ -1,5 +1,5 @@
 import type { UsageLogEvent } from '../data/quizSubmission'
-import { submitUsageLog } from './googleSheets'
+import { submitUsageLog } from './backendApi'
 
 const SESSION_STORAGE_KEY = 'flower-usage-session-id'
 

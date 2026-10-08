@@ -1,0 +1,7 @@
+project_id = "flower-journey"
+
+[functions.quiz-api]
+verify_jwt = false
+
+[functions.admin-api]
+verify_jwt = false

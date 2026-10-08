@@ -79,7 +79,9 @@ function setupTouchDesignerApiKey() {
 }
 
 function setupBoomscapeAdminPassword() {
-  var password = 'boomscape-admin-2026';
+  var password =
+    Utilities.getUuid().replace(/-/g, '') +
+    Utilities.getUuid().replace(/-/g, '');
   PropertiesService.getScriptProperties().setProperty('ADMIN_PASSWORD', password);
   console.log('Admin password: ' + password);
   return password;
@@ -329,15 +331,14 @@ function FW_getAdminDashboard_(event) {
   var callback = FW_sanitizeJsonpCallback_(params.callback);
   var suppliedPassword = String(params.password || '');
   var expectedPassword =
-    PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD') ||
-    'boomscape-admin-2026';
+    PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD');
   var spreadsheet;
   var responsesSheet;
   var logsSheet;
   var limit;
   var body;
 
-  if (suppliedPassword !== expectedPassword) {
+  if (!expectedPassword || suppliedPassword !== expectedPassword) {
     body = { ok: false, error: 'unauthorized' };
     return callback ? FW_jsonpResponse_(callback, body) : FW_jsonResponse_(body);
   }

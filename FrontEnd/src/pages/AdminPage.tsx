@@ -9,12 +9,13 @@ import {
 import {
   fetchAdminDashboard,
   isAdminConfigured,
+  restoreAdminSession,
+  signInAdmin,
+  signOutAdmin,
   type AdminDashboardData,
   type AdminRecord,
 } from '../services/adminApi'
 import './AdminPage.css'
-
-const ADMIN_SESSION_KEY = 'flower-admin-password'
 
 type AdminView = 'logs' | 'responses'
 type DateRange = 'today' | 'yesterday' | 'week' | 'all'
@@ -119,6 +120,9 @@ function filterRecordsByDateRange(records: AdminRecord[], range: DateRange) {
   return records.filter((record) => {
     const recordDate = parseSheetDate(
       pick(record, [
+        'เวลาที่บันทึก (Supabase)',
+        'เวลาที่บันทึกชื่อเล่น (Supabase)',
+        'เวลาที่บันทึกความคิดเห็น (Supabase)',
         'เวลาที่บันทึก (Google)',
         'เวลาที่บันทึกชื่อเล่น (Google)',
         'เวลาที่บันทึกความคิดเห็น (Google)',
@@ -138,10 +142,9 @@ function filterRecordsByDateRange(records: AdminRecord[], range: DateRange) {
 }
 
 function AdminPage() {
-  const [password, setPassword] = useState(
-    () => window.sessionStorage.getItem(ADMIN_SESSION_KEY) ?? '',
-  )
-  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(password))
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [data, setData] = useState<AdminDashboardData | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
@@ -188,19 +191,14 @@ function AdminPage() {
   }, [filteredData])
 
   const loadDashboard = useCallback(
-    async (nextPassword = password, options?: { silent?: boolean }) => {
-      if (!nextPassword.trim()) {
-        return
-      }
-
+    async (options?: { silent?: boolean }) => {
       if (!options?.silent) {
         setStatus('loading')
       }
       setErrorMessage('')
 
       try {
-        const nextData = await fetchAdminDashboard(nextPassword.trim(), 1000)
-        window.sessionStorage.setItem(ADMIN_SESSION_KEY, nextPassword.trim())
+        const nextData = await fetchAdminDashboard(1000)
         setData(nextData)
         setLastSyncedAt(nextData.generatedAt)
         hasLoadedData.current = true
@@ -210,7 +208,6 @@ function AdminPage() {
         setStatus('error')
 
         if (error instanceof Error && error.message === 'unauthorized') {
-          window.sessionStorage.removeItem(ADMIN_SESSION_KEY)
           setIsLoggedIn(false)
           setData(null)
           hasLoadedData.current = false
@@ -221,36 +218,47 @@ function AdminPage() {
         setErrorMessage(
           hasLoadedData.current
             ? 'รีเฟรชข้อมูลล่าสุดไม่สำเร็จ กำลังลองใหม่อัตโนมัติ'
-            : 'ยังโหลดข้อมูลไม่ได้ กรุณาตรวจ Apps Script และลองใหม่อีกครั้ง',
+            : 'ยังโหลดข้อมูลไม่ได้ กรุณาตรวจ Supabase และลองใหม่อีกครั้ง',
         )
       }
     },
-    [password],
+    [],
   )
 
-  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    void loadDashboard(password)
+    setStatus('loading')
+    setErrorMessage('')
+
+    try {
+      await signInAdmin(email.trim(), password)
+      await loadDashboard()
+    } catch {
+      setIsLoggedIn(false)
+      setStatus('error')
+      setErrorMessage('อีเมลหรือรหัสผ่านไม่ถูกต้อง หรือบัญชีนี้ไม่ใช่ Admin')
+    }
   }
 
   useEffect(() => {
-    const savedPassword = window.sessionStorage.getItem(ADMIN_SESSION_KEY)
-
-    if (savedPassword) {
-      void loadDashboard(savedPassword)
-    }
-    // Restore only the saved admin session on the first render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    void restoreAdminSession()
+      .then((hasSession) => {
+        if (hasSession) {
+          setIsLoggedIn(true)
+          void loadDashboard()
+        }
+      })
+      .catch(() => setIsLoggedIn(false))
+  }, [loadDashboard])
 
   useEffect(() => {
-    if (!isLoggedIn || !password) {
+    if (!isLoggedIn) {
       return undefined
     }
 
     const refresh = () => {
       if (document.visibilityState === 'visible') {
-        void loadDashboard(password, { silent: true })
+        void loadDashboard({ silent: true })
       }
     }
     const intervalId = window.setInterval(refresh, 5000)
@@ -261,16 +269,17 @@ function AdminPage() {
       window.clearInterval(intervalId)
       document.removeEventListener('visibilitychange', refresh)
     }
-  }, [isLoggedIn, loadDashboard, password])
+  }, [isLoggedIn, loadDashboard])
 
   if (!isAdminConfigured()) {
     return (
       <main className="admin-page">
         <section className="admin-card admin-card--login">
           <p className="admin-eyebrow">Boomscape Admin</p>
-          <h1>ยังไม่ได้ตั้งค่า Google Sheets endpoint</h1>
+          <h1>ยังไม่ได้ตั้งค่า Supabase</h1>
           <p>
-            กรุณาตั้งค่า VITE_GOOGLE_SHEETS_WEB_APP_URL ก่อนเปิดหน้า admin
+            กรุณาตั้งค่า VITE_SUPABASE_URL และ VITE_SUPABASE_PUBLISHABLE_KEY
+            ก่อนเปิดหน้า admin
           </p>
         </section>
       </main>
@@ -350,7 +359,7 @@ function AdminPage() {
           <div>
             <p className="admin-eyebrow">Boomscape Admin</p>
             <h1 id="admin-title">แดชบอร์ดการใช้งานเว็บไซต์</h1>
-            <p>ดูข้อมูลคนเข้าเว็บ การกดปุ่ม และผลลัพธ์ล่าสุดจาก Google Sheet</p>
+            <p>ดูข้อมูลคนเข้าเว็บ การกดปุ่ม และผลลัพธ์ล่าสุดจาก Supabase</p>
           </div>
 
           {isLoggedIn ? (
@@ -389,8 +398,9 @@ function AdminPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    window.sessionStorage.removeItem(ADMIN_SESSION_KEY)
+                    void signOutAdmin()
                     setIsLoggedIn(false)
+                    setEmail('')
                     setPassword('')
                     setData(null)
                     hasLoadedData.current = false
@@ -401,10 +411,10 @@ function AdminPage() {
               </div>
               <p className="admin-sync-status" aria-live="polite">
                 {lastSyncedAt
-                  ? `ซิงก์จาก Google Sheet ล่าสุด ${new Date(
+                  ? `ซิงก์จาก Supabase ล่าสุด ${new Date(
                       lastSyncedAt,
                     ).toLocaleTimeString('th-TH')}`
-                  : 'กำลังซิงก์ข้อมูลจาก Google Sheet'}
+                  : 'กำลังซิงก์ข้อมูลจาก Supabase'}
               </p>
             </div>
           ) : null}
@@ -412,6 +422,16 @@ function AdminPage() {
 
         {!isLoggedIn ? (
           <form className="admin-card admin-card--login" onSubmit={handleLogin}>
+            <label htmlFor="admin-email">อีเมล Admin</label>
+            <input
+              id="admin-email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="admin@example.com"
+              autoComplete="username"
+              required
+            />
             <label htmlFor="admin-password">รหัสผ่าน</label>
             <input
               id="admin-password"
@@ -462,7 +482,7 @@ function AdminPage() {
                   title="Log การใช้งานล่าสุด"
                   records={filteredData.logs}
                   columns={[
-                    'เวลาที่บันทึก (Google)',
+                    'เวลาที่บันทึก (Supabase)',
                     'เวลาที่เกิดเหตุการณ์ (อุปกรณ์)',
                     'Event Type',
                     'Page',
@@ -479,7 +499,7 @@ function AdminPage() {
                   title="Responses ล่าสุด"
                   records={filteredData.responses}
                   columns={[
-                    'เวลาที่บันทึก (Google)',
+                    'เวลาที่บันทึก (Supabase)',
                     'Submission ID',
                     'ชื่อ–นามสกุล',
                     'อายุ',
@@ -488,9 +508,9 @@ function AdminPage() {
                     'ดอกไม้',
                     'ชื่อผลลัพธ์',
                     'ชื่อเล่นของดอกไม้',
-                    'เวลาที่บันทึกชื่อเล่น (Google)',
+                    'เวลาที่บันทึกชื่อเล่น (Supabase)',
                     'ความคิดเห็นต่อผลลัพธ์',
-                    'เวลาที่บันทึกความคิดเห็น (Google)',
+                    'เวลาที่บันทึกความคิดเห็น (Supabase)',
                   ]}
                 />
               )}

@@ -5,13 +5,9 @@ import { extname, join, normalize, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const projectDirectory = fileURLToPath(new URL('.', import.meta.url))
-const staticDirectory = resolve(projectDirectory, 'dist/client')
+const staticDirectory = resolve(projectDirectory, 'dist')
 const port = Number.parseInt(process.env.FLOWER_WEB_PORT ?? '5174', 10)
 const host = '0.0.0.0'
-const maximumBodySize = 64 * 1024
-
-let latestResult = null
-
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
   '.html': 'text/html; charset=utf-8',
@@ -39,42 +35,6 @@ function writeJson(response, statusCode, body) {
   response.end(JSON.stringify(body))
 }
 
-function readJsonBody(request) {
-  return new Promise((resolveBody, rejectBody) => {
-    let body = ''
-
-    request.setEncoding('utf8')
-    request.on('data', (chunk) => {
-      body += chunk
-      if (Buffer.byteLength(body) > maximumBodySize) {
-        rejectBody(new Error('Request body is too large'))
-        request.destroy()
-      }
-    })
-    request.on('end', () => {
-      try {
-        resolveBody(JSON.parse(body))
-      } catch {
-        rejectBody(new Error('Invalid JSON'))
-      }
-    })
-    request.on('error', rejectBody)
-  })
-}
-
-function isValidResult(value) {
-  return Boolean(
-    value &&
-      typeof value === 'object' &&
-      typeof value.submissionId === 'string' &&
-      typeof value.completedAt === 'string' &&
-      typeof value.emotion === 'string' &&
-      typeof value.flower === 'string' &&
-      typeof value.flowerKey === 'string' &&
-      typeof value.resultTitle === 'string',
-  )
-}
-
 function serveStaticFile(requestPath, response) {
   const decodedPath = decodeURIComponent(requestPath.split('?')[0])
   const requestedPath = decodedPath === '/' ? '/index.html' : decodedPath
@@ -98,49 +58,8 @@ function serveStaticFile(requestPath, response) {
   createReadStream(filePath).pipe(response)
 }
 
-const server = createServer(async (request, response) => {
+const server = createServer((request, response) => {
   const requestUrl = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`)
-
-  if (request.method === 'OPTIONS') {
-    response.writeHead(204, {
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Origin': '*',
-    })
-    response.end()
-    return
-  }
-
-  if (requestUrl.pathname === '/api/touchdesigner/result') {
-    if (request.method === 'GET') {
-      writeJson(response, 200, {
-        ready: latestResult !== null,
-        result: latestResult,
-      })
-      return
-    }
-
-    if (request.method === 'POST') {
-      try {
-        const result = await readJsonBody(request)
-        if (!isValidResult(result)) {
-          writeJson(response, 400, { error: 'Result payload is incomplete' })
-          return
-        }
-
-        latestResult = result
-        writeJson(response, 200, { ok: true })
-      } catch (error) {
-        writeJson(response, 400, {
-          error: error instanceof Error ? error.message : 'Invalid request',
-        })
-      }
-      return
-    }
-
-    writeJson(response, 405, { error: 'Method not allowed' })
-    return
-  }
 
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     writeJson(response, 405, { error: 'Method not allowed' })
@@ -159,5 +78,5 @@ server.listen(port, host, () => {
   console.log('Flower Journey is ready')
   console.log(`This computer: http://127.0.0.1:${port}/`)
   addresses.forEach((address) => console.log(`Phone / other device: ${address}`))
-  console.log(`TouchDesigner JSON: http://127.0.0.1:${port}/api/touchdesigner/result`)
+  console.log('TouchDesigner reads results from Supabase; see touchdesigner/README.md')
 })

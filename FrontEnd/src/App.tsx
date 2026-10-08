@@ -10,9 +10,8 @@ import type {
   QuizAnswer,
   QuizOptionId,
 } from './data/quizSubmission'
-import { submitQuizResponse } from './services/googleSheets'
+import { submitQuizResponse } from './services/backendApi'
 import { logUsageEvent } from './services/usageLog'
-import { publishTouchDesignerResult } from './services/touchDesigner'
 import { preloadExperienceAssets } from './preloadAssets'
 import IntroPage from './pages/IntroPage'
 import PlayerInfoPage from './pages/PlayerInfoPage'
@@ -110,23 +109,12 @@ function App() {
       }).catch(() => {
         submissionAttempted.current = false
       })
-
-      void publishTouchDesignerResult({
-        submissionId,
-        completedAt: submittedAt,
-        emotion: completedEmotion,
-        flower: result.flower,
-        resultTitle: result.resultTitle,
-      }).catch(() => {
-        // TouchDesigner is an optional local output. The quiz still works when
-        // the bridge is not running, such as during normal Vite development.
-      })
     },
     [isAdminPage, playerInfo, privacyConsent, submissionId],
   )
 
   useEffect(() => {
-    if (isAdminPage) {
+    if (isAdminPage || !privacyConsent) {
       return
     }
 
@@ -136,7 +124,13 @@ function App() {
         answersCount: answers.length,
       },
     })
-  }, [answers.length, currentPage, isAdminPage, submissionId])
+  }, [
+    answers.length,
+    currentPage,
+    isAdminPage,
+    privacyConsent,
+    submissionId,
+  ])
 
   useEffect(() => {
     if (isAdminPage) {
@@ -353,7 +347,6 @@ function App() {
     return (
       <IntroPage
         onStart={() => {
-          logUsageEvent('button_click', 'intro', 'start-quiz')
           goToPage('player-info')
         }}
       />

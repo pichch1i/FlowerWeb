@@ -36,11 +36,13 @@ jobs:
       - name: Build website
         working-directory: FrontEnd
         env:
-          VITE_GOOGLE_SHEETS_WEB_APP_URL: https://script.google.com/macros/s/AKfycbzive7lTYQct72zT2IeqnJGxx95Qy034Zntv0UKz0cZslowcmTTyk9u4ZdP0EnZrgVarQ/exec
+          VITE_BASE_PATH: /boomscape/
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: npm run build
 
       - name: Prepare static site
-        run: touch FrontEnd/dist/client/.nojekyll
+        run: touch FrontEnd/dist/.nojekyll
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -48,7 +50,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: FrontEnd/dist/client
+          path: FrontEnd/dist
 
   deploy:
     environment:

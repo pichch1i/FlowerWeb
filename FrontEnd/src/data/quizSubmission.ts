@@ -6,7 +6,7 @@ export type PlayerInfo = {
   occupation: string
 }
 
-export const PRIVACY_NOTICE_VERSION = '2026-09-10'
+export const PRIVACY_NOTICE_VERSION = '2026-10-08'
 
 export type PrivacyConsent = {
   accepted: true

@@ -1,4 +1,7 @@
-# เชื่อม Google Sheet
+# Legacy Google Apps Script
+
+ระบบนี้ถูกแทนที่ด้วย Supabase แล้ว เก็บไว้ชั่วคราวเพื่ออ่านและย้ายข้อมูลเดิมด้วย
+`npm run supabase:migrate-google` เท่านั้น ห้ามใช้เป็น backend สำหรับ deployment ใหม่
 
 1. สร้าง Google Sheet ใหม่ แล้วเปิด **ส่วนขยาย > Apps Script**
 2. แทนที่โค้ดใน `Code.gs` ด้วยเนื้อหาจากไฟล์ `Code.gs` ในโฟลเดอร์นี้
