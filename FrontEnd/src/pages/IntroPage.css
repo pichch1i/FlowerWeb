@@ -207,7 +207,7 @@
   border: 1px solid #d08257;
   border-radius: 999px;
   color: #fffaf4;
-  background: #d98251;
+  background: linear-gradient(90deg, #b6744f 0%, #d98251 100%);
   box-shadow: 0 3px 3.8px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   font: inherit;
