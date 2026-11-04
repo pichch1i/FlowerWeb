@@ -308,7 +308,8 @@
   }
 
   .intro-page::before {
-    background-size: 32% 100%;
+    background-position: center center;
+    background-size: cover;
   }
 
   .intro-card {
