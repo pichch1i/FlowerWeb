@@ -42,13 +42,13 @@ function IntroPage({ language, onLanguageChange, onStart }: IntroPageProps) {
 
         <p className="intro-reassurance">
           <span aria-hidden="true">✦</span>
-          {isThai ? 'ไม่มีถูก ไม่มีผิด' : 'No right or wrong answers'}
+          {isThai ? 'ไม่มีถูก ไม่มีผิด' : 'There are no right or wrong answers'}
           <span aria-hidden="true">✦</span>
         </p>
 
         <div className="intro-time">
           <span className="intro-time__clock" aria-hidden="true" />
-          <span>{isThai ? 'ใช้เวลาไม่ถึง 2 นาที' : 'Takes under 2 minutes'}</span>
+          <span>{isThai ? 'ใช้เวลาไม่ถึง 2 นาที' : 'Takes less than 2 minutes'}</span>
         </div>
 
         <button className="intro-button" type="button" onClick={onStart}>
