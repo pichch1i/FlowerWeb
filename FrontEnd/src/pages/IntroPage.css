@@ -24,9 +24,9 @@
   inset: -12px;
   background-color: #f4eee4;
   background-image: url('../assets/intro-garden-bg.png');
-  background-position: center;
+  background-position: center top;
   background-repeat: no-repeat;
-  background-size: 390px 844px;
+  background-size: auto 100%;
   filter: none;
   transform: scale(1.01);
   content: '';
@@ -308,7 +308,7 @@
   }
 
   .intro-page::before {
-    background-size: 390px 844px;
+    background-size: auto 100%;
   }
 
   .intro-card {
