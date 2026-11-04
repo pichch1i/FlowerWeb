@@ -22,9 +22,17 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Prompt Light';
+  src: url('./assets/font/Prompt/Prompt-Light.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
 :root {
   --font-body:
-    'Prompt', 'Noto Sans Thai', 'Leelawadee UI', Tahoma,
+    'Prompt Light', 'Prompt', 'Noto Sans Thai', 'Leelawadee UI', Tahoma,
     sans-serif;
   --font-heading:
     'JaoTomato Thin', 'Noto Sans Thai', 'Leelawadee UI', Tahoma, sans-serif;

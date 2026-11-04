@@ -60,7 +60,7 @@
 }
 
 .intro-page .language-switcher button {
-  font-weight: 400;
+  font-weight: 300;
 }
 
 .intro-page .language-switcher > span {
@@ -98,7 +98,7 @@
   margin: 0 0 12px;
   color: #d39a7a;
   font-size: 0.78rem;
-  font-weight: 400;
+  font-weight: 300;
   letter-spacing: 0.12em;
 }
 
@@ -125,7 +125,7 @@
   margin: 28px auto 0;
   color: #461815;
   font-size: 0.97rem;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1.7;
 }
 
@@ -137,7 +137,7 @@
 .intro-message em {
   color: #d08257;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 300;
 }
 
 .intro-reassurance {
@@ -148,7 +148,7 @@
   margin: 25px 0 0;
   color: #461815;
   font-size: 1.08rem;
-  font-weight: 400;
+  font-weight: 300;
 }
 
 .intro-reassurance span {
@@ -168,7 +168,7 @@
   color: #d08257;
   background: rgba(230, 189, 167, 0.57);
   font-size: 0.82rem;
-  font-weight: 400;
+  font-weight: 300;
 }
 
 .intro-time__clock {
@@ -219,7 +219,7 @@
   cursor: pointer;
   font: inherit;
   font-size: 0.82rem;
-  font-weight: 400;
+  font-weight: 300;
   white-space: nowrap;
   transition:
     transform 180ms ease,
