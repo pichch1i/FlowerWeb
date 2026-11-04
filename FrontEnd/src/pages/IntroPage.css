@@ -23,7 +23,7 @@
   z-index: -2;
   inset: -12px;
   background-color: #f4eee4;
-  background-image: url('/intro-garden-bg.png');
+  background-image: url('../assets/intro-garden-bg.png');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
