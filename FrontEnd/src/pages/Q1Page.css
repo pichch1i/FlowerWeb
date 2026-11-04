@@ -99,7 +99,11 @@
   bottom: 0;
   left: 0;
   border-radius: 0;
-  background: url('../assets/q1-content-card.png') center / 100% 100% no-repeat;
+  background-color: #f4eee4;
+  background-image: url('../assets/q1-content-card.png');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   box-shadow: none;
   content: '';
 }
@@ -112,11 +116,12 @@
 .q1-panel.q1-panel--story-one .q1-progress {
   gap: 7px;
   position: absolute;
-  top: 34px;
-  right: 30px;
-  left: 30px;
+  top: 18px;
+  left: 50%;
+  width: min(calc(100% - 60px), 804px);
   display: block;
   text-align: center;
+  transform: translateX(-50%);
 }
 
 .q1-panel.q1-panel--story-one .q1-progress__track {
