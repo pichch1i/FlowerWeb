@@ -3,6 +3,7 @@ import type { Emotion } from './emotionResults'
 export type PlayerInfo = {
   fullName: string
   age: number
+  gender: string
   occupation: string
 }
 

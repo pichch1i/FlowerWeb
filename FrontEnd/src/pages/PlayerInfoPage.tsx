@@ -29,10 +29,18 @@ const occupations = [
   { value: 'parent', th: 'ผู้ปกครอง', en: 'Parent / Guardian' },
 ] as const
 
+const genders = [
+  { value: 'female', th: 'หญิง', en: 'Female' },
+  { value: 'male', th: 'ชาย', en: 'Male' },
+  { value: 'non-binary', th: 'ไม่ระบุ/เพศอื่น ๆ', en: 'Non-binary / other' },
+  { value: 'prefer-not-to-say', th: 'ไม่ประสงค์ระบุ', en: 'Prefer not to say' },
+] as const
+
 function PlayerInfoPage({ language, onLanguageChange, onContinue }: PlayerInfoPageProps) {
   const isThai = language === 'th'
   const [age, setAge] = useState('')
   const [isCustomAge, setIsCustomAge] = useState(false)
+  const [gender, setGender] = useState('')
   const [occupationChoice, setOccupationChoice] = useState('')
   const [customOccupation, setCustomOccupation] = useState('')
 
@@ -47,6 +55,7 @@ function PlayerInfoPage({ language, onLanguageChange, onContinue }: PlayerInfoPa
       {
         fullName: String(formData.get('fullName') ?? '').trim(),
         age: Number(age),
+        gender: String(formData.get('gender') ?? '').trim(),
         occupation:
           occupationChoice === 'other'
             ? customOccupation.trim()
@@ -143,6 +152,27 @@ function PlayerInfoPage({ language, onLanguageChange, onContinue }: PlayerInfoPa
               </div>
             </div>
 
+            <div className="journey-field journey-field--gender">
+              <span id="gender-label">{isThai ? 'เพศ' : 'Gender'}</span>
+              <div className="occupation-picker">
+                <select
+                  name="gender"
+                  value={gender}
+                  aria-labelledby="gender-label"
+                  onChange={(event) => setGender(event.target.value)}
+                  required
+                >
+                  <option value="">{isThai ? 'เลือกเพศ' : 'Select gender'}</option>
+                  {genders.map((gender) => (
+                    <option key={gender.value} value={gender[language]}>
+                      {gender[language]}
+                    </option>
+                  ))}
+                </select>
+                <span className="occupation-picker__chevron" aria-hidden="true" />
+              </div>
+            </div>
+
             <div className="journey-field journey-field--occupation">
               <span id="occupation-label">{isThai ? 'อาชีพ' : 'Occupation'}</span>
               <div className="occupation-picker">
@@ -202,8 +232,8 @@ function PlayerInfoPage({ language, onLanguageChange, onContinue }: PlayerInfoPa
 
             <p className="journey-privacy__summary">
               {isThai
-                ? 'เราจะเก็บชื่อ–นามสกุล อายุ อาชีพ คำตอบทั้ง 7 ข้อ ผลลัพธ์และความคิดเห็นต่อผลลัพธ์ (ถ้ามี) รวมถึงข้อมูลการใช้งานเว็บไซต์แบบพื้นฐาน เพื่อบันทึกและประเมินการใช้งานแบบทดสอบ โดยจัดเก็บใน Supabase'
-                : 'We collect your name, age, occupation, answers to all 7 questions, result and optional feedback, along with basic website usage data. The information is stored in Supabase to record and evaluate quiz participation.'}
+                ? 'เราจะเก็บชื่อ–นามสกุล อายุ เพศ อาชีพ คำตอบทั้ง 7 ข้อ ผลลัพธ์และความคิดเห็นต่อผลลัพธ์ (ถ้ามี) รวมถึงข้อมูลการใช้งานเว็บไซต์แบบพื้นฐาน เพื่อบันทึกและประเมินการใช้งานแบบทดสอบ โดยจัดเก็บใน Supabase'
+                : 'We collect your name, age, gender, occupation, answers to all 7 questions, result and optional feedback, along with basic website usage data. The information is stored in Supabase to record and evaluate quiz participation.'}
             </p>
 
             <details className="journey-privacy__details">
@@ -223,8 +253,8 @@ function PlayerInfoPage({ language, onLanguageChange, onContinue }: PlayerInfoPa
                 </h3>
                 <p>
                   {isThai
-                    ? 'เก็บชื่อ–นามสกุล อายุ อาชีพ ตัวเลือกและอารมณ์ของแต่ละข้อ ผลลัพธ์ และความคิดเห็นที่คุณเลือกส่ง รวมถึง log การใช้งาน เช่น การเข้าหน้าแรก การเปลี่ยนหน้า และการกดปุ่ม เพื่อสร้างผลแบบทดสอบ บันทึกการเข้าร่วม และวิเคราะห์ภาพรวมของโครงการ โดยอาศัยความยินยอมของคุณ'
-                    : 'We collect your name, age, occupation, choices and emotions for each question, result, optional feedback, and usage logs such as page views and button clicks. We use this data, with your consent, to generate the result, record participation, and analyse the project overall.'}
+                    ? 'เก็บชื่อ–นามสกุล อายุ เพศ อาชีพ ตัวเลือกและอารมณ์ของแต่ละข้อ ผลลัพธ์ และความคิดเห็นที่คุณเลือกส่ง รวมถึง log การใช้งาน เช่น การเข้าหน้าแรก การเปลี่ยนหน้า และการกดปุ่ม เพื่อสร้างผลแบบทดสอบ บันทึกการเข้าร่วม และวิเคราะห์ภาพรวมของโครงการ โดยอาศัยความยินยอมของคุณ'
+                    : 'We collect your name, age, gender, occupation, choices and emotions for each question, result, optional feedback, and usage logs such as page views and button clicks. We use this data, with your consent, to generate the result, record participation, and analyse the project overall.'}
                 </p>
 
                 <h3>{isThai ? 'การจัดเก็บและการเปิดเผย' : 'Storage and disclosure'}</h3>

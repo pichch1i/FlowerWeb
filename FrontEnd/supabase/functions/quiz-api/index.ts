@@ -223,6 +223,7 @@ async function saveQuiz(
     submitted_at: requiredDate(payload.submittedAt),
     full_name: requiredString(player?.fullName, 120),
     age,
+    gender: requiredString(player?.gender, 80),
     occupation: requiredString(player?.occupation, 120),
     consent_accepted: true,
     consent_accepted_at: requiredDate(consent.acceptedAt),

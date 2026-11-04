@@ -191,6 +191,7 @@ function App() {
       submissionId: nextSubmissionId,
       details: {
         age: nextPlayerInfo.age,
+        gender: nextPlayerInfo.gender,
         occupation: nextPlayerInfo.occupation,
       },
     })

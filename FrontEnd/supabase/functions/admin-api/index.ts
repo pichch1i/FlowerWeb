@@ -73,6 +73,7 @@ function responseRecord(row: Record<string, unknown>): Record<string, string> {
     'เวลาที่ส่ง (อุปกรณ์)': text(row.submitted_at),
     'ชื่อ–นามสกุล': text(row.full_name),
     อายุ: text(row.age),
+    เพศ: text(row.gender),
     อาชีพ: text(row.occupation),
     'ยินยอมให้ใช้ข้อมูล': text(row.consent_accepted),
     'เวลาที่ยินยอม': text(row.consent_accepted_at),

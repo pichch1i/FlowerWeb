@@ -6,28 +6,28 @@
   place-items: center;
   isolation: isolate;
   overflow: hidden;
-  padding: 22px 14px;
+  padding: 12px 10px;
   padding:
     max(22px, env(safe-area-inset-top))
     max(14px, env(safe-area-inset-right))
     max(22px, env(safe-area-inset-bottom))
     max(14px, env(safe-area-inset-left));
-  color: #f5eadf;
+  color: #461815;
   border: 0;
-  background-color: #050405;
+  background-color: #f4eee4;
   box-sizing: border-box;
 }
 
 .player-info-page::before {
   position: absolute;
   z-index: -2;
-  inset: -8px;
-  background-color: #050405;
-  background-image: url('/flower-grid-pixel-bg.webp');
-  background-position: center;
+  inset: -12px;
+  background-color: #f4eee4;
+  background-image: url('../assets/intro-garden-bg.png');
+  background-position: center top;
   background-repeat: no-repeat;
-  background-size: cover;
-  filter: saturate(0.92) brightness(0.58) contrast(1.12);
+  background-size: 100% 100%;
+  filter: none;
   content: '';
 }
 
@@ -35,9 +35,7 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  background:
-    radial-gradient(circle at 50% 46%, rgba(43, 19, 31, 0.1), rgba(2, 2, 3, 0.7) 84%),
-    linear-gradient(180deg, rgba(2, 2, 3, 0.5), transparent 46%, rgba(2, 2, 3, 0.62));
+  background: rgba(255, 250, 241, 0.12);
   content: '';
   pointer-events: none;
 }
@@ -51,23 +49,21 @@
 .journey-card {
   position: relative;
   z-index: 1;
-  width: min(100%, 680px);
-  padding: 64px 24px 36px;
+  width: min(100%, 390px);
+  padding: 58px 26px 30px;
   overflow: hidden;
-  border: 1px solid rgba(244, 200, 166, 0.2);
-  border-radius: 28px 8px 28px 8px;
-  background: linear-gradient(145deg, rgba(24, 12, 19, 0.96), rgba(8, 6, 11, 0.96));
-  box-shadow:
-    0 28px 80px rgba(0, 0, 0, 0.62),
-    inset 0 1px rgba(255, 232, 206, 0.07);
+  border: 0;
+  border-radius: 30px;
+  background: rgba(255, 250, 241, 0.18);
+  box-shadow: none;
   box-sizing: border-box;
 }
 
 @supports ((-webkit-backdrop-filter: blur(16px)) or (backdrop-filter: blur(16px))) {
   .journey-card {
-    background: linear-gradient(145deg, rgba(26, 13, 20, 0.9), rgba(7, 5, 9, 0.88));
-    -webkit-backdrop-filter: blur(14px) saturate(1.05);
-    backdrop-filter: blur(14px) saturate(1.05);
+    background: rgba(255, 250, 241, 0.12);
+    -webkit-backdrop-filter: blur(1px);
+    backdrop-filter: blur(1px);
   }
 }
 
@@ -78,7 +74,7 @@
 
 .journey-eyebrow {
   margin: 0 0 12px;
-  color: #d6a586;
+  color: #d39a7a;
   font-size: 0.76rem;
   font-weight: 400;
   letter-spacing: 0.16em;
@@ -86,7 +82,7 @@
 
 .journey-card h1 {
   margin: 0;
-  color: #fff6e9;
+  color: #461815;
   font-family: var(--font-heading);
   font-size: clamp(2.25rem, 10vw, 2.7rem);
   font-weight: 400;
@@ -96,7 +92,7 @@
 
 .journey-description {
   margin: 17px 0 0;
-  color: #c9beb8;
+  color: #461815;
   font-size: 0.91rem;
   line-height: 1.75;
 }
@@ -116,7 +112,7 @@
   display: grid;
   min-width: 0;
   gap: 9px;
-  color: #e7c5b0;
+  color: #461815;
   font-size: 0.83rem;
   font-weight: 400;
 }
@@ -128,23 +124,23 @@
 }
 
 .journey-field > span::before {
-  width: 6px;
-  height: 6px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
-  background: #e3a675;
-  box-shadow: 0 0 0 4px rgba(227, 166, 117, 0.12);
+  background: #f2d69c;
+  box-shadow: none;
   content: '';
 }
 
 .journey-field input {
   width: 100%;
-  min-height: 55px;
+  min-height: 48px;
   padding: 0 18px;
-  border: 1px solid rgba(244, 200, 166, 0.2);
-  border-radius: 15px 5px 15px 5px;
+  border: 1px solid #e3c278;
+  border-radius: 11px;
   outline: 0;
-  color: #fff6e9;
-  background: rgba(255, 246, 233, 0.07);
+  color: #461815;
+  background: rgba(255, 255, 255, 0.75);
   font: inherit;
   font-size: 0.94rem;
   font-weight: 400;
@@ -156,7 +152,7 @@
 }
 
 .journey-field input::placeholder {
-  color: #a99a97;
+  color: #aa9794;
   opacity: 1;
 }
 
@@ -174,9 +170,9 @@
 .journey-field input:-webkit-autofill,
 .journey-field input:-webkit-autofill:hover,
 .journey-field input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #fff6e9;
+  -webkit-text-fill-color: #461815;
   box-shadow:
-    inset 0 0 0 1000px #1b1118,
+    inset 0 0 0 1000px #fffaf4,
     0 0 0 4px rgba(216, 154, 112, 0.14);
   caret-color: #fff6e9;
 }
@@ -187,14 +183,14 @@
 
 .occupation-picker select {
   width: 100%;
-  min-height: 55px;
+  min-height: 48px;
   padding: 0 52px 0 18px;
-  border: 1px solid rgba(244, 200, 166, 0.2);
-  border-radius: 15px 5px 15px 5px;
+  border: 1px solid #e3c278;
+  border-radius: 11px;
   outline: 0;
   appearance: none;
-  color: #fff6e9;
-  background: rgba(255, 246, 233, 0.07);
+  color: #461815;
+  background: rgba(255, 255, 255, 0.75);
   cursor: pointer;
   font: inherit;
   font-size: 0.94rem;
@@ -232,8 +228,8 @@
   right: 21px;
   width: 9px;
   height: 9px;
-  border-right: 2px solid #d9c7ba;
-  border-bottom: 2px solid #d9c7ba;
+  border-right: 2px solid #71514b;
+  border-bottom: 2px solid #71514b;
   transform: translateY(-70%) rotate(45deg);
   pointer-events: none;
 }
@@ -290,8 +286,8 @@
   right: 21px;
   width: 9px;
   height: 9px;
-  border-right: 2px solid #d9c7ba;
-  border-bottom: 2px solid #d9c7ba;
+  border-right: 2px solid #71514b;
+  border-bottom: 2px solid #71514b;
   transform: translateY(-70%) rotate(45deg);
   pointer-events: none;
 }
@@ -310,10 +306,10 @@
   display: grid;
   gap: 13px;
   padding: 17px;
-  border: 1px solid rgba(244, 200, 166, 0.16);
-  border-radius: 18px 7px 18px 7px;
-  color: #c9beb8;
-  background: rgba(255, 246, 233, 0.055);
+  border: 1px solid #dfc99a;
+  border-radius: 18px;
+  color: #71514b;
+  background: rgba(242, 214, 156, 0.48);
 }
 
 .journey-privacy__heading {
@@ -328,8 +324,8 @@
   min-height: 30px;
   place-items: center;
   border-radius: 999px;
-  color: #fffdf7;
-  background: linear-gradient(115deg, #6e332e, #a15b45);
+  color: #461815;
+  background: #f2d69c;
   font-size: 0.63rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -342,14 +338,14 @@
 }
 
 .journey-privacy h2 {
-  color: #f1c79f;
+  color: #461815;
   font-size: 0.89rem;
   font-weight: 400;
 }
 
 .journey-privacy__heading p {
   margin-top: 2px;
-  color: #a99a97;
+  color: #8a6d66;
   font-size: 0.68rem;
 }
 
@@ -364,7 +360,7 @@
 }
 
 .journey-privacy__details summary {
-  color: #e7c5b0;
+  color: #71514b;
   cursor: pointer;
   font-size: 0.73rem;
   list-style-position: inside;
@@ -409,7 +405,7 @@
   grid-template-columns: 18px minmax(0, 1fr);
   align-items: start;
   gap: 10px;
-  color: #c9beb8;
+  color: #461815;
   cursor: pointer;
   padding: 0 3px;
   font-size: 0.73rem;
@@ -420,7 +416,7 @@
   width: 17px;
   height: 17px;
   margin: 2px 0 0;
-  accent-color: #c07955;
+  accent-color: #d98251;
 }
 
 .journey-consent input:focus-visible {
@@ -430,21 +426,21 @@
 
 .journey-button {
   display: flex;
-  min-height: 58px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   gap: 12px;
   margin-top: 8px;
   padding: 0 24px;
-  border: 1px solid rgba(255, 221, 190, 0.2);
-  border-radius: 16px 6px 16px 6px;
+  border: 1px solid #d08257;
+  border-radius: 999px;
   color: #fffdf7;
-  background: linear-gradient(115deg, #6e332e, #a15b45 55%, #c07955);
-  box-shadow: 0 14px 34px rgba(132, 58, 39, 0.38);
+  background: linear-gradient(90deg, #b6744f 0%, #d98251 100%);
+  box-shadow: 0 3px 3.8px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   font: inherit;
-  font-size: 0.97rem;
-  font-weight: 400;
+  font-size: 0.82rem;
+  font-weight: 300;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -530,9 +526,15 @@
     padding: 56px 24px;
   }
 
+  .player-info-page::before {
+    background-position: center center;
+    background-size: cover;
+  }
+
   .journey-card {
-    padding: 60px 70px 64px;
-    border-radius: 36px 10px 36px 10px;
+    width: min(100%, 390px);
+    padding: 58px 26px 30px;
+    border-radius: 30px;
   }
 
   .journey-card__intro {
@@ -548,8 +550,8 @@
   }
 
   .journey-form__row {
-    grid-template-columns: 128px minmax(0, 1fr);
-    gap: 18px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
   }
 
 }
