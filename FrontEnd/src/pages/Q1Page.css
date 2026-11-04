@@ -104,11 +104,24 @@
   z-index: 1;
 }
 
+.q1-panel.q1-panel--story-one .language-switcher {
+  top: 18px;
+  right: 18px;
+  left: auto;
+  z-index: 4;
+  transform: none;
+}
+
 .q1-panel.q1-panel--story-one .q1-progress {
   gap: 7px;
+  position: absolute;
+  top: 60px;
+  right: 28px;
+  left: 28px;
 }
 
 .q1-panel.q1-panel--story-one .q1-progress__track {
+  width: calc(100% - 42px);
   height: 7px;
   background: rgba(255, 255, 255, 0.7);
   box-shadow: none;
