@@ -15,6 +15,11 @@
   will-change: background-position, filter;
 }
 
+/* Language selection is available before the questionnaire; keep question pages clear. */
+.q1-page .language-switcher {
+  display: none !important;
+}
+
 @supports (min-height: 100svh) {
   .q1-page {
     min-height: 100svh;
