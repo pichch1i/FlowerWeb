@@ -308,7 +308,7 @@
   }
 
   .intro-page::before {
-    background-size: cover;
+    background-size: contain;
   }
 
   .intro-card {
