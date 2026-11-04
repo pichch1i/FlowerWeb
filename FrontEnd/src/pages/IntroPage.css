@@ -75,7 +75,7 @@
   padding: 58px 22px 26px;
   overflow: hidden;
   border: 0;
-  border-radius: 0;
+  border-radius: 30px;
   background: rgba(255, 250, 241, 0.12);
   box-shadow: none;
   text-align: center;
@@ -307,7 +307,7 @@
   .intro-card {
     width: min(100%, 430px);
     padding: 64px 46px 42px;
-    border-radius: 0;
+    border-radius: 30px;
   }
 
   .intro-message {
