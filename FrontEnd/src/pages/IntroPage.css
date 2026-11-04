@@ -50,6 +50,7 @@
   color: #461815;
   background: #f6eadb;
   box-shadow: 0 2px 4px rgba(70, 24, 21, 0.18);
+  opacity: 0.71;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
@@ -196,7 +197,7 @@
 .intro-button {
   display: flex;
   width: min(100%, 250px);
-  min-height: 47px;
+  min-height: 39px;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -207,10 +208,7 @@
   border-radius: 999px;
   color: #fffaf4;
   background: #d98251;
-  box-shadow:
-    0 4px 0 rgba(40, 21, 21, 0.78),
-    0 10px 20px rgba(70, 24, 21, 0.2),
-    inset 0 1px rgba(255, 234, 213, 0.35);
+  box-shadow: 0 3px 3.8px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   font: inherit;
   font-size: 0.82rem;
@@ -224,17 +222,13 @@
 .intro-button:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 5px 0 rgba(40, 21, 21, 0.78),
-    0 14px 26px rgba(70, 24, 21, 0.24),
-    inset 0 1px rgba(255, 238, 220, 0.24);
+    0 4px 4.5px rgba(0, 0, 0, 0.25);
 }
 
 .intro-button:active {
   transform: translateY(3px);
   box-shadow:
-    0 1px 0 rgba(40, 21, 21, 0.78),
-    0 4px 10px rgba(70, 24, 21, 0.16),
-    inset 0 1px rgba(255, 234, 213, 0.3);
+    0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .intro-button:focus-visible {
