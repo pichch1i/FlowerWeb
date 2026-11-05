@@ -100,7 +100,8 @@
   bottom: 0;
   left: 0;
   border-radius: 0;
-  background-color: #f4eee4;
+  /* Let the transparent rounded corners of Group 70.png reveal the garden. */
+  background-color: transparent;
   background-image: url('../assets/q1-content-card.png');
   background-position: center top;
   background-repeat: no-repeat;
