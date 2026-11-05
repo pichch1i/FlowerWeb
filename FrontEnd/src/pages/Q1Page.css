@@ -94,7 +94,8 @@
 .q1-panel.q1-panel--story-one::after {
   position: absolute;
   z-index: 0;
-  top: 210px;
+  /* Align the Group 70 card with the bottom edge of the garden scene. */
+  top: 170px;
   right: 0;
   bottom: 0;
   left: 0;
