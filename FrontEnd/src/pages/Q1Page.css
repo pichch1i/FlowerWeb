@@ -82,7 +82,7 @@
 .q1-panel.q1-panel--story-one::before {
   position: absolute;
   z-index: 0;
-  top: 82px;
+  top: 24px;
   left: 50%;
   width: min(282px, 78vw);
   height: 157px;
