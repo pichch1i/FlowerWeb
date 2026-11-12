@@ -1,24 +1,148 @@
 @import './Q1Page.css';
 
+/* Q4 follows the same composition as Q1 while using the crossroads scene. */
 .q1-page.q4-page {
-  background: #251440 url('/q4-pixel-garden-bg.webp') center / cover no-repeat;
+  position: relative;
+  padding: 12px;
+  overflow: hidden;
+  background-color: #f4eee4;
+  background-image: url('../assets/q4-garden-bg.png');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  animation: none;
 }
 
 .q1-panel.q4-panel {
-  --question-accent: #d0a07c;
-  --question-accent-soft: #efd0b3;
-  --question-selected-bg: linear-gradient(
-    110deg,
-    rgba(69, 43, 103, 0.88),
-    rgba(111, 70, 127, 0.76)
-  );
-  --question-selected-text: #eadcff;
-  --question-selected-ring: rgba(190, 145, 232, 0.16);
-  border: 1px solid #473e55;
-  border-radius: 34px;
-  background: rgba(37, 20, 64, 0.85);
+  --question-accent: #8e5ae9;
+  --question-accent-soft: #a990fd;
+  --question-selected-bg: #d98251;
+  --question-selected-text: #fffaf4;
+  --question-selected-ring: rgba(142, 90, 233, 0.2);
+  min-height: calc(100vh - 24px);
+  border: 0;
+  border-radius: 0;
+  color: #461815;
+  background: transparent;
+  box-shadow: none;
 }
 
-.q4-panel .q1-story__eyebrow {
-  color: var(--question-accent-soft);
+.q1-panel.q4-panel::before {
+  position: absolute;
+  z-index: 0;
+  top: 42px;
+  left: 50%;
+  width: min(407px, 100%);
+  height: 181px;
+  background: url('../assets/q4-crossroads.png') center / contain no-repeat;
+  transform: translateX(-50%);
+  content: '';
+}
+
+.q1-panel.q4-panel::after {
+  position: absolute;
+  z-index: 0;
+  top: 170px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-image: url('../assets/q1-content-card.png');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: none;
+  content: '';
+}
+
+.q1-panel.q4-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.q1-panel.q4-panel .q1-progress {
+  gap: 7px;
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: min(calc(100% - 60px), 804px);
+  display: block;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.q1-panel.q4-panel .q1-progress__track {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: none;
+}
+
+.q1-panel.q4-panel .q1-progress__value {
+  background: #8e5ae9;
+  box-shadow: none;
+}
+
+.q1-panel.q4-panel .q1-progress p {
+  margin-top: 5px;
+  color: #8a6d66;
+  font-size: 0.67rem;
+  text-align: right;
+}
+
+.q1-panel.q4-panel .q1-story {
+  margin-top: 112px;
+}
+
+.q1-panel.q4-panel .q1-story__eyebrow {
+  color: #a990fd;
+  font-size: 0.78rem;
+}
+
+.q1-panel.q4-panel .q1-story__situation {
+  margin-top: 28px;
+  color: #461815;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.q1-panel.q4-panel .q1-story h1 {
+  margin-top: 23px;
+  color: #8a61b5;
+  font-size: clamp(2rem, 10vw, 2.55rem);
+  font-weight: 400;
+}
+
+.q1-panel.q4-panel .q1-options {
+  gap: 10px;
+  margin-top: 23px;
+}
+
+.q1-panel.q4-panel .q1-option {
+  min-height: 53px;
+  padding: 10px 22px;
+  border: 0;
+  color: #461815;
+  background: #f3e7c2;
+  box-shadow: none;
+  font-size: 0.82rem;
+  font-weight: 300;
+}
+
+.q1-panel.q4-panel .q1-option:disabled:not(.q1-option--selected) {
+  opacity: 1;
+}
+
+.q1-panel.q4-panel .q1-option--selected {
+  border: 0;
+  color: #fffaf4;
+  background: #d98251;
+  box-shadow: 0 5px 12px rgba(70, 24, 21, 0.15);
+}
+
+@supports (min-height: 100svh) {
+  .q1-panel.q4-panel {
+    min-height: calc(100svh - 24px);
+  }
 }
