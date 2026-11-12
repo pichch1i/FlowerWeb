@@ -531,3 +531,230 @@
     transition: none;
   }
 }
+
+/* Current Bloomscape result layout: a warm, phone-first composition shared by all five flowers. */
+.result-page {
+  color: #754c34;
+  background: #f1ece1;
+}
+
+.result-page::before {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background-color: #f1ece1;
+  background-image: url('../assets/result-page-bg.png');
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  filter: none;
+  content: '';
+}
+
+.result-page::after {
+  display: none;
+}
+
+.result-hero {
+  display: block;
+  min-height: 0;
+  padding: 0 12px;
+}
+
+.result-card {
+  width: min(100%, 366px);
+  margin: 205px auto 0;
+  padding: 104px 24px 22px;
+  border: 0;
+  border-radius: 44px 44px 30px 30px;
+  color: #754c34;
+  background: rgba(241, 236, 225, 0.94);
+  box-shadow: 0 4px 8px rgba(70, 48, 34, 0.28);
+  backdrop-filter: none;
+}
+
+.result-card .language-switcher {
+  display: none;
+}
+
+.result-flower-image {
+  position: absolute;
+  top: -165px;
+  left: 50%;
+  width: 190px;
+  height: 190px;
+  margin: 0;
+  filter: none;
+  transform: translateX(-50%);
+}
+
+.result-eyebrow {
+  margin-top: 0;
+  color: #754c34;
+  font-size: 0.72rem;
+  letter-spacing: 0;
+}
+
+.result-flower-name {
+  margin-top: 7px;
+  color: #754c34;
+  font-size: 1.05rem;
+}
+
+.result-card h1 {
+  margin-top: 4px;
+  color: #4b2a1f;
+  font-size: clamp(1.25rem, 6vw, 1.55rem);
+  line-height: 1.28;
+}
+
+.result-description {
+  margin-top: 12px;
+  color: #b56c47;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.result-message {
+  margin-top: 15px;
+  padding: 10px 12px 11px;
+  border: 1px solid #dfb89a;
+  border-radius: 15px;
+  background: rgba(255, 246, 233, 0.28);
+}
+
+.result-message p {
+  color: #a17661;
+  font-size: 0.66rem;
+}
+
+.result-message blockquote {
+  margin-top: 4px;
+  color: #4b2a1f;
+  font-size: clamp(1rem, 5.2vw, 1.42rem);
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.result-emotion {
+  margin-top: 13px;
+  padding: 0;
+  border: 0;
+  color: #9b7968;
+  background: transparent;
+  font-size: 0.65rem;
+}
+
+.result-emotion strong {
+  color: #d98251;
+}
+
+.result-feedback {
+  width: min(calc(100% - 32px), 358px);
+  margin: 15px auto 42px;
+  padding: 15px 13px 13px;
+  border: 1px solid #e0b99d;
+  border-radius: 24px;
+  background: rgba(243, 225, 205, 0.78);
+  color: #754c34;
+}
+
+.result-feedback h2 {
+  color: #b56c47;
+  font-size: 0.92rem;
+}
+
+.result-feedback > p {
+  max-width: 300px;
+  color: #754c34;
+  font-size: 0.68rem;
+  line-height: 1.55;
+}
+
+.result-feedback form {
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.result-feedback label {
+  color: #754c34;
+  font-size: 0.7rem;
+}
+
+.result-feedback textarea {
+  min-height: 106px;
+  padding: 11px 12px;
+  border: 1px solid #e8b85a;
+  border-radius: 16px;
+  color: #754c34;
+  background: rgba(255, 255, 255, 0.64);
+  font-size: 0.72rem;
+}
+
+.result-feedback textarea::placeholder {
+  color: #a99488;
+}
+
+.result-feedback__footer > span {
+  color: #a17661;
+  font-size: 0.7rem;
+}
+
+.result-feedback button {
+  min-height: 32px;
+  padding: 0 15px;
+  border: 0;
+  color: #fffaf4;
+  background: #c77855;
+  font-size: 0.7rem;
+}
+
+.result-feedback .result-feedback__status {
+  color: #b56c47;
+  font-size: 0.68rem;
+}
+
+@media (max-width: 640px) {
+  .result-page {
+    min-height: 1061px;
+  }
+
+  .result-page::before {
+    position: absolute;
+    min-height: 1061px;
+    background-size: 100% auto;
+  }
+
+  .result-hero {
+    height: auto;
+    padding: 0 12px;
+  }
+
+  .result-card {
+    display: block;
+    height: auto;
+    min-height: 410px;
+    max-height: none;
+    padding: 104px 24px 22px;
+  }
+
+  .result-flower-image {
+    width: 190px;
+    height: 190px;
+    transform: translateX(-50%);
+  }
+
+  .result-feedback {
+    margin-top: 15px;
+  }
+}
+
+@media (min-width: 641px) {
+  .result-page::before {
+    background-size: max(100%, 390px) auto;
+  }
+
+  .result-card {
+    width: min(100%, 520px);
+  }
+}
