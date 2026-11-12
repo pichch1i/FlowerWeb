@@ -566,11 +566,29 @@
   margin: 205px auto 0;
   padding: 104px 24px 22px;
   border: 0;
-  border-radius: 44px 44px 30px 30px;
+  border-radius: 0;
+  overflow: visible;
+  isolation: isolate;
   color: #754c34;
-  background: rgba(241, 236, 225, 0.94);
-  box-shadow: 0 4px 8px rgba(70, 48, 34, 0.28);
+  background: transparent;
+  box-shadow: none;
   backdrop-filter: none;
+}
+
+/* Use the same transparent Group 70 card artwork as Q1 so the curved top
+   reveals the garden behind it and the lower edge keeps the reference shadow. */
+.result-card::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: url('../assets/q1-content-card.png') center / 100% 100% no-repeat;
+  content: '';
+  pointer-events: none;
+}
+
+.result-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .result-card .language-switcher {
@@ -579,6 +597,7 @@
 
 .result-flower-image {
   position: absolute;
+  z-index: 3;
   top: -165px;
   left: 50%;
   width: 190px;
@@ -586,6 +605,7 @@
   margin: 0;
   filter: none;
   transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .result-eyebrow {
@@ -736,6 +756,7 @@
     min-height: 410px;
     max-height: none;
     padding: 104px 24px 22px;
+    overflow: visible;
   }
 
   .result-flower-image {
