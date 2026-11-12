@@ -1,28 +1,150 @@
 @import './Q1Page.css';
 
+/* Q7 follows the same composition as Q1 while using the farewell-flower scene. */
 .q1-page.q7-page {
-  background: #111a11 url('/q7-pixel-garden-bg.webp') center / cover no-repeat;
+  position: relative;
+  padding: 12px;
+  overflow: hidden;
+  background-color: #f4eee4;
+  background-image: url('../assets/q7-garden-bg.png');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  animation: none;
 }
 
 .q1-panel.q7-panel {
-  --question-accent: #d69a91;
-  --question-accent-soft: #f2c6c0;
-  --question-selected-bg: linear-gradient(
-    110deg,
-    rgba(34, 70, 42, 0.9),
-    rgba(70, 103, 69, 0.76)
-  );
-  --question-selected-text: #dff2dc;
-  --question-selected-ring: rgba(130, 186, 119, 0.16);
-  border: 1px solid #3e493e;
-  border-radius: 34px;
-  background: rgba(17, 26, 17, 0.85);
+  --question-accent: #cd5a99;
+  --question-accent-soft: #e8a2c9;
+  --question-selected-bg: #d98251;
+  --question-selected-text: #fffaf4;
+  --question-selected-ring: rgba(205, 90, 153, 0.2);
+  min-height: calc(100vh - 24px);
+  border: 0;
+  border-radius: 0;
+  color: #461815;
+  background: transparent;
+  box-shadow: none;
 }
 
-.q7-panel .q1-story__eyebrow {
-  color: var(--question-accent-soft);
+.q1-panel.q7-panel::before {
+  position: absolute;
+  z-index: 0;
+  top: 42px;
+  left: 50%;
+  width: min(190px, 58vw);
+  height: 165px;
+  background: url('../assets/q7-flower.png') center / contain no-repeat;
+  transform: translateX(-50%);
+  content: '';
 }
 
-.q7-story h1 {
-  font-size: clamp(2rem, 9vw, 2.75rem);
+.q1-panel.q7-panel::after {
+  position: absolute;
+  z-index: 0;
+  top: 170px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-image: url('../assets/q1-content-card.png');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: none;
+  content: '';
+}
+
+.q1-panel.q7-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.q1-panel.q7-panel .q1-progress {
+  gap: 7px;
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: min(calc(100% - 60px), 804px);
+  display: block;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.q1-panel.q7-panel .q1-progress__track {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: none;
+}
+
+.q1-panel.q7-panel .q1-progress__value {
+  background: #f87ec1;
+  box-shadow: none;
+}
+
+.q1-panel.q7-panel .q1-progress p {
+  margin-top: 5px;
+  color: #8a6d66;
+  font-size: 0.67rem;
+  text-align: right;
+}
+
+.q1-panel.q7-panel .q1-story {
+  margin-top: 112px;
+}
+
+.q1-panel.q7-panel .q1-story__eyebrow {
+  color: #e8a2c9;
+  font-size: 0.78rem;
+}
+
+.q1-panel.q7-panel .q1-story__situation {
+  margin-top: 28px;
+  color: #461815;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.q1-panel.q7-panel .q1-story h1 {
+  width: min(100%, 340px);
+  margin: 23px auto 0;
+  color: #cd5a99;
+  font-size: clamp(1.8rem, 9vw, 2.45rem);
+  font-weight: 400;
+  line-height: 1.18;
+}
+
+.q1-panel.q7-panel .q1-options {
+  gap: 10px;
+  margin-top: 23px;
+}
+
+.q1-panel.q7-panel .q1-option {
+  min-height: 53px;
+  padding: 10px 22px;
+  border: 0;
+  color: #461815;
+  background: #f3e7c2;
+  box-shadow: none;
+  font-size: 0.82rem;
+  font-weight: 300;
+}
+
+.q1-panel.q7-panel .q1-option:disabled:not(.q1-option--selected) {
+  opacity: 1;
+}
+
+.q1-panel.q7-panel .q1-option--selected {
+  border: 0;
+  color: #fffaf4;
+  background: #d98251;
+  box-shadow: 0 5px 12px rgba(70, 24, 21, 0.15);
+}
+
+@supports (min-height: 100svh) {
+  .q1-panel.q7-panel {
+    min-height: calc(100svh - 24px);
+  }
 }
