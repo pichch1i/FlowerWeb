@@ -544,7 +544,9 @@
   inset: 0;
   background-color: #f1ece1;
   background-image: url('../assets/result-page-bg.png');
-  background-position: top center;
+  /* ResultPage.png contains a decorative phone status bar at the top.
+     Crop that baked-in strip so the web page does not show a duplicate status. */
+  background-position: center -44px;
   background-repeat: no-repeat;
   background-size: 100% auto;
   filter: none;
@@ -742,6 +744,7 @@
   .result-page::before {
     position: absolute;
     min-height: 1061px;
+    background-position: center -44px;
     background-size: 100% auto;
   }
 
