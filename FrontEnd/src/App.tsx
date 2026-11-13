@@ -44,15 +44,24 @@ type Page =
   | 'result'
 
 function App() {
-  // Keep the production quiz flow unchanged while providing a stable Daisy
-  // result preview for UI work (open with ?preview=daisy).
-  const isDaisyPreview =
-    new URLSearchParams(window.location.search).get('preview') === 'daisy'
+  // Keep the production quiz flow unchanged while providing stable result
+  // previews for UI work (open with ?preview=daisy, ?preview=sunflower, etc.).
+  const previewEmotionBySlug: Record<string, Emotion> = {
+    sunflower: 'Hope',
+    peachRose: 'Anxiety',
+    daisy: 'Serenity',
+    stripedCarnation: 'Sadness',
+    globeThistle: 'Frustration',
+  }
+  const previewEmotion =
+    previewEmotionBySlug[
+      new URLSearchParams(window.location.search).get('preview') ?? ''
+    ] ?? null
   const isAdminPage =
     window.location.pathname.replace(/\/+$/, '').endsWith('/admin') ||
     new URLSearchParams(window.location.search).get('admin') === '1'
   const [currentPage, setCurrentPage] = useState<Page>(
-    isDaisyPreview ? 'result' : 'intro',
+    previewEmotion ? 'result' : 'intro',
   )
   const [language, setLanguage] = useState<Language>(() => {
     const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
@@ -67,9 +76,8 @@ function App() {
   const submissionAttempted = useRef(false)
   const pageTimer = useRef<number | null>(null)
 
-  const resultEmotion = isDaisyPreview
-    ? 'Serenity'
-    : detectDominantEmotion(answers.map((answer) => answer.emotion))
+  const resultEmotion =
+    previewEmotion ?? detectDominantEmotion(answers.map((answer) => answer.emotion))
 
   const submitCompletedQuizResponse = useCallback(
     (completedAnswers: QuizAnswer[]) => {
