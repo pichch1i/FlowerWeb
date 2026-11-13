@@ -44,10 +44,16 @@ type Page =
   | 'result'
 
 function App() {
+  // Keep the production quiz flow unchanged while providing a stable Daisy
+  // result preview for UI work (open with ?preview=daisy).
+  const isDaisyPreview =
+    new URLSearchParams(window.location.search).get('preview') === 'daisy'
   const isAdminPage =
     window.location.pathname.replace(/\/+$/, '').endsWith('/admin') ||
     new URLSearchParams(window.location.search).get('admin') === '1'
-  const [currentPage, setCurrentPage] = useState<Page>('intro')
+  const [currentPage, setCurrentPage] = useState<Page>(
+    isDaisyPreview ? 'result' : 'intro',
+  )
   const [language, setLanguage] = useState<Language>(() => {
     const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
     return isLanguage(savedLanguage) ? savedLanguage : DEFAULT_LANGUAGE
@@ -61,9 +67,9 @@ function App() {
   const submissionAttempted = useRef(false)
   const pageTimer = useRef<number | null>(null)
 
-  const resultEmotion = detectDominantEmotion(
-    answers.map((answer) => answer.emotion),
-  )
+  const resultEmotion = isDaisyPreview
+    ? 'Serenity'
+    : detectDominantEmotion(answers.map((answer) => answer.emotion))
 
   const submitCompletedQuizResponse = useCallback(
     (completedAnswers: QuizAnswer[]) => {

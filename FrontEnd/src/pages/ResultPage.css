@@ -565,7 +565,8 @@
 
 .result-card {
   width: min(100%, 366px);
-  margin: 205px auto 0;
+  margin: 148px auto 0;
+  min-height: 390px;
   padding: 104px 24px 22px;
   border: 0;
   border-radius: 0;
@@ -600,10 +601,10 @@
 .result-flower-image {
   position: absolute;
   z-index: 3;
-  top: -165px;
+  top: -140px;
   left: 50%;
-  width: 190px;
-  height: 190px;
+  width: 250px;
+  height: 250px;
   margin: 0;
   filter: none;
   transform: translateX(-50%);
@@ -756,15 +757,15 @@
   .result-card {
     display: block;
     height: auto;
-    min-height: 410px;
+    min-height: 390px;
     max-height: none;
     padding: 104px 24px 22px;
     overflow: visible;
   }
 
   .result-flower-image {
-    width: 190px;
-    height: 190px;
+    width: 250px;
+    height: 250px;
     transform: translateX(-50%);
   }
 
