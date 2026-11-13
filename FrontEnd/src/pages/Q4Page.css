@@ -30,9 +30,9 @@
 .q1-panel.q4-panel::before {
   position: absolute;
   z-index: 0;
-  top: 66px;
+  top: 34px;
   left: 50%;
-  width: min(470px, 120vw);
+  width: min(500px, 128vw);
   height: auto;
   aspect-ratio: 407 / 181;
   background: url('../assets/q4-crossroads.png') center / contain no-repeat;
