@@ -43,7 +43,7 @@
 
 @media (min-width: 700px) {
   .q1-panel.q4-panel::before {
-    width: min(760px, calc(100vw - 48px));
+    width: min(900px, calc(100vw - 32px));
   }
 }
 
