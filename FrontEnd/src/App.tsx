@@ -57,11 +57,15 @@ function App() {
     previewEmotionBySlug[
       new URLSearchParams(window.location.search).get('preview') ?? ''
     ] ?? null
+  const previewQuestion =
+    new URLSearchParams(window.location.search).get('preview') === 'q4'
+      ? 'q4'
+      : null
   const isAdminPage =
     window.location.pathname.replace(/\/+$/, '').endsWith('/admin') ||
     new URLSearchParams(window.location.search).get('admin') === '1'
   const [currentPage, setCurrentPage] = useState<Page>(
-    previewEmotion ? 'result' : 'intro',
+    previewQuestion ?? (previewEmotion ? 'result' : 'intro'),
   )
   const [language, setLanguage] = useState<Language>(() => {
     const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
