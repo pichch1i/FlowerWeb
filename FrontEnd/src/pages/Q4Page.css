@@ -25,6 +25,7 @@
   color: #461815;
   background: transparent;
   box-shadow: none;
+  overflow: visible;
 }
 
 .q1-panel.q4-panel::before {
@@ -38,6 +39,12 @@
   background: url('../assets/q4-crossroads.png') center / contain no-repeat;
   transform: translateX(-50%);
   content: '';
+}
+
+@media (min-width: 700px) {
+  .q1-panel.q4-panel::before {
+    width: min(760px, calc(100vw - 48px));
+  }
 }
 
 .q1-panel.q4-panel::after {
