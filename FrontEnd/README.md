@@ -1,4 +1,4 @@
-# Flower Journey
+# Bloomscape.ths1
 
 เว็บแบบทดสอบดอกไม้ที่ใช้ React, TypeScript, Vite และ Supabase
 
@@ -7,7 +7,7 @@
 - Supabase Postgres เก็บคำตอบ ความยินยอม ชื่อเล่น feedback และ usage logs
 - Supabase Edge Function `quiz-api` รับข้อมูลจากผู้เล่นและเป็น feed ให้ TouchDesigner
 - Supabase Auth + Edge Function `admin-api` สำหรับหน้า Admin
-- GitHub Pages ให้บริการ frontend ที่ `/FlowerWeb/`
+- GitHub Pages ให้บริการ frontend ที่ `/Bloomscape.ths1/`
 
 ข้อมูลทั้งหมดผ่าน Edge Functions เท่านั้น ตารางเปิด RLS และไม่ให้ browser อ่านหรือเขียนโดยตรง
 

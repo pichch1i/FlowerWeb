@@ -1,4 +1,4 @@
-name: Deploy Flower Journey to GitHub Pages
+name: Deploy Bloomscape.ths1 to GitHub Pages
 
 on:
   push:
